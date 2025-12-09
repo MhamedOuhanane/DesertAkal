@@ -8,4 +8,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/004_create_table_languages.xml
   - include:
+      file: db/changelog/005_insert_default_languages.xml
+  - include:
       file: db/changelog/006_create_table_users.xml
