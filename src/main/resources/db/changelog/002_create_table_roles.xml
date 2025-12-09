@@ -7,11 +7,15 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
 
-    <changeSet id="001" author="mhamed">
-        <createTable tableName="permissions">
+    <changeSet id="002" author="mhamed">
+        <createTable tableName="roles">
 
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="uuid" type="UUID">
+                <constraints nullable="false" unique="true"/>
             </column>
 
             <column name="name" type="VARCHAR(255)">
