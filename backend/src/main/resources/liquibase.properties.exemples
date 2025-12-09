@@ -1,0 +1,5 @@
+changeLogFile=src/main/resources/db/changelog/changelog-master.xml
+url=jdbc:postgresql://localhost:5432/desertakal_db
+username=postgres
+password=password
+driver=org.postgresql.Driver
