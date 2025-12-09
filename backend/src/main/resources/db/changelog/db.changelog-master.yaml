@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/001_create_table_permissions.xml
+  - include:
+      file: db/changelog/002_create_table_roles.xml
+  - include:
+      file: db/changelog/003_create_table_role_permissions.xml
+  - include:
+      file: db/changelog/004_create_table_languages.xml
+  - include:
+      file: db/changelog/005_create_table_users.xml
