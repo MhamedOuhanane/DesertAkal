@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+
+    <changeSet id="005" author="mhamed">
+
+        <insert tableName="languages">
+            <column name="uuid" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="English"/>
+            <column name="code" value="en"/>
+        </insert>
+
+        <insert tableName="languages">
+            <column name="uuid" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="French"/>
+            <column name="code" value="fr"/>
+        </insert>
+
+        <insert tableName="languages">
+            <column name="uuid" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Arabic"/>
+            <column name="code" value="ar"/>
+        </insert>
+
+        <insert tableName="languages">
+            <column name="uuid" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Spanish"/>
+            <column name="code" value="es"/>
+        </insert>
+
+        <insert tableName="languages">
+            <column name="uuid" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Tamazight"/>
+            <column name="code" value="zgh"/>
+        </insert>
+
+    </changeSet>
+</databaseChangeLog>
