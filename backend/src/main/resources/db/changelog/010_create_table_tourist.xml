@@ -7,27 +7,31 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
 
-    <changeSet id="008" author="mhamed">
-        <createTable tableName="guides">
+    <changeSet id="010" author="mhamed">
+        <createTable tableName="tourists">
 
             <column name="id" type="BIGINT">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
-            <column name="experience_years" type="INT">
+            <column name="avatar_url" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
 
-            <column name="rating" type="DECIMAL(3,2)">
+            <column name="nationality" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="language" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
 
         </createTable>
 
         <addForeignKeyConstraint
-                baseTableName="guides"
+                baseTableName="tourists"
                 baseColumnNames="id"
-                constraintName="fk_guides"
+                constraintName="fk_tourists"
                 referencedTableName="users"
                 referencedColumnNames="id"
                 onDelete="CASCADE"

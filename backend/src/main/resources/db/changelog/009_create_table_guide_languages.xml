@@ -7,7 +7,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
 
-    <changeSet id="006" author="mhamed">
+    <changeSet id="009" author="mhamed">
         <createTable tableName="guide_languages">
 
             <column name="language_id" type="BIGINT">
@@ -22,7 +22,7 @@
 
         <addPrimaryKey
                 tableName="guide_languages"
-                columnNames="languages_id,guide_id"
+                columnNames="language_id,guide_id"
                 constraintName="pk_guide_languages"
         />
 
@@ -39,7 +39,7 @@
                 baseTableName="guide_languages"
                 baseColumnNames="guide_id"
                 constraintName="fk_guide_languages_guide"
-                referencedTableName="guide"
+                referencedTableName="guides"
                 referencedColumnNames="id"
                 onDelete="CASCADE"
         />

@@ -11,3 +11,11 @@ databaseChangeLog:
       file: db/changelog/005_insert_default_languages.xml
   - include:
       file: db/changelog/006_create_table_users.xml
+  - include:
+      file: db/changelog/007_create_table_admins.xml
+  - include:
+      file: db/changelog/008_create_table_guides.xml
+  - include:
+      file: db/changelog/009_create_table_guide_languages.xml
+  - include:
+      file: db/changelog/010_create_table_tourist.xml
