@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+
+    <changeSet id="015" author="mhamed">
+        <createTable tableName="reservations">
+
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="uuid" type="UUID">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="date" type="TIMESTAMP" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="start_date" type="TIMESTAMP" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="number_people" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="amount" type="DECIMAL(15,2)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="status" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="qr_code" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="pdf_url" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="tourist_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="guide_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="tour_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="reservations"
+                baseColumnNames="tourist_id"
+                constraintName="fk_reservations_tourist"
+                referencedTableName="tourists"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+        />
+
+        <addForeignKeyConstraint
+                baseTableName="reservations"
+                baseColumnNames="guide_id"
+                constraintName="fk_reservations_guide"
+                referencedTableName="guides"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+        />
+
+        <addForeignKeyConstraint
+                baseTableName="reservations"
+                baseColumnNames="tour_id"
+                constraintName="fk_reservations_tour"
+                referencedTableName="tours"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+        />
+
+    </changeSet>
+</databaseChangeLog>
