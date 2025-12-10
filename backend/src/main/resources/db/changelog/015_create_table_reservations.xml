@@ -46,15 +46,15 @@
                 <constraints nullable="true"/>
             </column>
 
-            <column name="tourist_id" type="INT">
+            <column name="tourist_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
 
-            <column name="guide_id" type="INT">
+            <column name="guide_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
 
-            <column name="tour_id" type="INT">
+            <column name="tour_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
 

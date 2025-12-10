@@ -29,3 +29,5 @@ databaseChangeLog:
       file: db/changelog/014_create_table_city_tours.xml
   - include:
       file: db/changelog/015_create_table_reservations.xml
+  - include:
+      file: db/changelog/016_create_table_payments.xml
