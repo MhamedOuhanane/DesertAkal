@@ -27,7 +27,7 @@
         <addForeignKeyConstraint
                 baseTableName="guides"
                 baseColumnNames="id"
-                constraintName="fk_guides"
+                constraintName="fk_guides_user"
                 referencedTableName="users"
                 referencedColumnNames="id"
                 onDelete="CASCADE"

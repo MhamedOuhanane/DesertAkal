@@ -8,7 +8,7 @@
 
 
     <changeSet id="011" author="mhamed">
-        <createTable tableName="cities">
+        <createTable tableName="tours">
 
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -18,23 +18,27 @@
                 <constraints nullable="false" unique="true"/>
             </column>
 
-            <column name="name" type="VARCHAR(100)">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="map_lat" type="DECIMAL(10,6)">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="map_lng" type="DECIMAL(10,6)">
+            <column name="title" type="VARCHAR(100)">
                 <constraints nullable="false"/>
             </column>
 
             <column name="description" type="Text">
-                <constraints nullable="false" unique="true"/>
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="durationDays" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="image" type="VARCHAR(255)">
+                <constraints nullable="false"/>
             </column>
 
             <column name="created_at" type="TIMESTAMP" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="now()">
                 <constraints nullable="false"/>
             </column>
 

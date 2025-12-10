@@ -30,7 +30,20 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="city_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
         </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="images"
+                baseColumnNames="city_id"
+                constraintName="fk_images_city"
+                referencedTableName="cities"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+        />
 
     </changeSet>
 </databaseChangeLog>

@@ -31,7 +31,7 @@
         <addForeignKeyConstraint
                 baseTableName="tourists"
                 baseColumnNames="id"
-                constraintName="fk_tourists"
+                constraintName="fk_tourists_user"
                 referencedTableName="users"
                 referencedColumnNames="id"
                 onDelete="CASCADE"

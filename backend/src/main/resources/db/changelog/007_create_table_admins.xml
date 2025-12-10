@@ -19,7 +19,7 @@
         <addForeignKeyConstraint
                 baseTableName="admins"
                 baseColumnNames="id"
-                constraintName="fk_admins"
+                constraintName="fk_admins_user"
                 referencedTableName="users"
                 referencedColumnNames="id"
                 onDelete="CASCADE"
