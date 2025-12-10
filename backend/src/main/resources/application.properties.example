@@ -1,13 +1,17 @@
 spring.application.name=desertakal
+server.port=8080
 
 spring.datasource.url=jdbc:postgresql://localhost:5432/desertakal_db
 spring.datasource.username=postgres
 spring.datasource.password=password
 spring.datasource.driver-class-name=org.postgresql.Driver
 
+spring.liquibase.enabled=true
+
 spring.jpa.hibernate.ddl-auto=none
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.show-sql=false
+spring.jpa.open-in-view=false
 
 springdoc.api-docs.path=/api-docs
 springdoc.swagger-ui.path=/swagger-ui.html
@@ -19,5 +23,3 @@ spring.docker.compose.file=../compose.yml
 spring.jackson.deserialization.fail-on-unknown-properties=false
 
 spring.mvc.throw-exception-if-no-handler-found=true
-
-server.port=8080

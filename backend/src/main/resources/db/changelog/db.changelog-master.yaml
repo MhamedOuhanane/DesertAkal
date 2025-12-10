@@ -19,3 +19,11 @@ databaseChangeLog:
       file: db/changelog/009_create_table_guide_languages.xml
   - include:
       file: db/changelog/010_create_table_tourist.xml
+  - include:
+      file: db/changelog/011_create_table_cities.xml
+  - include:
+      file: db/changelog/012_create_table_images.xml
+  - include:
+      file: db/changelog/013_create_table_tours.xml
+  - include:
+      file: db/changelog/014_create_table_city_tours.xml
