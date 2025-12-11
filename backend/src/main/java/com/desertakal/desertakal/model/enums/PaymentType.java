@@ -9,7 +9,5 @@ public enum PaymentType {
 
     private final String desc;
 
-    PaymentType(String desc) {
-        this.desc = desc;
-    }
+    PaymentType(String desc) {this.desc = desc;}
 }

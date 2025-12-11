@@ -11,7 +11,5 @@ public enum ReservationStatus {
 
     private final String desc;
 
-    ReservationStatus(String desc) {
-        this.desc = desc;
-    }
+    ReservationStatus(String desc) {this.desc = desc;}
 }

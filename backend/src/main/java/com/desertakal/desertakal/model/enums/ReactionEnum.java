@@ -13,7 +13,5 @@ public enum ReactionEnum  {
 
     private final String desc;
 
-    ReactionEnum (String desc) {
-        this.desc = desc;
-    }
+    ReactionEnum (String desc) { this.desc = desc; }
 }

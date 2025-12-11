@@ -10,7 +10,5 @@ public enum UserStatus {
 
     private final String desc;
 
-    UserStatus(String desc) {
-        this.desc = desc;
-    }
+    UserStatus(String desc) {this.desc = desc;}
 }

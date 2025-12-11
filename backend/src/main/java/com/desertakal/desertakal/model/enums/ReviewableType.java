@@ -9,7 +9,5 @@ public enum ReviewableType  {
 
     private final String desc;
 
-    ReviewableType (String desc) {
-        this.desc = desc;
-    }
+    ReviewableType (String desc) {this.desc = desc;}
 }

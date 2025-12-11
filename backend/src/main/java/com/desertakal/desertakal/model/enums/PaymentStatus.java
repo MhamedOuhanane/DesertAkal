@@ -13,7 +13,5 @@ public enum PaymentStatus {
 
     private final String desc;
 
-    PaymentStatus(String desc) {
-        this.desc = desc;
-    }
+    PaymentStatus(String desc) {this.desc = desc;}
 }
