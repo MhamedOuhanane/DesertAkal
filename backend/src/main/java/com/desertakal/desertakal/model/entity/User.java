@@ -27,10 +27,10 @@ public class User {
     @Column(columnDefinition = "uuid", updatable = false, nullable = false, unique = true)
     protected UUID uuid;
 
-    @Column(nullable = false)
+    @Column(name = "first_name", nullable = false)
     protected String firstName;
 
-    @Column(nullable = false)
+    @Column(name = "last_name", nullable = false)
     protected String lastName;
 
     @Column(nullable = false, unique = true)
