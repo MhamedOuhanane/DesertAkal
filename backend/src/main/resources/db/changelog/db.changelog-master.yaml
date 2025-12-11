@@ -35,3 +35,5 @@ databaseChangeLog:
       file: db/changelog/017_create_table_notifications.xml
   - include:
       file: db/changelog/018_create_table_reviews.xml
+  - include:
+      file: db/changelog/019_create_table_articles.xml
