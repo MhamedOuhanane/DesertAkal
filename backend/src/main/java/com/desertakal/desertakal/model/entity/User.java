@@ -17,51 +17,59 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    protected Long id;
 
+    @EqualsAndHashCode.Include
     @Column(columnDefinition = "uuid", updatable = false, nullable = false, unique = true)
-    private UUID uuid;
+    protected UUID uuid;
 
     @Column(nullable = false)
-    private String firstName;
+    protected String firstName;
 
     @Column(nullable = false)
-    private String lastName;
+    protected String lastName;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    protected String username;
 
     @Column(nullable = false, unique = true)
-    private String email;
+    protected String email;
 
     @Column(nullable = false)
-    private String password;
+    protected String password;
 
     @Column(nullable = false)
-    private String phone;
+    protected String phone;
 
     @Column(nullable = false)
-    private String photo;
+    protected String photo;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UserStatus status = UserStatus.ACTIVE;
+    protected UserStatus status = UserStatus.ACTIVE;
 
     @Column(name = "last_login_at", nullable = false)
-    private Boolean lastLoginAt;
+    protected Boolean lastLoginAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    protected LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    protected LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Role role;
+    protected Role role;
+
+    @PrePersist
+    public void prePersist(){
+        if (uuid == null)
+            uuid = UUID.randomUUID();
+    }
 }
