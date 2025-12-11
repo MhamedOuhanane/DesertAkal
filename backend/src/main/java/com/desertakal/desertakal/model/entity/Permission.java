@@ -29,4 +29,10 @@ public class Permission {
     @Builder.Default
     @ManyToMany(mappedBy = "permissions", fetch = FetchType.LAZY)
     private List<Role> roles = new ArrayList<>();
+
+    @PrePersist
+    public void prePersist(){
+        if (uuid == null)
+            uuid = UUID.randomUUID();
+    }
 }

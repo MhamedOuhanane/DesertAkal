@@ -10,15 +10,14 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "languages")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Inheritance(strategy = InheritanceType.JOINED)
-public class User {
+public class Language {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
@@ -27,34 +26,11 @@ public class User {
     @Column(columnDefinition = "uuid", updatable = false, nullable = false, unique = true)
     protected UUID uuid;
 
-    @Column(nullable = false)
-    protected String firstName;
-
-    @Column(nullable = false)
-    protected String lastName;
+    @Column(nullable = false, unique = true)
+    protected String name;
 
     @Column(nullable = false, unique = true)
-    protected String username;
-
-    @Column(nullable = false, unique = true)
-    protected String email;
-
-    @Column(nullable = false)
-    protected String password;
-
-    @Column(nullable = false)
-    protected String phone;
-
-    @Column(nullable = false)
-    protected String photo;
-
-    @Builder.Default
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    protected UserStatus status = UserStatus.ACTIVE;
-
-    @Column(name = "last_login_at", nullable = false)
-    protected LocalDateTime lastLoginAt;
+    protected String code;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
@@ -63,9 +39,6 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     protected LocalDateTime updatedAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    protected Role role;
 
     @PrePersist
     public void prePersist(){
