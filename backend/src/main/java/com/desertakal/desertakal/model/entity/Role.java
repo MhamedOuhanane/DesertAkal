@@ -34,4 +34,8 @@ public class Role {
             inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
     private List<Permission> permissions = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    private List<User> users = new ArrayList<>();
 }

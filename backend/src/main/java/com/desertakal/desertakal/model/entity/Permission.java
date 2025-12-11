@@ -26,6 +26,7 @@ public class Permission {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Builder.Default
     @ManyToMany(mappedBy = "permissions", fetch = FetchType.LAZY)
     private List<Role> roles = new ArrayList<>();
 }
