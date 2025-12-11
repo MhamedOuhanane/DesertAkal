@@ -37,3 +37,7 @@ databaseChangeLog:
       file: db/changelog/018_create_table_reviews.xml
   - include:
       file: db/changelog/019_create_table_articles.xml
+  - include:
+      file: db/changelog/020_create_table_comments.xml
+  - include:
+      file: db/changelog/021_create_table_reactions.xml
