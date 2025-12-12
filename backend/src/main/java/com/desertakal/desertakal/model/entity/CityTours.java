@@ -23,7 +23,7 @@ public class CityTours {
     @Column(nullable = false)
     private Integer order_index;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "city_id")
     private City city;
 

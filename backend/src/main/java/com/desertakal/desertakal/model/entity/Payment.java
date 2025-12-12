@@ -1,5 +1,7 @@
 package com.desertakal.desertakal.model.entity;
 
+import com.desertakal.desertakal.model.enums.PaymentStatus;
+import com.desertakal.desertakal.model.enums.PaymentType;
 import com.desertakal.desertakal.model.enums.ReservationStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,19 +10,17 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "reservations")
+@Table(name = "payments")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Reservation {
+public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
@@ -33,49 +33,29 @@ public class Reservation {
     @Column(nullable = false)
     protected LocalDateTime date;
 
-    @Column(name = "start_date", nullable = false)
-    protected LocalDateTime startDate;
-
-    @Column(name = "number_people", nullable = false)
-    protected Integer numberPeople;
-
     @Column(nullable = false, precision = 15, scale = 2)
     protected BigDecimal amount;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ReservationStatus status = ReservationStatus.PENDING;
+    private PaymentStatus status = PaymentStatus.PENDING;
 
-    @Column(name = "qr_code", nullable = false)
-    private String qrCode;
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentType type = PaymentType.PAYMENT;
 
-    @Column(name = "pdf_url", nullable = false)
-    private String pdfUrl;
+    @Column(nullable = false)
+    private String method;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     protected LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    protected LocalDateTime updatedAt;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tour_id")
-    private Tour tour;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "guide_id")
-    private Guide guide;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tourist_id")
-    private Tourist tourist;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "reservation", fetch = FetchType.LAZY)
-    private List<Payment> payments = new ArrayList<>();
+    @JoinColumn(name = "reservation_id")
+    private Reservation reservation;
 
     @PrePersist
     public void prePersist(){
