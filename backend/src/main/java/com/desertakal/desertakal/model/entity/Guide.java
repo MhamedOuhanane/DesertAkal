@@ -33,4 +33,8 @@ public class Guide extends User {
             inverseJoinColumns = @JoinColumn(name = "language_id")
     )
     private List<Language> languages = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "guide", fetch = FetchType.LAZY)
+    private List<Reservation> reservations = new ArrayList<>();
 }

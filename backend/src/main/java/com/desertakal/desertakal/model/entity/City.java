@@ -43,11 +43,13 @@ public class City {
     @Column(name = "created_at", nullable = false)
     protected LocalDateTime createdAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
     private List<Image> images = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
-    private List<CityTours> cityTours;
+    private List<CityTours> cityTours = new ArrayList<>();
 
     @PrePersist
     public void prePersist(){

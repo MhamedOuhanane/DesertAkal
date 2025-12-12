@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.model.entity;
 
+import com.desertakal.desertakal.model.enums.ReservationStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -7,19 +8,18 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "tours")
+@Table(name = "reservations")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Tour {
+public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
@@ -28,20 +28,29 @@ public class Tour {
     @Column(columnDefinition = "uuid", updatable = false, nullable = false, unique = true)
     protected UUID uuid;
 
+    @CreationTimestamp
     @Column(nullable = false)
-    private String title;
+    protected LocalDateTime date;
 
+    @Column(name = "start_date", nullable = false)
+    protected LocalDateTime startDate;
+
+    @Column(name = "number_people", nullable = false)
+    protected Integer numberPeople;
+
+    @Column(nullable = false, precision = 15, scale = 2)
+    protected BigDecimal amount;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String description;
+    private ReservationStatus status = ReservationStatus.PENDING;
 
-    @Column(nullable = false)
-    private Integer durationDays;
+    @Column(name = "qr_code", nullable = false)
+    private String qrCode;
 
-    @Column(nullable = false)
-    private String image;
-
-    @Column(nullable = false, precision = 3, scale = 2)
-    protected BigDecimal rating;
+    @Column(name = "pdf_url", nullable = false)
+    private String pdfUrl;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
@@ -51,9 +60,17 @@ public class Tour {
     @Column(name = "updated_at", nullable = false)
     protected LocalDateTime updatedAt;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "tour")
-    private List<CityTours> cityTours = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "tour_id")
+    private Tour tour;
+
+    @ManyToOne
+    @JoinColumn(name = "guide_id")
+    private Tour guide;
+
+    @ManyToOne
+    @JoinColumn(name = "tourist_id")
+    private Tour tourist;
 
     @PrePersist
     public void prePersist(){

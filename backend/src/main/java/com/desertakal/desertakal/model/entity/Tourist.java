@@ -25,4 +25,9 @@ public class Tourist extends User {
 
     @Column(nullable = false)
     private String language;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "tourist", fetch = FetchType.LAZY)
+    private List<Reservation> reservations = new ArrayList<>();
+
 }
