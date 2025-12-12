@@ -74,6 +74,10 @@ public abstract class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Notifications> notifications = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Comment> comments = new ArrayList<>();
+
     @PrePersist
     public void prePersist(){
         if (uuid == null)

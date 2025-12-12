@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -31,6 +33,9 @@ public class Article {
     @Column(name = "cover_image", nullable = false)
     private String coverImage;
 
+    @Column(name = "comment_count", nullable = false)
+    private Integer commentCount;
+
     @Column(name = "reaction_count", nullable = false)
     private Integer reactionCount;
 
@@ -43,12 +48,12 @@ public class Article {
     protected LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "city_id")
-    private City city;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
+    private List<Comment> comments = new ArrayList<>();
 
     @PrePersist
     public void prePersist(){
@@ -58,5 +63,21 @@ public class Article {
 
     public void incrementReactionCount() {
         reactionCount = (reactionCount == null ? 0 : reactionCount) + 1;
+    }
+
+    public void incrementCommentCount() {
+        commentCount = (commentCount == null ? 0 : commentCount) + 1;
+    }
+
+    public void decrementReactionCount() {
+        reactionCount = (reactionCount == null || reactionCount <= 0)
+                ? 0
+                : reactionCount - 1;
+    }
+
+    public void decrementCommentCount() {
+        commentCount = (commentCount == null || commentCount <= 0)
+                ? 0
+                : commentCount - 1;
     }
 }
