@@ -52,7 +52,7 @@ public class Review {
     @Column(name = "updated_at", nullable = false)
     protected LocalDateTime updatedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tourist")
     private Tourist tourist;
 

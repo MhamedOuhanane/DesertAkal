@@ -62,6 +62,10 @@ public class Tour implements Reviewable {
     @OneToMany(mappedBy = "tour")
     private List<CityTours> cityTours = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "tour", fetch = FetchType.LAZY)
+    private List<Reservation> reservations = new ArrayList<>();
+
     @PrePersist
     public void prePersist(){
         if (uuid == null)

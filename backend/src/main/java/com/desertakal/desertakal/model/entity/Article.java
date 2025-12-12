@@ -55,6 +55,10 @@ public class Article {
     @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
+    private List<Reaction> reactions = new ArrayList<>();
+
     @PrePersist
     public void prePersist(){
         if (uuid == null)

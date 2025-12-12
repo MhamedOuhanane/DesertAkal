@@ -32,7 +32,7 @@ public class Guide extends User implements Reviewable {
     private Integer reviewCount = 0;
 
     @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(
             name = "guide_language",
             joinColumns = @JoinColumn(name = "guide_id"),
