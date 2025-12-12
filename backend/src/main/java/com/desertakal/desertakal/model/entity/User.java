@@ -7,6 +7,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -67,6 +69,10 @@ public abstract class User {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     protected Role role;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Notifications> notifications = new ArrayList<>();
 
     @PrePersist
     public void prePersist(){
