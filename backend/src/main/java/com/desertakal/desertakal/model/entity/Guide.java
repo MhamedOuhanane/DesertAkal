@@ -1,5 +1,7 @@
 package com.desertakal.desertakal.model.entity;
 
+import com.desertakal.desertakal.model.enums.ReviewableType;
+import com.desertakal.desertakal.model.interfaces.Reviewable;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -17,13 +19,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Guide extends User {
+public class Guide extends User implements Reviewable {
     @Column(name = "experience_years", nullable = false)
     private Integer experienceYears;
 
     @Builder.Default
     @Column(nullable = false, precision = 3, scale = 2)
     private BigDecimal rating = BigDecimal.ZERO;
+
+    @Builder.Default
+    @Column(name = "review_count", nullable = false)
+    private Integer reviewCount = 0;
 
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
@@ -37,4 +43,31 @@ public class Guide extends User {
     @Builder.Default
     @OneToMany(mappedBy = "guide", fetch = FetchType.LAZY)
     private List<Reservation> reservations = new ArrayList<>();
+
+    @Override
+    public ReviewableType getReviewableType() {
+        return ReviewableType.GUIDE;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return firstName + " " + lastName;
+    }
+
+    @Override
+    public void updateAverageRating(BigDecimal newAverage) {
+        rating = newAverage;
+    }
+
+    @Override
+    public void incrementReviewCount() {
+        reviewCount = (reviewCount == null ? 0 : reviewCount) + 1;
+    }
+
+    @Override
+    public void decrementReviewCount() {
+        reviewCount = (reviewCount == null || reviewCount <= 0)
+                ? 0
+                : reviewCount - 1;
+    }
 }

@@ -1,5 +1,7 @@
 package com.desertakal.desertakal.model.entity;
 
+import com.desertakal.desertakal.model.enums.ReviewableType;
+import com.desertakal.desertakal.model.interfaces.Reviewable;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,7 +21,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Tour {
+public class Tour implements Reviewable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
@@ -40,8 +42,13 @@ public class Tour {
     @Column(nullable = false)
     private String image;
 
+    @Builder.Default
     @Column(nullable = false, precision = 3, scale = 2)
-    protected BigDecimal rating;
+    protected BigDecimal rating = BigDecimal.ZERO;
+
+    @Builder.Default
+    @Column(name = "review_count", nullable = false)
+    private Integer reviewCount = 0;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
@@ -59,5 +66,32 @@ public class Tour {
     public void prePersist(){
         if (uuid == null)
             uuid = UUID.randomUUID();
+    }
+
+    @Override
+    public ReviewableType getReviewableType() {
+        return ReviewableType.TOUR;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return title;
+    }
+
+    @Override
+    public void updateAverageRating(BigDecimal newAverage) {
+        rating = newAverage;
+    }
+
+    @Override
+    public void incrementReviewCount() {
+        reviewCount = (reviewCount == null ? 0 : reviewCount) + 1;
+    }
+
+    @Override
+    public void decrementReviewCount() {
+        reviewCount = (reviewCount == null || reviewCount <= 0)
+                ? 0
+                : reviewCount - 1;
     }
 }

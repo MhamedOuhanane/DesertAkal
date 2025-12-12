@@ -38,6 +38,8 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="review_count" type="INT" defaultValue="0" />
+
             <column name="created_at" type="TIMESTAMP" defaultValueComputed="now()">
                 <constraints nullable="false"/>
             </column>

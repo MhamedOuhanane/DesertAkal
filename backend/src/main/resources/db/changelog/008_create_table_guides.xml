@@ -22,6 +22,8 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="review_count" type="INT" defaultValue="0" />
+
         </createTable>
 
         <addForeignKeyConstraint
