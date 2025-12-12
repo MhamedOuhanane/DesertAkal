@@ -14,17 +14,11 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
-            <column name="avatar_url" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="avatar_url" type="VARCHAR(255)"/>
 
-            <column name="nationality" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="nationality" type="VARCHAR(255)"/>
 
-            <column name="language" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="language" type="VARCHAR(255)"/>
 
         </createTable>
 

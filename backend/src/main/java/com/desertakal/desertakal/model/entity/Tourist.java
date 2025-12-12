@@ -17,13 +17,10 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class Tourist extends User {
-    @Column(name = "avatar_url", nullable = false)
+    @Column(name = "avatar_url")
     private String avatarUrl;
 
-    @Column(nullable = false)
     private String nationality;
-
-    @Column(nullable = false)
     private String language;
 
     @Builder.Default

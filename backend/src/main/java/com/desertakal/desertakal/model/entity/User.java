@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.model.entity;
 
+import com.desertakal.desertakal.model.enums.OauthProvider;
 import com.desertakal.desertakal.model.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -41,13 +42,10 @@ public abstract class User {
     @Column(nullable = false, unique = true)
     protected String email;
 
-    @Column(nullable = false)
     protected String password;
 
-    @Column(nullable = false)
     protected String phone;
 
-    @Column(nullable = false)
     protected String photo;
 
     @Builder.Default
@@ -57,6 +55,15 @@ public abstract class User {
 
     @Column(name = "last_login_at", nullable = false)
     protected LocalDateTime lastLoginAt;
+
+    @Builder.Default
+    @Column(name = "oauth_linked", nullable = false)
+    private Boolean oauthLinked = false;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(name = "oauth_provider", nullable = false)
+    protected OauthProvider oauthProvider = OauthProvider.LOCAL;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
@@ -72,15 +79,15 @@ public abstract class User {
 
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Notifications> notifications = new ArrayList<>();
+    protected List<Notifications> notifications = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Comment> comments = new ArrayList<>();
+    protected List<Comment> comments = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Reaction> reactions = new ArrayList<>();
+    protected List<Reaction> reactions = new ArrayList<>();
 
 
     @PrePersist
