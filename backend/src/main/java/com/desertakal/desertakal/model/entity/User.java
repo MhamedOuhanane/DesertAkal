@@ -57,8 +57,16 @@ public abstract class User {
     protected LocalDateTime lastLoginAt;
 
     @Builder.Default
-    @Column(name = "oauth_linked", nullable = false)
-    private Boolean oauthLinked = false;
+    @Column(name = "google_linked", nullable = false)
+    private boolean googleLinked = false;
+
+    @Builder.Default
+    @Column(name = "facebook_linked", nullable = false)
+    private boolean facebookLinked = false;
+
+    @Builder.Default
+    @Column(name = "discord_linked", nullable = false)
+    private boolean discordLinked = false;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)

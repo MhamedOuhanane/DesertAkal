@@ -48,7 +48,15 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="oauth_linked" type="BOOLEAN" defaultValue="false">
+            <column name="google_linked" type="BOOLEAN" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="facebook_linked" type="BOOLEAN" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="discord_linked" type="BOOLEAN" defaultValue="false">
                 <constraints nullable="false"/>
             </column>
 
