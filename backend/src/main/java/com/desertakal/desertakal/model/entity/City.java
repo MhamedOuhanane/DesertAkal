@@ -43,8 +43,11 @@ public class City {
     @Column(name = "created_at", nullable = false)
     protected LocalDateTime createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
     private List<Image> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
+    private List<CityTours> cityTours;
 
     @PrePersist
     public void prePersist(){

@@ -37,7 +37,8 @@ public class Image {
     @Column(name = "created_at", nullable = false)
     protected LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "images", fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id")
     private City city;
 
     @PrePersist

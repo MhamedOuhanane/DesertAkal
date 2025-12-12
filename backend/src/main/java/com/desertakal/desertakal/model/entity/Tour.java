@@ -5,7 +5,9 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -38,7 +40,7 @@ public class Tour {
     private String image;
 
     @Column(nullable = false, precision = 3, scale = 2)
-    protected Boolean rating;
+    protected BigDecimal rating;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
@@ -47,6 +49,9 @@ public class Tour {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     protected LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "tour")
+    private List<CityTours> cityTours;
 
     @PrePersist
     public void prePersist(){
