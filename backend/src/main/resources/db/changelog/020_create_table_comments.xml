@@ -36,7 +36,7 @@
                 baseTableName="comments"
                 baseColumnNames="article_id"
                 constraintName="fk_comments_article"
-                referencedTableName="comments"
+                referencedTableName="articles"
                 referencedColumnNames="id"
                 onDelete="CASCADE"
         />

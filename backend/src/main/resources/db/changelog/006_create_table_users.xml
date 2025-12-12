@@ -44,22 +44,6 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="oauth_provider" type="VARCHAR(20)" defaultValue="LOCAL">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="google_linked" type="BOOLEAN" defaultValue="false">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="facebook_linked" type="BOOLEAN" defaultValue="false">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="discord_linked" type="BOOLEAN" defaultValue="false">
-                <constraints nullable="false"/>
-            </column>
-
             <column name="last_login_at" type="TIMESTAMP" defaultValueComputed="now()">
                 <constraints nullable="false"/>
             </column>

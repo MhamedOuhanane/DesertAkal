@@ -41,3 +41,5 @@ databaseChangeLog:
       file: db/changelog/020_create_table_comments.xml
   - include:
       file: db/changelog/021_create_table_reactions.xml
+  - include:
+      file: db/changelog/022_create_table_user_oauth.xml

@@ -8,7 +8,7 @@
 
 
     <changeSet id="021" author="mhamed">
-        <createTable tableName="reactions">
+        <createTable tableName="user_oauth">
 
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -18,11 +18,15 @@
                 <constraints nullable="false" unique="true"/>
             </column>
 
-            <column name="reaction" type="VARCHAR(50)">
+            <column name="provider" type="VARCHAR(20)" defaultValue="LOCAL">
                 <constraints nullable="false"/>
             </column>
 
-            <column name="article_id" type="BIGINT">
+            <column name="provider_id" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="user_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
 
@@ -33,10 +37,10 @@
         </createTable>
 
         <addForeignKeyConstraint
-                baseTableName="reactions"
-                baseColumnNames="article_id"
-                constraintName="fk_reactions_article"
-                referencedTableName="articles"
+                baseTableName="user_oauth"
+                baseColumnNames="user_id"
+                constraintName="fk_user_oauth_user"
+                referencedTableName="users"
                 referencedColumnNames="id"
                 onDelete="CASCADE"
         />
