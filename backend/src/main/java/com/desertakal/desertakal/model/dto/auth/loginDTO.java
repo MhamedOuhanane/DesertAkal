@@ -1,4 +1,4 @@
-package com.desertakal.desertakal.model.dto.login;
+package com.desertakal.desertakal.model.dto.auth;
 
 import lombok.*;
 

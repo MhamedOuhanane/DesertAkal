@@ -29,7 +29,7 @@ public class UserOAuth {
     @Column(nullable = false)
     private OauthProvider provider = OauthProvider.LOCAL;
 
-    @Column(unique = true)
+    @Column(name = "provider_id", unique = true)
     private String providerId;
 
     @CreationTimestamp

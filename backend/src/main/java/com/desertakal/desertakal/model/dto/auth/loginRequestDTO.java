@@ -1,5 +1,6 @@
-package com.desertakal.desertakal.model.dto.login;
+package com.desertakal.desertakal.model.dto.auth;
 
+import com.desertakal.desertakal.model.enums.OauthProvider;
 import lombok.*;
 
 @Getter
@@ -10,4 +11,7 @@ import lombok.*;
 public class loginRequestDTO {
     private String username;
     private String password;
+
+    private OauthProvider provider;
+    private String providerId;
 }
