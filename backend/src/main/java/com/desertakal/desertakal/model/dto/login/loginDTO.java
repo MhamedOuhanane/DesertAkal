@@ -1,0 +1,19 @@
+package com.desertakal.desertakal.model.dto.login;
+
+import lombok.*;
+
+import java.util.UUID;
+
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class loginDTO {
+    private UUID uuid;
+    private String username;
+    private String fullName;
+    private String role;
+    private String accessToken;
+    private String refreshToken;
+}
