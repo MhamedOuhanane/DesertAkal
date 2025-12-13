@@ -1,6 +1,5 @@
 package com.desertakal.desertakal.model.entity;
 
-import com.desertakal.desertakal.model.enums.OauthProvider;
 import com.desertakal.desertakal.model.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -56,23 +55,6 @@ public abstract class User {
     @Column(name = "last_login_at", nullable = false)
     protected LocalDateTime lastLoginAt;
 
-    @Builder.Default
-    @Column(name = "google_linked", nullable = false)
-    private boolean googleLinked = false;
-
-    @Builder.Default
-    @Column(name = "facebook_linked", nullable = false)
-    private boolean facebookLinked = false;
-
-    @Builder.Default
-    @Column(name = "discord_linked", nullable = false)
-    private boolean discordLinked = false;
-
-    @Builder.Default
-    @Enumerated(EnumType.STRING)
-    @Column(name = "oauth_provider", nullable = false)
-    protected OauthProvider oauthProvider = OauthProvider.LOCAL;
-
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     protected LocalDateTime createdAt;
@@ -84,6 +66,9 @@ public abstract class User {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     protected Role role;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    protected List<UserOAuth> oAuths;
 
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
