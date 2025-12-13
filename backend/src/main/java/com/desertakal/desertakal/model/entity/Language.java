@@ -22,25 +22,25 @@ import java.util.UUID;
 public class Language {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    private Long id;
 
     @EqualsAndHashCode.Include
     @Column(columnDefinition = "uuid", updatable = false, nullable = false, unique = true)
-    protected UUID uuid;
+    private UUID uuid;
 
     @Column(nullable = false, unique = true)
-    protected String name;
+    private String name;
 
     @Column(nullable = false, unique = true)
-    protected String code;
+    private String code;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
-    protected LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    protected LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
     @Builder.Default
     @ManyToMany(mappedBy = "languages", fetch = FetchType.LAZY)

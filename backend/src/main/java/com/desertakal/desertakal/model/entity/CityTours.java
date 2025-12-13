@@ -18,7 +18,7 @@ import java.util.UUID;
 public class CityTours {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    private Long id;
 
     @Column(nullable = false)
     private Integer order_index;

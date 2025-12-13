@@ -36,7 +36,7 @@ public class Notifications {
 
     @CreationTimestamp
     @Column(nullable = false)
-    protected LocalDateTime date;
+    private LocalDateTime date;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

@@ -21,27 +21,27 @@ import java.util.UUID;
 public class City {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    private Long id;
 
     @EqualsAndHashCode.Include
     @Column(columnDefinition = "uuid", updatable = false, nullable = false, unique = true)
-    protected UUID uuid;
+    private UUID uuid;
 
     @Column(nullable = false, unique = true)
     private String name;
 
     @Column(name = "map_lat", nullable = false, precision = 10, scale = 6)
-    protected BigDecimal map_lat;
+    private BigDecimal map_lat;
 
     @Column(name = "map_lng", nullable = false, precision = 10, scale = 6)
-    protected BigDecimal map_lng;
+    private BigDecimal map_lng;
 
     @Column(nullable = false)
-    protected String description;
+    private String description;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
-    protected LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @Builder.Default
     @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)

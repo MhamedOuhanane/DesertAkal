@@ -24,15 +24,15 @@ import java.util.UUID;
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    private Long id;
 
     @EqualsAndHashCode.Include
     @Column(columnDefinition = "uuid", updatable = false, nullable = false, unique = true)
-    protected UUID uuid;
+    private UUID uuid;
 
     @Builder.Default
     @Column(nullable = false, precision = 3, scale = 2)
-    protected BigDecimal rating = BigDecimal.ZERO;
+    private BigDecimal rating = BigDecimal.ZERO;
 
     @Column(nullable = false)
     private String comment;
@@ -46,11 +46,11 @@ public class Review {
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
-    protected LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    protected LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tourist")

@@ -19,11 +19,11 @@ import java.util.UUID;
 public class Reaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    private Long id;
 
     @EqualsAndHashCode.Include
     @Column(columnDefinition = "uuid", updatable = false, nullable = false, unique = true)
-    protected UUID uuid;
+    private UUID uuid;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -31,7 +31,7 @@ public class Reaction {
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
-    protected LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

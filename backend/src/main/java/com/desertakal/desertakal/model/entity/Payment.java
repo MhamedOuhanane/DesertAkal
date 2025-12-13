@@ -23,18 +23,18 @@ import java.util.UUID;
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    private Long id;
 
     @EqualsAndHashCode.Include
     @Column(columnDefinition = "uuid", updatable = false, nullable = false, unique = true)
-    protected UUID uuid;
+    private UUID uuid;
 
     @CreationTimestamp
     @Column(nullable = false)
-    protected LocalDateTime date;
+    private LocalDateTime date;
 
     @Column(nullable = false, precision = 15, scale = 2)
-    protected BigDecimal amount;
+    private BigDecimal amount;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
@@ -51,7 +51,7 @@ public class Payment {
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
-    protected LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id")

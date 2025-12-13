@@ -24,11 +24,11 @@ import java.util.UUID;
 public class Tour implements Reviewable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    private Long id;
 
     @EqualsAndHashCode.Include
     @Column(columnDefinition = "uuid", updatable = false, nullable = false, unique = true)
-    protected UUID uuid;
+    private UUID uuid;
 
     @Column(nullable = false)
     private String title;
@@ -44,7 +44,7 @@ public class Tour implements Reviewable {
 
     @Builder.Default
     @Column(nullable = false, precision = 3, scale = 2)
-    protected BigDecimal rating = BigDecimal.ZERO;
+    private BigDecimal rating = BigDecimal.ZERO;
 
     @Builder.Default
     @Column(name = "review_count", nullable = false)
@@ -52,11 +52,11 @@ public class Tour implements Reviewable {
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
-    protected LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    protected LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
     @Builder.Default
     @OneToMany(mappedBy = "tour")

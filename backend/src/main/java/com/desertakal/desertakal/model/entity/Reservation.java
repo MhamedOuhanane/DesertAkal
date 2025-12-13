@@ -23,24 +23,24 @@ import java.util.UUID;
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    private Long id;
 
     @EqualsAndHashCode.Include
     @Column(columnDefinition = "uuid", updatable = false, nullable = false, unique = true)
-    protected UUID uuid;
+    private UUID uuid;
 
     @CreationTimestamp
     @Column(nullable = false)
-    protected LocalDateTime date;
+    private LocalDateTime date;
 
     @Column(name = "start_date", nullable = false)
-    protected LocalDateTime startDate;
+    private LocalDateTime startDate;
 
     @Column(name = "number_people", nullable = false)
-    protected Integer numberPeople;
+    private Integer numberPeople;
 
     @Column(nullable = false, precision = 15, scale = 2)
-    protected BigDecimal amount;
+    private BigDecimal amount;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
@@ -55,11 +55,11 @@ public class Reservation {
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
-    protected LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    protected LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tour_id")
