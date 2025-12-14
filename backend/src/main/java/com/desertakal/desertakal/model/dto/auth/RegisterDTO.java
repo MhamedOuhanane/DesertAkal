@@ -11,20 +11,20 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class RegisterDTO {
-    private String firstName;
-    private String lastName;
+    protected String firstName;
+    protected String lastName;
 
-    private String username;
-    private String email;
+    protected String username;
+    protected String email;
 
-    private String password;
-    private String confirmPassword;
+    protected String password;
+    protected String confirmPassword;
 
-    private Long roleUuid;
+    protected Long roleUuid;
 
-    private String nationality;
-    private String language;
+    protected String nationality;
+    protected String language;
 
-    private OauthProvider oauthProvider;
-    private String providerId;
+    protected OauthProvider oauthProvider;
+    protected String providerId;
 }
