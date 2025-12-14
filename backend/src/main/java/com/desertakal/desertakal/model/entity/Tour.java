@@ -60,7 +60,7 @@ public class Tour implements Reviewable {
 
     @Builder.Default
     @OneToMany(mappedBy = "tour")
-    private List<CityTours> cityTours = new ArrayList<>();
+    private List<CityTour> cityTours = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "tour", fetch = FetchType.LAZY)

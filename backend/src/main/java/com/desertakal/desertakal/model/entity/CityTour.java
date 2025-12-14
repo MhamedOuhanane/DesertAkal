@@ -15,13 +15,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class CityTours {
+public class CityTour {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private Integer order_index;
+    private Integer orderIndex;
 
     @ManyToOne
     @JoinColumn(name = "city_id")

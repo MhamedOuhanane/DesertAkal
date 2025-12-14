@@ -49,7 +49,7 @@ public class City {
 
     @Builder.Default
     @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
-    private List<CityTours> cityTours = new ArrayList<>();
+    private List<CityTour> cityTours = new ArrayList<>();
 
     @PrePersist
     public void prePersist(){

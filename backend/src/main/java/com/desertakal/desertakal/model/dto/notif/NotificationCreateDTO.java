@@ -17,7 +17,6 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 public class NotificationCreateDTO {
     private String title;
     private String message;
