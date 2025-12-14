@@ -87,6 +87,10 @@ public abstract class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     protected List<Reaction> reactions = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    protected List<EmailVerificationToken> emailVerificationTokens = new ArrayList<>();
+
 
     @PrePersist
     public void prePersist(){

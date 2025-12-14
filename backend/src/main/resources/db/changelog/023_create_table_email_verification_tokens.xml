@@ -7,39 +7,35 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
 
-    <changeSet id="022" author="mhamed">
-        <createTable tableName="user_oauth">
+    <changeSet id="023" author="mhamed">
+        <createTable tableName="email_verification_tokens">
 
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
-            <column name="uuid" type="UUID">
+            <column name="token" type="VARCHAR(255)" defaultValue="LOCAL">
                 <constraints nullable="false" unique="true"/>
             </column>
 
-            <column name="provider" type="VARCHAR(20)" defaultValue="LOCAL">
+            <column name="expires_at" type="TIMESTAMP" defaultValueComputed="now()">
                 <constraints nullable="false"/>
             </column>
 
-            <column name="provider_id" type="VARCHAR(255)">
-                <constraints unique="true"/>
+            <column name="used" type="BOOLEAN" defaultValue="false">
+                <constraints nullable="false"/>
             </column>
 
             <column name="user_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
 
-            <column name="created_at" type="TIMESTAMP" defaultValueComputed="now()">
-                <constraints nullable="false"/>
-            </column>
-
         </createTable>
 
         <addForeignKeyConstraint
-                baseTableName="user_oauth"
+                baseTableName="email_verification_tokens"
                 baseColumnNames="user_id"
-                constraintName="fk_user_oauth_user"
+                constraintName="fk_email_verification_tokens_user"
                 referencedTableName="users"
                 referencedColumnNames="id"
                 onDelete="CASCADE"
