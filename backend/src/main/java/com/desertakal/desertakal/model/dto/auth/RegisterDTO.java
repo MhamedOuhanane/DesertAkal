@@ -2,10 +2,11 @@ package com.desertakal.desertakal.model.dto.auth;
 
 import com.desertakal.desertakal.model.enums.OauthProvider;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode

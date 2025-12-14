@@ -1,6 +1,5 @@
 package com.desertakal.desertakal.model.dto.guide;
 
-import com.desertakal.desertakal.model.dto.auth.RegisterDTO;
 import com.desertakal.desertakal.model.dto.language.LanguageDTO;
 import com.desertakal.desertakal.model.dto.user.UserDTO;
 import lombok.*;
@@ -15,7 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class GuideCreateDTO extends RegisterDTO {
+public class GuideDTO extends UserDTO {
     private Integer experienceYears;
+    private BigDecimal rating;
+    private Integer reviewCount;
     private List<LanguageDTO> languages;
 }

@@ -11,8 +11,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class LanguageDTO {
+public class LanguageFindDTO {
     private UUID uuid;
     private String name;
     private String code;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

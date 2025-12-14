@@ -15,8 +15,9 @@ import java.util.UUID;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class UserDTO {
+    @EqualsAndHashCode.Include
     protected UUID uuid;
 
     protected String firstName;
