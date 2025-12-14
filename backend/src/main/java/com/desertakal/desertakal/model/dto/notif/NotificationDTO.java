@@ -18,4 +18,5 @@ public class NotificationDTO {
     private LocalDateTime date;
     private Long userId;
     private String userName;
+    private String userPhoto;
 }

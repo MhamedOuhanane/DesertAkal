@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -16,5 +17,5 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class GuideUpdateDTO extends UserUpdateDTO {
     private Integer experienceYears;
-    private List<LanguageDTO> languages;
+    private List<UUID> languageUsUuids;
 }

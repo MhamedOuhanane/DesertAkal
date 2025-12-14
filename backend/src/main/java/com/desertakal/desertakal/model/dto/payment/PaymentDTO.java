@@ -24,4 +24,5 @@ public class PaymentDTO {
 
     private UUID reservationUuid;
     private String touristName;
+    private String touristPhoto;
 }

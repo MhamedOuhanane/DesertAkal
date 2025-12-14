@@ -24,9 +24,10 @@ public class ReservationFindDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private UUID tourUuid;
-    private String tourName;
+    private String tourTitle;
     private UUID guideUuid;
     private String guideName;
     private UUID touristUuid;
     private String touristName;
+    private String touristPhoto;
 }

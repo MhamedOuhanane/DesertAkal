@@ -15,7 +15,5 @@ public class ReservationUpdateDTO {
     private LocalDateTime startDate;
     private Integer numberPeople;
     private BigDecimal amount;
-    private UUID tourUuid;
     private UUID guideUuid;
-    private UUID touristUuid;
 }

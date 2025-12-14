@@ -20,9 +20,10 @@ public class ReservationDTO {
     private BigDecimal amount;
     private ReservationStatus status;
     private UUID tourUuid;
-    private String tourName;
+    private String tourTitle;
     private UUID guideUuid;
     private String guideName;
     private UUID touristUuid;
     private String touristName;
+    private String touristPhoto;
 }

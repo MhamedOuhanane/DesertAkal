@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -17,5 +18,5 @@ public class GuideCreateDTO extends RegisterDTO {
     private Integer experienceYears;
     private String phone;
     private String photo;
-    private List<LanguageDTO> languages;
+    private List<UUID> languageUsUuids;
 }
