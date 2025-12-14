@@ -44,7 +44,7 @@ public class City {
     private LocalDateTime createdAt;
 
     @Builder.Default
-    @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "city", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Image> images = new ArrayList<>();
 
     @Builder.Default
