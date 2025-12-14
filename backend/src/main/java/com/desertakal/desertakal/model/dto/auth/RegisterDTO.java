@@ -20,9 +20,6 @@ public class RegisterDTO {
     private String password;
     private String confirmPassword;
 
-    private String phone;
-    private String photo;
-
     private Long roleUuid;
 
     private String nationality;

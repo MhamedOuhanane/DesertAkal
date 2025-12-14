@@ -2,11 +2,9 @@ package com.desertakal.desertakal.model.dto.guide;
 
 import com.desertakal.desertakal.model.dto.auth.RegisterDTO;
 import com.desertakal.desertakal.model.dto.language.LanguageDTO;
-import com.desertakal.desertakal.model.dto.user.UserDTO;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Setter
@@ -17,5 +15,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class GuideCreateDTO extends RegisterDTO {
     private Integer experienceYears;
+    private String phone;
+    private String photo;
     private List<LanguageDTO> languages;
 }
