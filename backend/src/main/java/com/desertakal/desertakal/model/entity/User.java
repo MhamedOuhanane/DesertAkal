@@ -3,6 +3,7 @@ package com.desertakal.desertakal.model.entity;
 import com.desertakal.desertakal.model.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -15,7 +16,7 @@ import java.util.UUID;
 @Table(name = "users")
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -48,6 +49,10 @@ public abstract class User {
     protected String photo;
 
     @Builder.Default
+    @Column(name = "email_verified", nullable = false)
+    protected Boolean emailVerified = false;
+
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     protected UserStatus status = UserStatus.ACTIVE;
@@ -67,7 +72,7 @@ public abstract class User {
     @JoinColumn(name = "role_id")
     protected Role role;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     protected List<UserOAuth> oAuths;
 
     @Builder.Default

@@ -10,6 +10,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class LanguageDTO {
     private UUID uuid;
     private String name;

@@ -1,14 +1,13 @@
 package com.desertakal.desertakal.model.dto.permission;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Setter
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class PermissionRequestDTO {
     private String name;
 }

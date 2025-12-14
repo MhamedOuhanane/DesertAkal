@@ -8,7 +8,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterRequestDTO {
+@EqualsAndHashCode
+public class RegisterDTO {
     private String firstName;
     private String lastName;
 

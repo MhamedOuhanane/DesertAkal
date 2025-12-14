@@ -9,6 +9,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class loginDTO {
     private UUID uuid;
     private String username;
