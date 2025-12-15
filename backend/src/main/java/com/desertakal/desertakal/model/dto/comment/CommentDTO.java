@@ -10,8 +10,12 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentCreateDTO {
+public class CommentDTO {
+    private UUID uuid;
     private String content;
+    private LocalDateTime createdAt;
     private UUID articleUuid;
     private UUID userUuid;
+    private String userName;
+    private String userPhoto;
 }
