@@ -10,7 +10,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ArticleDTO {
+public class ArticleCreateDTO {
     private String content;
     private UUID userUuid;
 }

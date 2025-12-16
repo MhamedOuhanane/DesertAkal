@@ -2,6 +2,8 @@ package com.desertakal.desertakal.model.dto.comment;
 
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder

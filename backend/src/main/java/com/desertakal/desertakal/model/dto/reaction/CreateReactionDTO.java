@@ -3,6 +3,8 @@ package com.desertakal.desertakal.model.dto.reaction;
 import com.desertakal.desertakal.model.enums.ReactionEnum;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder

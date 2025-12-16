@@ -43,3 +43,5 @@ databaseChangeLog:
       file: db/changelog/021_create_table_reactions.xml
   - include:
       file: db/changelog/022_create_table_user_oauth.xml
+  - include:
+      file: db/changelog/024_create_table_refresh_tokens.xml

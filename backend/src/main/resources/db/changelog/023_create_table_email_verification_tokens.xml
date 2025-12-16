@@ -14,11 +14,11 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
-            <column name="token" type="VARCHAR(255)" defaultValue="LOCAL">
+            <column name="token" type="VARCHAR(255)">
                 <constraints nullable="false" unique="true"/>
             </column>
 
-            <column name="expires_at" type="TIMESTAMP" defaultValueComputed="now()">
+            <column name="expires_at" type="TIMESTAMP" defaultValueComputed="NOW() + INTERVAL '30 days'">
                 <constraints nullable="false"/>
             </column>
 

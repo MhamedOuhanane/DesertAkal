@@ -11,7 +11,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReacionDTO {
+public class ReactionDTO {
     private UUID uuid;
     private ReactionEnum reaction;
     private String emoji;
