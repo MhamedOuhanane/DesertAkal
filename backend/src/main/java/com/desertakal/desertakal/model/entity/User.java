@@ -77,7 +77,7 @@ public abstract class User {
 
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    protected List<Notifications> notifications = new ArrayList<>();
+    protected List<Notification> notifications = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)

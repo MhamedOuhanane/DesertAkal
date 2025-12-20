@@ -12,7 +12,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(source = "role", target = "role.name")
+    @Mapping(source = "role.name", target = "role")
     UserDTO toDto(User user);
 
     @Mapping(target = "oauthProviders", expression = "java(user.getOAuths() != null ? " +
