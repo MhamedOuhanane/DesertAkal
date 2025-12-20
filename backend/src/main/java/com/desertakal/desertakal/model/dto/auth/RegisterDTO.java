@@ -13,11 +13,11 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode
 public class RegisterDTO {
     @NotBlank(message = "First name is required")
-    @Size(min = 4, max = 50)
+    @Size(min = 3, max = 50, message = "First name must be between 3 and 50 characters")
     protected String firstName;
 
     @NotBlank(message = "Last name is required")
-    @Size(min = 4, max = 50)
+    @Size(min = 3, max = 50, message = "Last name must be between 3 and 50 characters")
     protected String lastName;
 
     @NotBlank
