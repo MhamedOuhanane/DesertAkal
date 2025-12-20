@@ -10,7 +10,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CityTourDTO {
-    private Integer order_index;
+    private Integer orderIndex;
     private UUID cityUuid;
     private String cityName;
 }
