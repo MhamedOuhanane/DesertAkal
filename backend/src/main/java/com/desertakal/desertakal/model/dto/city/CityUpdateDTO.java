@@ -20,6 +20,6 @@ public class CityUpdateDTO {
     private BigDecimal map_lat;
     private BigDecimal map_lng;
 
-    @Size(max = 500, message = "Description must be at most 500 characters")
+    @Size(max = 5000, message = "Description must be at most 5000 characters")
     private String description;
 }
