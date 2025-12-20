@@ -25,5 +25,4 @@ public interface CityTourMapper {
     CityTour toEntity(CityTourCreateDTO dto);
 
     List<CityTourDTO> toDtos(List<CityTour> cityTours);
-    List<CityTourFindDTO> toFindDtos(List<CityTour> cityTours);
 }

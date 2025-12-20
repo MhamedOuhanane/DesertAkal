@@ -33,5 +33,4 @@ public interface CityMapper {
     void updateEntityFromDto(CityUpdateDTO dto, @MappingTarget City city);
 
     List<CityDTO> toDtos(List<City> cities);
-    List<CityFIndDTO> toFindDtos(List<City> cities);
 }

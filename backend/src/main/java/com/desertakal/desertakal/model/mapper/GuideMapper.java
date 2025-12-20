@@ -5,28 +5,35 @@ import com.desertakal.desertakal.model.dto.guide.GuideDTO;
 import com.desertakal.desertakal.model.dto.guide.GuideFindDTO;
 import com.desertakal.desertakal.model.dto.guide.GuideUpdateDTO;
 import com.desertakal.desertakal.model.entity.Guide;
-import org.mapstruct.InheritConfiguration;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {LanguageMapper.class, UserMapper.class})
 public interface GuideMapper {
 
-    @InheritConfiguration(name = "toDto")
     GuideDTO toDto(Guide guide);
 
-    @InheritConfiguration(name = "toFindDto")
     GuideFindDTO toFindDto(Guide guide);
 
-    @InheritConfiguration(name = "toEntity")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "role", ignore = true)
     @Mapping(target = "languages", ignore = true)
     @Mapping(target = "reservations", ignore = true)
     Guide toEntity(GuideCreateDTO dto);
 
-    @InheritConfiguration(name = "updateEntityFromDto")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "photo", ignore = true)
+    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "emailVerified", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "rating", ignore = true)
     @Mapping(target = "reviewCount", ignore = true)
     @Mapping(target = "languages", ignore = true)
@@ -34,5 +41,4 @@ public interface GuideMapper {
     void updateEntityFromDto(GuideUpdateDTO dto, @MappingTarget Guide guide);
 
     List<GuideDTO> toDtos(List<Guide> guides);
-    List<GuideFindDTO> toFindDtos(List<Guide> guides);
 }

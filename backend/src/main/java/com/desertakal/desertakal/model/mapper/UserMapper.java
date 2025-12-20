@@ -45,5 +45,4 @@ public interface UserMapper {
     void updateEntityFromDto(UserUpdateDTO dto, @MappingTarget User user);
 
     List<UserDTO> toDtos(List<User> users);
-    List<UserFindDTO> toFindDtos(List<User> users);
 }

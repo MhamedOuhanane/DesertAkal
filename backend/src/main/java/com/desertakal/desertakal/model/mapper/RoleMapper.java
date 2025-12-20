@@ -36,5 +36,4 @@ public interface RoleMapper {
 
 
     List<RoleDTO> toDtos(List<Role> roles);
-    List<RoleFindDTO> toFindDtos(List<Role> roles);
 }

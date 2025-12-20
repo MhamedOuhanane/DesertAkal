@@ -36,5 +36,4 @@ public interface TourMapper {
     void updateEntityFromDto(TourUpdateDTO dto, @MappingTarget Tour tour);
 
     List<TourDTO> toDtos(List<Tour> tours);
-    List<TourFindDTO> toFindDtos(List<Tour> tours);
 }
