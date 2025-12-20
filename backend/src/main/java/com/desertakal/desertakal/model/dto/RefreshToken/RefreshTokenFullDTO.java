@@ -18,7 +18,7 @@ public class RefreshTokenFullDTO {
     private String familyId;
     private String parentToken;
     private LocalDateTime createdAt;
-    private LocalDateTime expiryAt;
+    private LocalDateTime expiresAt;
     private LocalDateTime usedAt;
     private LocalDateTime revokedAt;
     private boolean revoked;

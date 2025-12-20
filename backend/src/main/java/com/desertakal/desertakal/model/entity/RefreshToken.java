@@ -35,14 +35,14 @@ public class RefreshToken {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "family_id", nullable = false, length = 100)
     private String familyId;
 
     @Column(name = "parent_token", length = 500)
     private String parentToken;
 
     @Column(name = "expires_at", nullable = false)
-    private LocalDateTime expiryAt;
+    private LocalDateTime expiresAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
@@ -54,17 +54,25 @@ public class RefreshToken {
     @Column(name = "revoked_at")
     private LocalDateTime revokedAt;
 
+    @Builder.Default
     @Column(nullable = false)
     private boolean revoked = false;
 
+    @Builder.Default
     @Column(nullable = false)
     private boolean used = false;
 
+    @Builder.Default
     @Column(name = "reuse_detected", nullable = false)
     private boolean reuseDetected = false;
 
+    @Column(name = "ip_address")
     private String ipAddress;
+
+    @Column(name = "user_agent")
     private String userAgent;
+
+    @Column(name = "device_id")
     private String deviceId;
 
     @Version
@@ -72,7 +80,7 @@ public class RefreshToken {
 
     @PrePersist
     public void prePersist() {
-        if (expiryAt == null)
-            expiryAt = LocalDateTime.now().plusDays(30);
+        if (expiresAt == null)
+            expiresAt = LocalDateTime.now().plusDays(30);
     }
 }

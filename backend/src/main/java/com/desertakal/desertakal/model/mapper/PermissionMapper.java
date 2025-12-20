@@ -1,0 +1,18 @@
+package com.desertakal.desertakal.model.mapper;
+
+import com.desertakal.desertakal.model.dto.permission.PermissionDTO;
+import com.desertakal.desertakal.model.dto.permission.PermissionRequestDTO;
+import com.desertakal.desertakal.model.entity.Permission;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+@Mapper(componentModel = "spring")
+public interface PermissionMapper {
+
+    PermissionDTO toDto(Permission permission);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "roles", ignore = true)
+    Permission toEntity(PermissionRequestDTO dto);
+}

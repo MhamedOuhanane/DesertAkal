@@ -19,7 +19,7 @@ public class RefreshTokenDTO {
     private String userAgent;
     private String ipAddress;
     private LocalDateTime createdAt;
-    private LocalDateTime expiryAt;
+    private LocalDateTime expiresAt;
     private boolean revoked;
     private boolean used;
 }
