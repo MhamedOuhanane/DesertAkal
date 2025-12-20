@@ -15,5 +15,4 @@ import java.util.UUID;
 public class RoleDTO {
     private UUID uuid;
     private String name;
-    List<PermissionDTO> permissions;
 }

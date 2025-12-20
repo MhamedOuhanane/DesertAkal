@@ -12,7 +12,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class RoleUpdateDTO {
-    private UUID uuid;
     private String name;
     List<UUID> permissionUuids;
 }

@@ -47,3 +47,5 @@ databaseChangeLog:
       file: db/changelog/023_create_table_email_verification_tokens.xml
   - include:
       file: db/changelog/024_create_table_refresh_tokens.xml
+  - include:
+      file: db/changelog/025_insert_default_roles.xml

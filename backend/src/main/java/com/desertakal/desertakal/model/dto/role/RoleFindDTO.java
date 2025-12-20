@@ -16,4 +16,5 @@ import java.util.UUID;
 public class RoleFindDTO {
     private UUID uuid;
     private String name;
+    List<PermissionDTO> permissions;
 }
