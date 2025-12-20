@@ -15,15 +15,13 @@ public interface LanguageMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "guides", ignore = true)
     Language toEntity(LanguageCreateDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "guides", ignore = true)
+    @InheritConfiguration(name = "toEntity")
     void updateEntityFromDto(LanguageUpdateDTO dto, @MappingTarget Language language);
 
     List<LanguageDTO> toDtos(List<Language> languages);

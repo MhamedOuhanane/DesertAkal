@@ -24,12 +24,7 @@ public interface CityMapper {
     City toEntity(CityCreateDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "images", ignore = true)
-    @Mapping(target = "cityTours", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
+    @InheritConfiguration(name = "toEntity")
     void updateEntityFromDto(CityUpdateDTO dto, @MappingTarget City city);
 
     List<CityDTO> toDtos(List<City> cities);

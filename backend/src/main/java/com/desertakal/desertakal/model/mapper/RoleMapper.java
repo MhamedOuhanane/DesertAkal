@@ -28,12 +28,5 @@ public interface RoleMapper {
     @Mapping(target = "permissions", ignore = true)
     void updateEntityFromDto(RoleUpdateDTO dto, @MappingTarget Role role);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "permissions", ignore = true)
-    @Mapping(target = "users", ignore = true)
-    Role toEntity(RoleUpdateDTO dto);
-
-
     List<RoleDTO> toDtos(List<Role> roles);
 }

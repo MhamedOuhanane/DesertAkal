@@ -17,6 +17,7 @@ public interface TourMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "image", ignore = true)
     @Mapping(target = "rating", ignore = true)
     @Mapping(target = "reviewCount", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -25,14 +26,7 @@ public interface TourMapper {
     Tour toEntity(TourCreateDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "image", ignore = true)
-    @Mapping(target = "rating", ignore = true)
-    @Mapping(target = "reviewCount", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "cityTours", ignore = true)
+    @InheritConfiguration(name = "toEntity")
     void updateEntityFromDto(TourUpdateDTO dto, @MappingTarget Tour tour);
 
     List<TourDTO> toDtos(List<Tour> tours);

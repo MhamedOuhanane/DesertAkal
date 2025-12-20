@@ -18,9 +18,7 @@ public interface PermissionMapper {
     Permission toEntity(PermissionRequestDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "roles", ignore = true)
+    @InheritConfiguration(name = "toEntity")
     void updateEntityFromDto(PermissionRequestDTO dto, @MappingTarget Permission permission);
 
     List<PermissionDTO> toDtos(List<Permission> permissions);
