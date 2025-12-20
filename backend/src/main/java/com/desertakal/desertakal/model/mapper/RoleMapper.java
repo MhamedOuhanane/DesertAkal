@@ -8,6 +8,8 @@ import com.desertakal.desertakal.model.entity.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", uses = {PermissionMapper.class})
 public interface RoleMapper {
 
@@ -25,4 +27,8 @@ public interface RoleMapper {
     @Mapping(target = "permissions", ignore = true)
     @Mapping(target = "users", ignore = true)
     Role toEntity(RoleUpdateDTO dto);
+
+
+    List<RoleDTO> toDtos(List<Role> roles);
+    List<RoleFindDTO> toFindDtos(List<Role> roles);
 }

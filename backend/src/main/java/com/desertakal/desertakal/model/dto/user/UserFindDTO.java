@@ -1,7 +1,6 @@
 package com.desertakal.desertakal.model.dto.user;
 
 import com.desertakal.desertakal.model.dto.role.RoleFindDTO;
-import com.desertakal.desertakal.model.enums.OauthProvider;
 import com.desertakal.desertakal.model.enums.UserStatus;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -15,14 +14,16 @@ import java.util.UUID;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class UserDTO {
-    @EqualsAndHashCode.Include
-    protected UUID uuid;
-    protected String firstName;
-    protected String lastName;
-    protected String photo;
-    protected String username;
-    protected String email;
-    protected String role;
+@EqualsAndHashCode(callSuper = true)
+public class UserFindDTO extends UserDTO {
+
+    protected String phone;
+
+    protected UserStatus status;
+
+    protected LocalDateTime lastLoginAt;
+    protected LocalDateTime createdAt;
+    protected LocalDateTime updatedAt;
+
+    private List<String> oauthProviders;
 }

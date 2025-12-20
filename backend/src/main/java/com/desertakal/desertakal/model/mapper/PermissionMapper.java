@@ -6,6 +6,8 @@ import com.desertakal.desertakal.model.entity.Permission;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface PermissionMapper {
 
@@ -15,4 +17,6 @@ public interface PermissionMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "roles", ignore = true)
     Permission toEntity(PermissionRequestDTO dto);
+
+    List<PermissionDTO> toDtos(List<Permission> permissions);
 }
