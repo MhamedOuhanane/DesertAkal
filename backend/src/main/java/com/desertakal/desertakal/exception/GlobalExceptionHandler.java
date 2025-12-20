@@ -3,12 +3,16 @@ package com.desertakal.desertakal.exception;
 import com.desertakal.desertakal.exception.base.BusinessException;
 import com.desertakal.desertakal.model.dto.error.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -28,4 +32,30 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(exception.getStatus()).body(error);
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException exception,
+            HttpServletRequest request
+    ) {
+        var errorsValid = exception.getBindingResult().getFieldErrors().stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        fe -> fe.getDefaultMessage() != null
+                                ? fe.getDefaultMessage()
+                                : "Invalid value",
+                        (existing, replacement) -> existing + "; " + replacement
+                ));
+
+        var error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(errorsValid)
+                .message("Validation failed")
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
 }
