@@ -33,5 +33,4 @@ public class UserUpdateDTO {
             message = "Phone number is invalid"
     )
     protected String phone;
-    protected String photo;
 }
