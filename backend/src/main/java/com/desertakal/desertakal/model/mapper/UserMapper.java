@@ -22,6 +22,7 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "password", ignore = true)
+    @Mapping(target = "photo")
     @Mapping(target = "role", ignore = true)
     User toEntity(RegisterDTO dto);
 
@@ -30,6 +31,7 @@ public interface UserMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "status", ignore = true)
+    @Mapping(target = "photo", ignore = true)
     @Mapping(target = "emailVerified", ignore = true)
     @Mapping(target = "lastLoginAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

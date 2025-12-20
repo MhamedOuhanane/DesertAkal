@@ -27,6 +27,7 @@ public interface TourMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "image", ignore = true)
     @Mapping(target = "rating", ignore = true)
     @Mapping(target = "reviewCount", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
