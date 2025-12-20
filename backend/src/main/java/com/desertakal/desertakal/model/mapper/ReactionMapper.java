@@ -1,11 +1,7 @@
 package com.desertakal.desertakal.model.mapper;
 
-import com.desertakal.desertakal.model.dto.article.ArticleCreateDTO;
-import com.desertakal.desertakal.model.dto.article.ArticleDTO;
-import com.desertakal.desertakal.model.dto.article.ArticleUpdateDTO;
 import com.desertakal.desertakal.model.dto.reaction.ReactionCreateDTO;
 import com.desertakal.desertakal.model.dto.reaction.ReactionDTO;
-import com.desertakal.desertakal.model.entity.Article;
 import com.desertakal.desertakal.model.entity.Reaction;
 import org.mapstruct.*;
 

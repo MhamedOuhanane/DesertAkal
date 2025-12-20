@@ -11,6 +11,4 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CommentCreateDTO {
     private String content;
-    private UUID articleUuid;
-    private UUID userUuid;
 }
