@@ -12,5 +12,4 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ArticleCreateDTO {
     private String content;
-    private UUID userUuid;
 }

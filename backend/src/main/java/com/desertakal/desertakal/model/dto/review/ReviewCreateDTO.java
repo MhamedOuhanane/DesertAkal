@@ -16,5 +16,4 @@ public class ReviewCreateDTO {
     private String comment;
     private Long reviewableUuid;
     private ReviewableType reviewableType;
-    private UUID touristUuid;
 }

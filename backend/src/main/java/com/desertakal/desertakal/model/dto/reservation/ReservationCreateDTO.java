@@ -20,5 +20,4 @@ public class ReservationCreateDTO {
     private BigDecimal amount;
     private UUID tourUuid;
     private UUID guideUuid;
-    private UUID touristUuid;
 }
