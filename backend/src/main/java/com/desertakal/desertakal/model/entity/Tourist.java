@@ -30,5 +30,4 @@ public class Tourist extends User {
     @Builder.Default
     @OneToMany(mappedBy = "tourist", fetch = FetchType.LAZY)
     private List<Review> reviews = new ArrayList<>();
-
 }
