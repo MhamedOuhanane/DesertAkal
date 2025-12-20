@@ -21,7 +21,7 @@ public class RegisterDTO {
     protected String lastName;
 
     @NotBlank
-    @Size(min = 7, max = 20)
+    @Size(min = 7, max = 20, message = "Username must be at least 7 characters")
     @Pattern(
             regexp = "^[a-zA-Z0-9._-]+$",
             message = "Username can contain letters, numbers, dot, underscore and dash only"

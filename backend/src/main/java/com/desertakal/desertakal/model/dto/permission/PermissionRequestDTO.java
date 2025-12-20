@@ -12,6 +12,6 @@ import lombok.*;
 @EqualsAndHashCode
 public class PermissionRequestDTO {
     @NotBlank(message = "Permission name is required")
-    @Size(min = 3, max = 50, message = "Permission name must be between 3 and 50 characters")
+    @Size(min = 5, max = 50, message = "Permission name must be between 5 and 50 characters")
     private String name;
 }
