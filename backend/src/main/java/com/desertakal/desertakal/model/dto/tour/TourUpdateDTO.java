@@ -13,7 +13,6 @@ import java.util.List;
 public class TourUpdateDTO {
     private String title;
     private String description;
-    private String image;
     private List<CityTourCreateDTO> cityTours;
 
 }
