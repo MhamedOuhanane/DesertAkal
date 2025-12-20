@@ -11,12 +11,12 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface LanguageMapper {
 
-    LanguageDTO toDto(Language permission);
+    LanguageDTO toDto(Language language);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "guides", ignore = true)
     Language toEntity(LanguageCreateDTO dto);
 
-    List<LanguageDTO> toDtos(List<Language> permissions);
+    List<LanguageDTO> toDtos(List<Language> languages);
 }

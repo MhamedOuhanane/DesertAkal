@@ -13,7 +13,7 @@ public interface NotificationMapper {
 
     @Mapping(target = "userUuid", source = "user.uuid")
     @Mapping(target = "userName", expression = "java(notification.getUser().getFirstName() + \" \" + notification.getUser().getLastName())")
-    NotificationDTO toDto(Notification permission);
+    NotificationDTO toDto(Notification notification);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uuid", ignore = true)
@@ -22,5 +22,5 @@ public interface NotificationMapper {
     @Mapping(target = "user", ignore = true)
     Notification toEntity(NotificationCreateDTO dto);
 
-    List<NotificationDTO> toDtos(List<Notification> permissions);
+    List<NotificationDTO> toDtos(List<Notification> notifications);
 }
