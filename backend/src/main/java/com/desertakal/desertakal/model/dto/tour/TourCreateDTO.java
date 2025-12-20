@@ -15,7 +15,6 @@ import java.util.List;
 public class TourCreateDTO {
     private String title;
     private String description;
-    private String image;
     private List<CityTourCreateDTO> cityTours;
 
 }
