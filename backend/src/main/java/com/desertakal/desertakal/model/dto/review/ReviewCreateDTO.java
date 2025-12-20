@@ -14,7 +14,7 @@ import java.util.UUID;
 public class ReviewCreateDTO {
     private BigDecimal rating;
     private String comment;
-    private Long reviewableId;
+    private Long reviewableUuid;
     private ReviewableType reviewableType;
-    private UUID touristId;
+    private UUID touristUuid;
 }

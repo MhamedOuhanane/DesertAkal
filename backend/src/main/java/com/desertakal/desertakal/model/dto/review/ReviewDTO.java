@@ -16,9 +16,9 @@ public class ReviewDTO {
     private UUID uuid;
     private BigDecimal rating;
     private String comment;
-    private Long reviewableId;
+    private Long reviewableUuid;
     private ReviewableType reviewableType;
-    private UUID touristId;
+    private UUID touristUuid;
     private String touristName;
     private String touristPhoto;
     private LocalDateTime createdAt;

@@ -37,8 +37,8 @@ public class Review {
     @Column(nullable = false)
     private String comment;
 
-    @Column(name = "reviewable_id", nullable = false)
-    private Long reviewableId;
+    @Column(name = "reviewable_uuid", nullable = false)
+    private Long reviewableUuid;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "reviewable_type", nullable = false)

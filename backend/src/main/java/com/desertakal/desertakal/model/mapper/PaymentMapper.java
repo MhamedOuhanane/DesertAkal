@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {ReservationMapper.class})
 public interface PaymentMapper {
 
     @Mapping(source = "reservation.uuid", target = "reservationUuid")
