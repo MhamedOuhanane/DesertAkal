@@ -50,7 +50,7 @@
 
         <createIndex tableName="reviews" indexName="idx_reviews_target">
             <column name="reviewable_type"/>
-            <column name="reviewable_id"/>
+            <column name="reviewable_uuid"/>
         </createIndex>
 
         <addForeignKeyConstraint
