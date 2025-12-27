@@ -74,6 +74,17 @@
             <column name="family_id"/>
         </createIndex>
 
+        <createIndex tableName="refresh_tokens" indexName="idx_user_device">
+            <column name="user_id"/>
+            <column name="device_id"/>
+        </createIndex>
+
+        <createIndex tableName="refresh_tokens" indexName="idx_family_active">
+            <column name="family_id"/>
+            <column name="revoked"/>
+            <column name="used"/>
+        </createIndex>
+
         <addForeignKeyConstraint
                 baseTableName="refresh_tokens"
                 baseColumnNames="user_id"

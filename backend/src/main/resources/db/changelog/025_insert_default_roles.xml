@@ -11,17 +11,17 @@
 
         <insert tableName="roles">
             <column name="uuid" valueComputed="gen_random_uuid()"/>
-            <column name="name" value="ROLE_ADMIN"/>
+            <column name="name" value="ADMIN"/>
         </insert>
 
         <insert tableName="roles">
             <column name="uuid" valueComputed="gen_random_uuid()"/>
-            <column name="name" value="ROLE_GUIDE"/>
+            <column name="name" value="GUIDE"/>
         </insert>
 
         <insert tableName="roles">
             <column name="uuid" valueComputed="gen_random_uuid()"/>
-            <column name="name" value="ROLE_TOURIST"/>
+            <column name="name" value="TOURIST"/>
         </insert>
 
     </changeSet>

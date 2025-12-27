@@ -1,4 +1,4 @@
-package com.desertakal.desertakal.Security.jwt.security;
+package com.desertakal.desertakal.Security.config;
 
 public class SecurityConfig {
 }

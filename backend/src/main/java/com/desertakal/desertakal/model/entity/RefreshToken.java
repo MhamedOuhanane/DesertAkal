@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -11,6 +13,8 @@ import java.util.UUID;
 @Table(name = "refresh_tokens", indexes = {
         @Index(name = "idx_token", columnList = "token"),
         @Index(name = "idx_family", columnList = "family_id"),
+        @Index(name = "idx_user_device", columnList = "user_id, device_id"),
+        @Index(name = "idx_family_active", columnList = "family_id, revoked, used"),
         @Index(name = "idx_user_family", columnList = "user_id, family_id")
 })
 @Getter
@@ -19,7 +23,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class RefreshToken {
+public class RefreshToken implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -77,6 +81,9 @@ public class RefreshToken {
 
     @Version
     private Long version;
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @PrePersist
     public void prePersist() {

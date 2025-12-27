@@ -1,4 +1,4 @@
-package com.desertakal.desertakal.config.security;
+package com.desertakal.desertakal.Security.jwt;
 
 import com.desertakal.desertakal.model.entity.User;
 import io.jsonwebtoken.Claims;
