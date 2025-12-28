@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
                 .status(exception.getStatus().value())
                 .error(exception.getStatus().getReasonPhrase())
                 .message(exception.getMessage())
-                .path(request.getRequestURI())
+                .path(request.getServletPath())
                 .build();
 
         return ResponseEntity.status(exception.getStatus()).body(error);
@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error(errorsValid)
                 .message("Validation failed")
-                .path(request.getRequestURI())
+                .path(request.getServletPath())
                 .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -68,7 +68,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
                 .message("An unexpected error occurred. Please contact support.")
-                .path(request.getRequestURI())
+                .path(request.getServletPath())
                 .build();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
