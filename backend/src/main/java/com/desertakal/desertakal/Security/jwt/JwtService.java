@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.Security.jwt;
 
+import com.desertakal.desertakal.Security.user.CustomUserDetails;
 import com.desertakal.desertakal.model.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -64,11 +66,13 @@ public class JwtService {
                 .getBody();
     }
 
-    public boolean isValidToken(String token) {
+    public boolean isValidToken(String token, CustomUserDetails userDetails) {
         try {
-            final String tokenType = extractClaim(token, claims -> claims.get("type", String.class));
+            final String uuid = extractSub(token);
+            String tokenType = extractClaim(token, claims -> claims.get("type", String.class));
 
-            return (!isTokenExpired(token)
+            return (userDetails.getUuid().equals(UUID.fromString(uuid))
+                    && !isTokenExpired(token)
                     && "ACCESS_TOKEN".equals(tokenType));
         } catch (Exception e) {
             return false;

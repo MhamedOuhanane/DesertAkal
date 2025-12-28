@@ -27,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 
     @Cacheable(value = "users", key = "#uuid")
-    public UserDetails loadUserByUuid(String uuid) throws UsernameNotFoundException {
+    public CustomUserDetails loadUserByUuid(String uuid) throws UsernameNotFoundException {
         return repository.findByUuid(UUID.fromString(uuid))
                 .map(CustomUserDetails::new)
                 .orElseThrow(() ->
