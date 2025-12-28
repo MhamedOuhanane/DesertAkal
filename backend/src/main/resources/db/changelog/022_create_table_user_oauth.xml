@@ -18,6 +18,10 @@
                 <constraints nullable="false" unique="true"/>
             </column>
 
+            <column name="uuid" type="UUID">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
             <column name="provider" type="VARCHAR(20)" defaultValue="LOCAL">
                 <constraints nullable="false"/>
             </column>

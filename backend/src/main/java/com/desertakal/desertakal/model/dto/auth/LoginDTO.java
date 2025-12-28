@@ -10,7 +10,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class loginDTO {
+public class LoginDTO {
     private UUID uuid;
     private String username;
     private String fullName;

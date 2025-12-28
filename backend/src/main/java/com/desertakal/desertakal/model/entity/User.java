@@ -62,7 +62,7 @@ public abstract class User implements Serializable {
     @Column(nullable = false)
     protected UserStatus status = UserStatus.ACTIVE;
 
-    @Column(name = "last_login_at", nullable = false)
+    @Column(name = "last_login_at")
     protected LocalDateTime lastLoginAt;
 
     @CreationTimestamp
@@ -101,5 +101,12 @@ public abstract class User implements Serializable {
     public void prePersist(){
         if (uuid == null)
             uuid = UUID.randomUUID();
+
+        if (status == null)
+            status = UserStatus.ACTIVE;
+    }
+
+    public String getFullName() {
+        return firstName + " " + lastName;
     }
 }
