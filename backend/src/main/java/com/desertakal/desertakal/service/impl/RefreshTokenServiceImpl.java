@@ -15,6 +15,7 @@ import com.desertakal.desertakal.repository.UserRepository;
 import com.desertakal.desertakal.service.interfaces.RefreshTokenService;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenServiceImpl implements RefreshTokenService {
@@ -67,25 +69,37 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Transactional
     @Override
     public LoginDTO refresh(@NonNull String token, @NonNull RefreshTokenRequestDTO dto) {
-        RefreshToken oldToken = repository.findByToken(token).orElseThrow(() ->
-                    new ResourceNotFoundException("Refresh token", "token", token)
-                );
+        log.info("Attempting to refresh token for device: {} from IP: {}", dto.getDeviceId(), dto.getIpAddress());
+
+        RefreshToken oldToken = repository.findByToken(token).orElseThrow(() -> {
+            log.warn("Refresh attempt failed: Token not found in database.");
+            return new ResourceNotFoundException("Refresh token", "token", token);
+        });
 
         if (oldToken.isUsed() || oldToken.isReuseDetected()) {
+            log.error("SECURITY ALERT: Reuse detected for User: {}. FamilyId: {}. ParentToken: {}",
+                    oldToken.getUser().getEmail(), oldToken.getFamilyId(), oldToken.getParentToken());
             handleSecurityBreach(oldToken);
             throw new BadRequestException("Security Alert: This token has already been used. All related sessions revoked.");
         }
 
-        if (oldToken.isRevoked())
+        if (oldToken.isRevoked()){
+            log.warn("Revoked token access attempt: FamilyId {}, User {}",
+                    oldToken.getFamilyId(), oldToken.getUser().getEmail());
             throw new BadRequestException("This session has been revoked. Please login again.");
+        }
 
         if (oldToken.getDeviceId() != null && !oldToken.getDeviceId().equals(dto.getDeviceId())) {
+            log.warn("SECURITY WARNING: Device mismatch. Expected {}, but got {}. User: {}",
+                    oldToken.getDeviceId(), dto.getDeviceId(), oldToken.getUser().getEmail());
             handleSecurityBreach(oldToken);
             throw new BadRequestException("Security Alert: Device mismatch detected.");
         }
 
-        if (oldToken.getExpiresAt().isBefore(LocalDateTime.now()))
+        if (oldToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            log.info("Token expired for user: {}. Expiration date: {}", oldToken.getUser().getEmail(), oldToken.getExpiresAt());
             throw new BadRequestException("Refresh token expired.");
+        }
 
         oldToken.setUsed(true);
         oldToken.setUsedAt(LocalDateTime.now());
@@ -93,7 +107,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         User user = oldToken.getUser();
         String newAccessToken = jwtService.generateAccessToken(user);
         String newRefreshToken = jwtService.generateRefreshToken(user);
-        Date expiration = jwtService.extractClaim(token, Claims::getExpiration);
+        Date expiration = jwtService.extractClaim(newRefreshToken, Claims::getExpiration);
 
         RefreshToken newToken = RefreshToken.builder()
                 .uuid(UUID.randomUUID())
@@ -102,12 +116,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 .familyId(oldToken.getFamilyId())
                 .parentToken(oldToken.getToken())
                 .deviceId(oldToken.getDeviceId())
-                .ipAddress(oldToken.getIpAddress())
-                .userAgent(oldToken.getUserAgent())
+                .ipAddress(dto.getIpAddress())
+                .userAgent(dto.getUserAgent())
                 .expiresAt(expiration.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .build();
 
         repository.save(newToken);
+
+        log.info("Token successfully rotated for user: {}. New Token UUID: {}", user.getEmail(), newToken.getUuid());
 
         return LoginDTO.builder()
                 .uuid(user.getUuid())
@@ -135,9 +151,15 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     private void handleSecurityBreach(RefreshToken compromisedToken) {
+        log.error("BREACH HANDLER: Revoking entire family {} for user {}",
+                compromisedToken.getFamilyId(), compromisedToken.getUser().getEmail());
+
         compromisedToken.setReuseDetected(true);
         compromisedToken.setRevoked(true);
         compromisedToken.setRevokedAt(LocalDateTime.now());
 
+        repository.deleteByFamilyId(compromisedToken.getFamilyId());
+
+        log.info("Family {} has been purged from the system.", compromisedToken.getFamilyId());
     }
 }
