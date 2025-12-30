@@ -4,6 +4,7 @@ import com.desertakal.desertakal.Security.jwt.JwtService;
 import com.desertakal.desertakal.exception.custom.BadRequestException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.auth.LoginDTO;
+import com.desertakal.desertakal.model.dto.refreshToken.ActiveSessionDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenFullDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
@@ -22,10 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -39,13 +38,19 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public RefreshTokenDTO create(@NonNull RefreshTokenRequestDTO dto) {
-        if (dto.getUserUuid() == null)
+        log.info("Creating new Refresh Token session for User UUID: {} on Device: {}",
+                dto.getUserUuid(), dto.getDeviceId());
+
+        if (dto.getUserUuid() == null) {
+            log.error("Failed to create Refresh Token: User UUID is missing.");
             throw new BadRequestException("The user's UUID is missing from the request.");
+        }
 
         User user = userRepository.findByUuid(dto.getUserUuid())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User", "identifier", dto.getUserUuid().toString())
-                );
+                .orElseThrow(() -> {
+                    log.warn("User not found for UUID: {}", dto.getUserUuid());
+                    return new ResourceNotFoundException("User", "identifier", dto.getUserUuid().toString());
+                });
 
         String token = jwtService.generateRefreshToken(user);
         Date expiration = jwtService.extractClaim(token, Claims::getExpiration);
@@ -62,6 +67,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         );
 
         repository.save(refreshToken);
+
+        log.info("Successfully created Refresh Token session. User: {}, FamilyId: {}, IP: {}, Expires at: {}",
+                user.getEmail(), refreshToken.getFamilyId(), dto.getIpAddress(), refreshToken.getExpiresAt());
 
         return mapper.toDto(refreshToken);
     }
@@ -133,6 +141,42 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 .refreshToken(newRefreshToken)
                 .accessToken(newAccessToken)
                 .build();
+    }
+
+    @Override
+    public List<ActiveSessionDTO> getActiveSessions(@NonNull UUID userUuid) {
+        log.info("Request received to fetch active sessions for User UUID: {}", userUuid);
+
+        User user = userRepository.findByUuid(userUuid)
+                .orElseThrow(() -> {
+                    log.warn("User not found for UUID: {}", userUuid);
+                    return new ResourceNotFoundException("User", "identifier", userUuid.toString());
+                });
+
+        log.info("Fetching active sessions for user: {}", user.getEmail());
+
+        List<RefreshToken> activeTokens = repository.findAllByUserAndRevokedFalseAndUsedFalseByCreatedAtDesc(user);
+
+        Map<String, RefreshToken> uniqueSessions = activeTokens.stream()
+                .collect(Collectors.toMap(
+                        RefreshToken::getDeviceId,
+                        token -> token,
+                        (existing, replacement) -> existing
+                ));
+
+        log.info("Found {} active sessions for user: {}", activeTokens.size(), user.getEmail());
+
+        return uniqueSessions.values().stream()
+                .map(token -> ActiveSessionDTO.builder()
+                        .sessionUuid(token.getUuid())
+                        .ipAddress(token.getIpAddress())
+                        .userAgent(token.getUserAgent())
+                        .lastActive(token.getCreatedAt())
+                        .expiresAt(token.getExpiresAt())
+                        .build()
+                )
+                .sorted(Comparator.comparing(ActiveSessionDTO::getLastActive).reversed())
+                .toList();
     }
 
     @Override

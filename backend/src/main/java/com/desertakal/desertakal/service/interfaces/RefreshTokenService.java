@@ -1,6 +1,7 @@
 package com.desertakal.desertakal.service.interfaces;
 
 import com.desertakal.desertakal.model.dto.auth.LoginDTO;
+import com.desertakal.desertakal.model.dto.refreshToken.ActiveSessionDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenFullDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
@@ -13,7 +14,9 @@ import java.util.UUID;
 public interface RefreshTokenService {
     RefreshTokenDTO create(@NonNull RefreshTokenRequestDTO dto);
     LoginDTO refresh(@NonNull String token, @NonNull RefreshTokenRequestDTO dto);
+    List<ActiveSessionDTO> getActiveSessions(@NonNull UUID userUuid);
     RefreshTokenFullDTO find(@NonNull String token);
     List<RefreshTokenDTO> findAll(@NonNull Map<String, Object> map);
     List<RefreshTokenDTO> findAllByUser(@NonNull UUID userUuid, @NonNull Map<String, Object> map);
+
 }

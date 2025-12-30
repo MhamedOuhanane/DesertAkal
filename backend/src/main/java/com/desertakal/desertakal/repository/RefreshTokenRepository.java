@@ -27,7 +27,7 @@ public interface RefreshTokenRepository extends JpaRepository<@NonNull RefreshTo
     List<RefreshToken> findAllByUserAndIsUsed(User user, boolean isUsed);
 
     @EntityGraph(attributePaths = {"user"})
-    List<RefreshToken> findAllByUserAndIsRevokedFalseAndIsUsedFalseByCreatedAtDesc(User user);
+    List<RefreshToken> findAllByUserAndRevokedFalseAndUsedFalseByCreatedAtDesc(User user);
     List<RefreshToken> findAllByUserAndIsReuseDetectedFalse(User user);
 
     @Transactional
