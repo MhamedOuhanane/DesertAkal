@@ -52,7 +52,7 @@ public class RefreshToken implements Serializable {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "used_ed_at")
+    @Column(name = "used_at")
     private LocalDateTime usedAt;
 
     @Column(name = "revoked_at")

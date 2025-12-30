@@ -58,7 +58,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 new ResourceNotFoundException("Role", "name", "TOURIST")
         );
 
-        User user = repository.findByEmailOrUsername(userInfo.email)
+        User user = repository.findByEmailOrUsernameWithSecurity(userInfo.email)
                 .orElseGet(()-> repository.save(
                         Tourist.builder()
                                 .uuid(UUID.randomUUID())

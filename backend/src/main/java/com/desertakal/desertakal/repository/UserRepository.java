@@ -19,6 +19,13 @@ public interface UserRepository extends JpaRepository<@NonNull User, @NonNull UU
     @EntityGraph(attributePaths = {"role, role.permissions"})
     Optional<User> findByUuid(UUID uuid);
 
+    @EntityGraph(attributePaths = {"role", "role.permissions"})
+    @Query("SELECT u FROM User u WHERE u.email = :identifier OR u.username = :identifier")
+    Optional<User> findByEmailOrUsernameWithSecurity(@Param("identifier") String identifier);
+
+    @EntityGraph(attributePaths = {"role", "role.permissions"})
+    Optional<User> findWithSecurityByUuid(UUID uuid);
+
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
 }

@@ -1,4 +1,4 @@
-package com.desertakal.desertakal.model.dto.RefreshToken;
+package com.desertakal.desertakal.model.dto.refreshToken;
 
 import lombok.*;
 
