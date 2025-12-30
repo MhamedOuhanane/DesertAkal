@@ -22,12 +22,10 @@ public interface EmailTokenRepository extends JpaRepository<@NonNull EmailVerifi
     void deleteByToken(String token);
 
     @Transactional
-    void deleteByExpiryDateBefore(LocalDateTime dateTime);
+    void deleteByUser(User user);
 
-    @Modifying
     @Transactional
-    @Query("UPDATE EmailVerificationToken e SET e.used = true WHERE e.token = :token")
-    void markAsUsed(String token);
+    void deleteByExpiryDateBefore(LocalDateTime dateTime);
 
     boolean existsByUserAndExpiryDateAfter(User user, LocalDateTime now);
 }

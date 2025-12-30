@@ -1,0 +1,62 @@
+package com.desertakal.desertakal.service.impl;
+
+import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
+import com.desertakal.desertakal.model.entity.EmailVerificationToken;
+import com.desertakal.desertakal.model.entity.User;
+import com.desertakal.desertakal.repository.EmailTokenRepository;
+import com.desertakal.desertakal.repository.UserRepository;
+import com.desertakal.desertakal.service.interfaces.EmailVerificationTokenService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class EmailVerificationTokenServiceImpl implements EmailVerificationTokenService {
+    private final EmailTokenRepository repository;
+    private final MailService mailService;
+    private final UserRepository userRepository;
+
+    @Override
+    public void createVerificationToken(@NonNull UUID userUuid) {
+        log.info("Initiating email verification process for User UUID: {}", userUuid);
+
+        User user = userRepository.findByUuid(userUuid)
+                .orElseThrow(() -> {
+                    log.warn("Verification failed: User not found for UUID: {}", userUuid);
+                    return new ResourceNotFoundException("User", "identifier", userUuid.toString());
+                });
+
+        try {
+            repository.deleteByUser(user);
+            log.debug("Cleared existing verification tokens for user: {}", user.getEmail());
+        } catch (Exception e) {
+            log.error("Failed to delete old tokens for user {}: {}", user.getEmail(), e.getMessage());
+        }
+
+
+        String token = UUID.randomUUID().toString();
+        EmailVerificationToken verificationToken = EmailVerificationToken.builder()
+                .token(token)
+                .user(user)
+                .expiresAt(LocalDateTime.now().plusHours(24))
+                .used(false)
+                .build();
+
+        repository.save(verificationToken);
+        log.info("New verification token generated for user [{}]. Expiration: {}",
+                user.getEmail(), verificationToken.getExpiresAt());
+
+        mailService.sendVerificationEmail(user.getEmail(), token);
+    }
+
+    @Override
+    public void confirmEmail(@NonNull String token) {
+
+    }
+}
