@@ -90,7 +90,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         LoginDTO login = LoginDTO.builder()
                 .uuid(user.getUuid())
-                .username(user.getUsername())
+                .username(user.getEmail())
                 .fullName(user.getFullName())
                 .role(role.getName())
                 .accessToken(accessToken)

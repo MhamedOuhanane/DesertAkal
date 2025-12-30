@@ -3,6 +3,7 @@ package com.desertakal.desertakal.repository;
 import com.desertakal.desertakal.model.entity.RefreshToken;
 import com.desertakal.desertakal.model.entity.User;
 import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface RefreshTokenRepository extends JpaRepository<@NonNull RefreshToken, @NonNull UUID> {
+    @EntityGraph(attributePaths = {"user"})
     Optional<RefreshToken> findByToken(String token);
 
     List<RefreshToken> findByUserAndDeviceId(User user, String deviceId);

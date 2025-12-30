@@ -12,8 +12,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class RefreshTokenRequestDTO {
     private UUID userUuid;
-    private String familyId;
-    private String parentToken;
     private String deviceId;
     private String userAgent;
     private String ipAddress;
