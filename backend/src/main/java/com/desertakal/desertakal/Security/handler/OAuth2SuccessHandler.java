@@ -74,7 +74,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                                     .username(userInfo.email())
                                     .email(userInfo.email())
                                     .emailVerified(true)
-                                    .status(UserStatus.ACTIVE)
                                     .password(passwordEncoder.encode(UUID.randomUUID().toString()))
                                     .role(role)
                                     .lastLoginAt(LocalDateTime.now())
@@ -97,6 +96,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     );
                 });
 
+
         log.info("JWT generated for OAuth2 user: {}", user.getEmail());
 
         String accessToken = jwtService.generateAccessToken(user);
@@ -110,6 +110,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+
+        user.setLastLoginAt(LocalDateTime.now());
+        repository.save(user);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

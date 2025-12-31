@@ -5,6 +5,8 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @SuperBuilder
@@ -47,7 +49,7 @@ public class RegisterDTO {
     protected String confirmPassword;
 
     @NotNull(message = "Role is required")
-    protected Long roleUuid;
+    protected UUID roleUuid;
 
     @Size(max = 50)
     protected String nationality;

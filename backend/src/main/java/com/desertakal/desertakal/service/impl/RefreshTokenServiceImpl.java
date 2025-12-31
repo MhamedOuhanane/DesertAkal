@@ -154,7 +154,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
         log.info("Fetching active sessions for user: {}", user.getEmail());
 
-        List<RefreshToken> activeTokens = repository.findAllByUserAndRevokedFalseAndUsedFalseByCreatedAtDesc(user);
+        List<RefreshToken> activeTokens = repository.findAllByUserAndRevokedFalseAndUsedFalseOrderByCreatedAtDesc(user);
 
         Map<String, RefreshToken> uniqueSessions = activeTokens.stream()
                 .collect(Collectors.toMap(

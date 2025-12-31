@@ -22,15 +22,15 @@ public interface RefreshTokenRepository extends JpaRepository<@NonNull RefreshTo
 
     List<RefreshToken> findAllByFamilyId(String familyId);
 
-    Optional<RefreshToken> findAllByTokenAndIsRevoked(String token, boolean isRevoked);
-    Optional<RefreshToken> findAllByTokenAndIsUsed(String token, boolean isUsed);
+    Optional<RefreshToken> findByTokenAndRevoked(String token, boolean Revoked);
+    Optional<RefreshToken> findByTokenAndUsed(String token, boolean Used);
 
-    List<RefreshToken> findAllByUserAndIsRevoked(User user, boolean isRevoked);
-    List<RefreshToken> findAllByUserAndIsUsed(User user, boolean isUsed);
+    List<RefreshToken> findAllByUserAndRevoked(User user, boolean Revoked);
+    List<RefreshToken> findAllByUserAndUsed(User user, boolean Used);
 
     @EntityGraph(attributePaths = {"user"})
-    List<RefreshToken> findAllByUserAndRevokedFalseAndUsedFalseByCreatedAtDesc(User user);
-    List<RefreshToken> findAllByUserAndIsReuseDetectedFalse(User user);
+    List<RefreshToken> findAllByUserAndRevokedFalseAndUsedFalseOrderByCreatedAtDesc(User user);
+    List<RefreshToken> findAllByUserAndReuseDetectedFalse(User user);
 
     @Transactional
     void deleteByUser(User user);
