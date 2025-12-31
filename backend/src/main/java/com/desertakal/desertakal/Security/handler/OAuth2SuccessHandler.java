@@ -17,6 +17,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +35,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final UserRepository repository;
     private final UserOAuthRepository oAuthRepository;
@@ -54,36 +56,48 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         OauthUserInfo userInfo = extractUserInfo(authToke, registrationId);
 
-        Role role = roleRepository.findByName("TOURIST").orElseThrow(() ->
-                new ResourceNotFoundException("Role", "name", "TOURIST")
-        );
+        log.info("OAuth2 login success for provider: {} | Email: {}", registrationId, userInfo.email());
 
-        User user = repository.findByEmailOrUsernameWithSecurity(userInfo.email)
-                .orElseGet(()-> repository.save(
-                        Tourist.builder()
-                                .uuid(UUID.randomUUID())
-                                .firstName(userInfo.firstName)
-                                .lastName(userInfo.lastName)
-                                .username(userInfo.email)
-                                .email(userInfo.email)
-                                .emailVerified(true)
-                                .status(UserStatus.ACTIVE)
-                                .password(passwordEncoder.encode(UUID.randomUUID().toString()))
-                                .role(role)
-                                .lastLoginAt(LocalDateTime.now())
-                                .language(userInfo.langName)
-                                .build()
-                ));
+        Role role = roleRepository.findByName("TOURIST").orElseThrow(() -> {
+            log.error("Critical: Role TOURIST not found in database");
+            return new ResourceNotFoundException("Role", "name", "TOURIST");
+        });
 
-        oAuthRepository.findByUserAndProvider(user, userInfo.provider)
-                .orElseGet(() -> oAuthRepository.save(
-                        UserOAuth.builder()
-                                .uuid(UUID.randomUUID())
-                                .user(user)
-                                .provider(userInfo.provider)
-                                .providerId(userInfo.providerId)
-                                .build()
-                ));
+        User user = repository.findByEmailOrUsernameWithSecurity(userInfo.email())
+                .orElseGet(()-> {
+                    log.info("Creating new Tourist user from OAuth2: {}", userInfo.email());
+                    return repository.save(
+                            Tourist.builder()
+                                    .uuid(UUID.randomUUID())
+                                    .firstName(userInfo.firstName())
+                                    .lastName(userInfo.lastName())
+                                    .username(userInfo.email())
+                                    .email(userInfo.email())
+                                    .emailVerified(true)
+                                    .status(UserStatus.ACTIVE)
+                                    .password(passwordEncoder.encode(UUID.randomUUID().toString()))
+                                    .role(role)
+                                    .lastLoginAt(LocalDateTime.now())
+                                    .language(userInfo.langName())
+                                    .build()
+                    );
+                });
+
+        oAuthRepository.findByUserAndProvider(user, userInfo.provider())
+                .orElseGet(() -> {
+                    log.info("Linking new OAuth2 provider {} to user {}", userInfo.provider().name(), user.getEmail());
+
+                    return oAuthRepository.save(
+                            UserOAuth.builder()
+                                    .uuid(UUID.randomUUID())
+                                    .user(user)
+                                    .provider(userInfo.provider())
+                                    .providerId(userInfo.providerId())
+                                    .build()
+                    );
+                });
+
+        log.info("JWT generated for OAuth2 user: {}", user.getEmail());
 
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);

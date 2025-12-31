@@ -3,6 +3,7 @@ package com.desertakal.desertakal.Security.user;
 import com.desertakal.desertakal.model.entity.User;
 import com.desertakal.desertakal.model.enums.UserStatus;
 import lombok.Getter;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -44,6 +45,7 @@ public class CustomUserDetails implements UserDetails, Serializable {
     }
 
     @Override
+    @NonNull
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
@@ -54,6 +56,7 @@ public class CustomUserDetails implements UserDetails, Serializable {
     }
 
     @Override
+    @NonNull
     public String getUsername() {
         return uuid.toString();
     }

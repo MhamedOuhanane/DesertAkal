@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     private final ObjectMapper mapper;
 
@@ -25,6 +27,9 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
             @NonNull HttpServletResponse response,
             @NonNull AccessDeniedException accessDeniedException
     ) throws IOException, ServletException {
+        log.warn("Access Denied: User at {} attempted to access forbidden path: {}",
+                request.getRemoteAddr(), request.getServletPath());
+
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
