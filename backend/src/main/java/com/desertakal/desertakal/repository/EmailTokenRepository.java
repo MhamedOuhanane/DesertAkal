@@ -25,7 +25,7 @@ public interface EmailTokenRepository extends JpaRepository<@NonNull EmailVerifi
     void deleteByUser(User user);
 
     @Transactional
-    void deleteByExpiryDateBefore(LocalDateTime dateTime);
+    void deleteByExpiresAtBefore(LocalDateTime dateTime);
 
-    boolean existsByUserAndExpiryDateAfter(User user, LocalDateTime now);
+    boolean existsByUserAndExpiresAtAfter(User user, LocalDateTime now);
 }

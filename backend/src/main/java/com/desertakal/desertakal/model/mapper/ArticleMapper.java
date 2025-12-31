@@ -11,7 +11,7 @@ import java.util.List;
 public interface ArticleMapper {
 
     @Mapping(source = "user.uuid", target = "userUuid")
-    @Mapping(expression = "java(reservation.getUser().getFirstName() + \" \" + reservation.getUser().getLastName())", target = "userName")
+    @Mapping(expression = "java(article.getUser().getFirstName() + \" \" + article.getUser().getLastName())", target = "userName")
     @Mapping(source = "user.photo", target = "userPhoto")
     ArticleDTO toDto(Article article);
 

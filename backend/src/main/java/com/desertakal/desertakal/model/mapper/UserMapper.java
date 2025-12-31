@@ -12,17 +12,19 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
+    @Named("toDto")
     @Mapping(source = "role.name", target = "role")
     UserDTO toDto(User user);
 
     @Mapping(target = "oauthProviders", expression = "java(user.getOAuths() != null ? " +
             "user.getOAuths().stream().map(auth -> auth.getProvider().name()).toList() : null)")
+    @Mapping(source = "role.name", target = "role")
     UserFindDTO toFindDto(User user);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "photo")
+    @Mapping(target = "photo", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "role", ignore = true)
     User toEntity(RegisterDTO dto);
@@ -33,12 +35,13 @@ public interface UserMapper {
     @Mapping(target = "lastLoginAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "oAuths", ignore = true)
+    @Mapping(target = "OAuths", ignore = true)
     @Mapping(target = "notifications", ignore = true)
     @Mapping(target = "comments", ignore = true)
     @Mapping(target = "reactions", ignore = true)
     @Mapping(target = "emailVerificationTokens", ignore = true)
     void updateEntityFromDto(UserUpdateDTO dto, @MappingTarget User user);
 
+    @IterableMapping(qualifiedByName = "toDto")
     List<UserDTO> toDtos(List<User> users);
 }

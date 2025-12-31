@@ -20,5 +20,5 @@ import java.util.UUID;
 public class NotificationCreateDTO {
     private String title;
     private String message;
-    private Long userId;
+    private UUID userUuid;
 }

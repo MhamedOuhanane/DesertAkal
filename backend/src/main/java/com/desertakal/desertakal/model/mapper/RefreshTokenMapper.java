@@ -11,10 +11,14 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface RefreshTokenMapper {
 
+    @Named("toDto")
     @Mapping(source = "user.uuid", target = "userUuid")
     RefreshTokenDTO toDto(RefreshToken refreshToken);
 
     @Mapping(source = "user.uuid", target = "userUuid")
+    @Mapping(expression = "java(refreshToken.getUser() != null ? " +
+            "refreshToken.getUser().getFullName() : null)",
+            target = "userName")
     RefreshTokenFullDTO toFindDto(RefreshToken refreshToken);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -22,6 +26,8 @@ public interface RefreshTokenMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "token", ignore = true)
     @Mapping(target = "user", ignore = true)
+    @Mapping(target = "familyId", ignore = true)
+    @Mapping(target = "parentToken", ignore = true)
     @Mapping(target = "expiresAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "usedAt", ignore = true)
@@ -32,5 +38,6 @@ public interface RefreshTokenMapper {
     @Mapping(target = "version", ignore = true)
     RefreshToken toEntity(RefreshTokenRequestDTO dto);
 
+    @IterableMapping(qualifiedByName = "toDto")
     List<RefreshTokenDTO> toDtos(List<RefreshToken> refreshTokens);
 }

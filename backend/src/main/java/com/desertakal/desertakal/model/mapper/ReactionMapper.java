@@ -12,10 +12,10 @@ public interface ReactionMapper {
 
     @Mapping(source = "user.uuid", target = "userUuid")
     @Mapping(source = "article.uuid", target = "articleUuid")
-    @Mapping(source = "reaction.getDesc()", target = "emoji")
-    @Mapping(expression = "java(reservation.getUser().getFirstName() + \" \" + reservation.getUser().getLastName())", target = "userName")
+    @Mapping(source = "reaction.desc", target = "emoji")
+    @Mapping(expression = "java(reaction.getUser().getFirstName() + \" \" + reaction.getUser().getLastName())", target = "userName")
     @Mapping(source = "user.photo", target = "userPhoto")
-    ReactionDTO toDto(Reaction article);
+    ReactionDTO toDto(Reaction reaction);
 
     @Mapping(target = "id" , ignore = true)
     @Mapping(target = "uuid" , ignore = true)
@@ -25,5 +25,5 @@ public interface ReactionMapper {
     @Mapping(target = "article" , ignore = true)
     Reaction toEntity(ReactionCreateDTO dto);
 
-    List<ReactionDTO> toDtos(List<Reaction> articles);
+    List<ReactionDTO> toDtos(List<Reaction> reactions);
 }

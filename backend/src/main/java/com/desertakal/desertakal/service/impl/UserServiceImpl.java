@@ -12,6 +12,7 @@ import com.desertakal.desertakal.model.mapper.UserMapper;
 import com.desertakal.desertakal.repository.RefreshTokenRepository;
 import com.desertakal.desertakal.repository.RoleRepository;
 import com.desertakal.desertakal.repository.UserRepository;
+import com.desertakal.desertakal.service.interfaces.EmailVerificationTokenService;
 import com.desertakal.desertakal.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserMapper mapper;
     private final TouristMapper touristMapper;
+    private final EmailVerificationTokenService emailVerificationTokenService;
 
 
     @Override
@@ -48,17 +50,19 @@ public class UserServiceImpl implements UserService {
         }
 
         log.debug("Fetching role with UUID: {}", dto.getRoleUuid());
-        Role role = roleRepository.findByUuid(dto.getRoleUuid())
-                .orElseThrow(() -> {
-                    log.error("Registration failed: Role UUID {} not found", dto.getRoleUuid());
-                    return new ResourceNotFoundException("Role", "uuid", dto.getRoleUuid().toString());
-                });
+        Role role = roleRepository.findByName("TOURIST")
+                        .orElseThrow(() -> {
+                            log.error("Registration failed: Role UUID {} not found", "TOURIST");
+                            return new ResourceNotFoundException("Role", "name", "TOURIST");
+                        });
 
         Tourist tourist = touristMapper.toEntity(dto);
         tourist.setPassword(passwordEncoder.encode(dto.getPassword()));
         tourist.setRole(role);
 
         repository.save(tourist);
+        emailVerificationTokenService.createVerificationToken(tourist.getUuid());
+
         log.info("Tourist registered successfully! User UUID: {}, Email: {}",
                 tourist.getUuid(), tourist.getEmail());
     }

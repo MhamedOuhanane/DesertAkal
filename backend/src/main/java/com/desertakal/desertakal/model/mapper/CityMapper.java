@@ -12,12 +12,12 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {ImageMapper.class})
 public interface CityMapper {
 
+    @Named("toDto")
     CityDTO toDto(City city);
     CityFIndDTO toFindDto(City city);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "images", ignore = true)
     @Mapping(target = "cityTours", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -27,5 +27,6 @@ public interface CityMapper {
     @InheritConfiguration(name = "toEntity")
     void updateEntityFromDto(CityUpdateDTO dto, @MappingTarget City city);
 
+    @IterableMapping(qualifiedByName = "toDto")
     List<CityDTO> toDtos(List<City> cities);
 }

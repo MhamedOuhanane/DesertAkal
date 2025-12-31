@@ -140,18 +140,29 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             OAuth2User oAuth2User = authToken.getPrincipal();
             Map<String, Object> attributes = oAuth2User.getAttributes();
 
+            System.out.println((String) attributes.get("email") + " || " + oAuth2User.getName());
             email = (String) attributes.get("email");
             providerId = oAuth2User.getName();
             langCode = (String) attributes.getOrDefault("locale", "en");
 
             String name = (String) attributes.get("name");
-            if (name != null && name.contains(" ")) {
+            if (name == null) {
+                name = (String) attributes.get("global_name");
+            }
+            if (name == null) {
+                name = (String) attributes.get("username");
+            }
+
+            if (name.contains(" ")) {
                 String[] parts = name.split(" ", 2);
                 firstName = parts[0];
                 lastName = parts[1];
             } else
                 firstName = name;
 
+            if (email == null) {
+                email = providerId + "@" + registrationId + ".com";
+            }
             provider = registrationId.equalsIgnoreCase("facebook")
                     ? OauthProvider.FACEBOOK
                     : OauthProvider.DISCORD;

@@ -48,7 +48,6 @@ public class RegisterDTO {
     )
     protected String confirmPassword;
 
-    @NotNull(message = "Role is required")
     protected UUID roleUuid;
 
     @Size(max = 50)

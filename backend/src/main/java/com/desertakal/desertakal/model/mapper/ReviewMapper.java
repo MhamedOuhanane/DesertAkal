@@ -11,8 +11,9 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ReviewMapper {
 
+    @Named("toDto")
     @Mapping(source = "tourist.uuid", target = "touristUuid")
-    @Mapping(expression = "java(reservation.getTourist().getFirstName() + \" \" + reservation.getTourist().getLastName())", target = "touristName")
+    @Mapping(expression = "java(review.getTourist().getFullName())", target = "touristName")
     @Mapping(source = "tourist.photo", target = "touristPhoto")
     ReviewDTO toDto(Review review);
 
@@ -29,5 +30,6 @@ public interface ReviewMapper {
     @Mapping(target = "reviewableType", ignore = true)
     void updateEntityFromDto(ReviewUpdateDTO dto, @MappingTarget Review review);
 
+    @IterableMapping(qualifiedByName = "toDto")
     List<ReviewDTO> toDtos(List<Review> reviews);
 }

@@ -12,6 +12,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ReservationMapper {
 
+    @Named("toDto")
     @Mapping(source = "tour.uuid", target = "tourUuid")
     @Mapping(source = "tour.title", target = "tourTitle")
     @Mapping(source = "guide.uuid", target = "guideUuid")
@@ -42,5 +43,6 @@ public interface ReservationMapper {
     @InheritConfiguration(name = "toEntity")
     void updateEntityFromDto(ReservationUpdateDTO dto, @MappingTarget Reservation reservation);
 
+    @IterableMapping(qualifiedByName = "toDto")
     List<ReservationDTO> toDtos(List<Reservation> reservations);
 }

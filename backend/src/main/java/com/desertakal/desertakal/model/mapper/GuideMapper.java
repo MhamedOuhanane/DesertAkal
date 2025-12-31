@@ -9,11 +9,18 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {LanguageMapper.class, UserMapper.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {LanguageMapper.class, UserMapper.class},
+        builder = @Builder(disableBuilder = true)
+)
 public interface GuideMapper {
 
+    @Named("toDto")
+    @Mapping(source = "role.name", target = "role")
     GuideDTO toDto(Guide guide);
 
+    @Mapping(source = "role.name", target = "role")
     GuideFindDTO toFindDto(Guide guide);
 
     @Mapping(target = "id", ignore = true)
@@ -35,5 +42,6 @@ public interface GuideMapper {
     @InheritConfiguration(name = "toEntity")
     void updateEntityFromDto(GuideUpdateDTO dto, @MappingTarget Guide guide);
 
+    @IterableMapping(qualifiedByName = "toDto")
     List<GuideDTO> toDtos(List<Guide> guides);
 }

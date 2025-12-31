@@ -9,15 +9,20 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {UserMapper.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {UserMapper.class},
+        builder = @Builder(disableBuilder = true)
+)
 public interface TouristMapper {
 
+    @Mapping(source = "role.name", target = "role")
     TouristDTO toDto(Tourist tourist);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "photo")
+    @Mapping(target = "photo", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "role", ignore = true)
     Tourist toEntity(RegisterDTO dto);

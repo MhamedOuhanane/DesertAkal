@@ -12,9 +12,9 @@ public interface CommentMapper {
 
     @Mapping(source = "user.uuid", target = "userUuid")
     @Mapping(source = "article.uuid", target = "articleUuid")
-    @Mapping(expression = "java(reservation.getUser().getFirstName() + \" \" + reservation.getUser().getLastName())", target = "userName")
+    @Mapping(expression = "java(comment.getUser().getFirstName() + \" \" + comment.getUser().getLastName())", target = "userName")
     @Mapping(source = "user.photo", target = "userPhoto")
-    CommentDTO toDto(Comment article);
+    CommentDTO toDto(Comment comment);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uuid", ignore = true)
@@ -26,7 +26,7 @@ public interface CommentMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @InheritConfiguration(name = "toEntity")
-    void updateEntityFromDto(CommentCreateDTO dto, @MappingTarget Comment article);
+    void updateEntityFromDto(CommentCreateDTO dto, @MappingTarget Comment comment);
 
-    List<CommentDTO> toDtos(List<Comment> articles);
+    List<CommentDTO> toDtos(List<Comment> comments);
 }

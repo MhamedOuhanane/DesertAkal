@@ -12,6 +12,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {PermissionMapper.class})
 public interface RoleMapper {
 
+    @Named("toDto")
     RoleDTO toDto(Role role);
     RoleFindDTO toFindDto(Role role);
 
@@ -28,5 +29,6 @@ public interface RoleMapper {
     @Mapping(target = "permissions", ignore = true)
     void updateEntityFromDto(RoleUpdateDTO dto, @MappingTarget Role role);
 
+    @IterableMapping(qualifiedByName = "toDto")
     List<RoleDTO> toDtos(List<Role> roles);
 }

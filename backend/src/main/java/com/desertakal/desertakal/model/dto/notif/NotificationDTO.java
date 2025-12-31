@@ -16,6 +16,6 @@ public class NotificationDTO {
     private String message;
     private Boolean seen;
     private LocalDateTime date;
-    private Long userUuid;
+    private UUID userUuid;
     private String userName;
 }

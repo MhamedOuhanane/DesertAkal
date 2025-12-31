@@ -32,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
 
-    @Cacheable(value = "users", key = "#uuid")
+//    @Cacheable(value = "users", key = "#uuid")
     public CustomUserDetails loadUserByUuid(String uuid) throws UsernameNotFoundException {
         log.debug("Loading user by UUID from DB (Cache Miss): {}", uuid);
 

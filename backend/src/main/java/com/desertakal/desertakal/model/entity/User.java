@@ -23,7 +23,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class User implements Serializable {
+public class User implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 

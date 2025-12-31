@@ -12,6 +12,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {CityTourMapper.class})
 public interface TourMapper {
 
+    @Named("toDto")
     TourDTO toDto(Tour tour);
     TourFindDTO toFindDto(Tour tour);
 
@@ -19,6 +20,7 @@ public interface TourMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "image", ignore = true)
     @Mapping(target = "rating", ignore = true)
+    @Mapping(target = "durationDays", ignore = true)
     @Mapping(target = "reviewCount", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
@@ -29,5 +31,6 @@ public interface TourMapper {
     @InheritConfiguration(name = "toEntity")
     void updateEntityFromDto(TourUpdateDTO dto, @MappingTarget Tour tour);
 
+    @IterableMapping(qualifiedByName = "toDto")
     List<TourDTO> toDtos(List<Tour> tours);
 }

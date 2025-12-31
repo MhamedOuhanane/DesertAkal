@@ -26,7 +26,7 @@ public class ReviewCreateDTO {
     private String comment;
 
     @NotNull(message = "Reviewable UUID is required")
-    private Long reviewableUuid;
+    private UUID reviewableUuid;
 
     @NotNull(message = "Reviewable type is required")
     private ReviewableType reviewableType;
