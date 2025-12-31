@@ -16,7 +16,5 @@ public interface RefreshTokenService {
     LoginDTO refresh(@NonNull String token, @NonNull RefreshTokenRequestDTO dto);
     List<ActiveSessionDTO> getActiveSessions(@NonNull UUID userUuid);
     RefreshTokenFullDTO find(@NonNull String token);
-    List<RefreshTokenDTO> findAll(@NonNull Map<String, Object> map);
-    List<RefreshTokenDTO> findAllByUser(@NonNull UUID userUuid, @NonNull Map<String, Object> map);
 
 }

@@ -181,17 +181,12 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public RefreshTokenFullDTO find(@NonNull String token) {
-        return null;
-    }
+        RefreshToken refreshToken = repository.findByToken(token).orElseThrow(() -> {
+            log.warn("Refresh attempt failed: Token not found in database.");
+            return new ResourceNotFoundException("Refresh token", "token", token);
+        });
 
-    @Override
-    public List<RefreshTokenDTO> findAll(@NonNull Map<String, Object> map) {
-        return List.of();
-    }
-
-    @Override
-    public List<RefreshTokenDTO> findAllByUser(@NonNull UUID userUuid, @NonNull Map<String, Object> map) {
-        return List.of();
+        return mapper.toFindDto(refreshToken);
     }
 
     private void handleSecurityBreach(RefreshToken compromisedToken) {

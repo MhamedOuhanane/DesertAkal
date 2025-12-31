@@ -81,7 +81,6 @@ public class EmailVerificationTokenServiceImpl implements EmailVerificationToken
 
         User user = token.getUser();
         user.setEmailVerified(true);
-        userRepository.save(user);
 
         token.setUsed(true);
 
