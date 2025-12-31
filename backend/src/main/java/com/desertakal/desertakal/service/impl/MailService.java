@@ -19,7 +19,7 @@ public class MailService {
 
     @Async
     public void sendVerificationEmail(String to, String token) {
-        String verificationUrl = apiBaseUrl + "/auth/verify-email?token=" + token;
+        String verificationUrl = apiBaseUrl + "/api/auth/verify-email?token=" + token;
 
         SimpleMailMessage message = new SimpleMailMessage();
 

@@ -64,4 +64,25 @@ public class AuthController {
         );
     }
 
+    @GetMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(
+            @NonNull @RequestParam("token") String token,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("Received email verification request for token: {} | IP: {}", token, request.getRemoteAddr());
+
+        emailVerificationTokenService.confirmEmail(token);
+
+        log.info("Email verified successfully for token: {}", token);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "timestamp", LocalDateTime.now().toString(),
+                        "message", "Your email has been verified successfully. You can now log in to your account.",
+                        "status", "200",
+                        "path", request.getServletPath()
+                )
+        );
+    }
+
 }

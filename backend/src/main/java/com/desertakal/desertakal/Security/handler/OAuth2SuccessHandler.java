@@ -100,19 +100,20 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         log.info("JWT generated for OAuth2 user: {}", user.getEmail());
 
-        String userAgent = request.getHeader("User-Agent");
-        String ipAddress = request.getRemoteAddr();
-        String deviceId = request.getHeader("X-Device-ID") != null ? request.getHeader("X-Device-ID") : "OAuth2-Session";
+//        String userAgent = request.getHeader("User-Agent");
+//        String ipAddress = request.getRemoteAddr();
+//        String deviceId = request.getHeader("X-Device-ID") != null ? request.getHeader("X-Device-ID") : "OAuth2-Session";
 
         String accessToken = jwtService.generateAccessToken(user);
-        RefreshTokenDTO refreshToken = refreshTokenService.create(
-                RefreshTokenRequestDTO.builder()
-                        .userUuid(user.getUuid())
-                        .deviceId(deviceId)
-                        .userAgent(userAgent)
-                        .ipAddress(ipAddress)
-                        .build()
-        );
+        String refreshToken = jwtService.generateRefreshToken(user);
+//        RefreshTokenDTO refreshToken = refreshTokenService.create(
+//                RefreshTokenRequestDTO.builder()
+//                        .userUuid(user.getUuid())
+//                        .deviceId(deviceId)
+//                        .userAgent(userAgent)
+//                        .ipAddress(ipAddress)
+//                        .build()
+//        );
 
         LoginDTO login = LoginDTO.builder()
                 .uuid(user.getUuid())
@@ -120,7 +121,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 .fullName(user.getFullName())
                 .role(role.getName())
                 .accessToken(accessToken)
-                .refreshToken(refreshToken.getToken())
+                .refreshToken(refreshToken)
                 .build();
 
         user.setLastLoginAt(LocalDateTime.now());
