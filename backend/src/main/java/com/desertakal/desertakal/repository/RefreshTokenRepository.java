@@ -16,6 +16,8 @@ public interface RefreshTokenRepository extends JpaRepository<@NonNull RefreshTo
     @EntityGraph(attributePaths = {"user"})
     Optional<RefreshToken> findByToken(String token);
 
+    Optional<RefreshToken> findByUuid(UUID uuid);
+
     List<RefreshToken> findByUserAndDeviceId(User user, String deviceId);
 
     List<RefreshToken> findAllByFamilyId(String familyId);

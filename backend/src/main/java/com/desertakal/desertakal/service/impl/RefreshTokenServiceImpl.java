@@ -4,10 +4,7 @@ import com.desertakal.desertakal.Security.jwt.JwtService;
 import com.desertakal.desertakal.exception.custom.BadRequestException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.auth.LoginDTO;
-import com.desertakal.desertakal.model.dto.refreshToken.ActiveSessionDTO;
-import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenDTO;
-import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenFullDTO;
-import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
+import com.desertakal.desertakal.model.dto.refreshToken.*;
 import com.desertakal.desertakal.model.entity.RefreshToken;
 import com.desertakal.desertakal.model.entity.User;
 import com.desertakal.desertakal.model.mapper.RefreshTokenMapper;
@@ -18,6 +15,7 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +32,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final RefreshTokenMapper mapper;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -187,6 +186,37 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         });
 
         return mapper.toFindDto(refreshToken);
+    }
+
+    @Transactional
+    @Override
+    public void remoteLogout(@NonNull UUID userUuid, @NonNull RemoteLogoutRequestDTO dto) {
+        log.info("Remote logout initiated by user uuid: {} for session UUID: {}",
+                userUuid, dto.getSessionUuid());
+
+        User user = userRepository.findByUuid(userUuid)
+                .orElseThrow(() -> {
+                    log.warn("User not found for UUID: {}", userUuid);
+                    return new ResourceNotFoundException("User", "identifier", userUuid.toString());
+                });
+
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+            log.warn("Security alert: Incorrect password during remote logout attempt by user: {}",
+                    user.getEmail());
+            throw new BadRequestException("Invalid password. Action denied.");
+        }
+
+        RefreshToken targetToken = repository.findByUuid(dto.getSessionUuid())
+                .orElseThrow(() -> {
+                    log.warn("Logout failed: Session UUID {} not found", dto.getSessionUuid().toString());
+                    return new ResourceNotFoundException("Session", "id", dto.getSessionUuid().toString());
+                });
+
+        String familyId = targetToken.getFamilyId();
+        repository.deleteByFamilyId(familyId);
+
+        log.info("Successfully revoked all tokens in family: {} for user: {}",
+                familyId, user.getEmail());
     }
 
     private void handleSecurityBreach(RefreshToken compromisedToken) {

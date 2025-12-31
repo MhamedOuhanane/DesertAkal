@@ -12,11 +12,8 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<@NonNull User, @NonNull UUID> {
 
-    @EntityGraph(attributePaths = {"role", "role.permissions"})
-    @Query("Select u From User u Where u.email = :identifier Or u.username = :identifier")
     Optional<User> findByEmailOrUsername(@Param("identifier") String identifier);
 
-    @EntityGraph(attributePaths = {"role, role.permissions"})
     Optional<User> findByUuid(UUID uuid);
 
     @EntityGraph(attributePaths = {"role", "role.permissions"})

@@ -1,10 +1,7 @@
 package com.desertakal.desertakal.service.interfaces;
 
 import com.desertakal.desertakal.model.dto.auth.LoginDTO;
-import com.desertakal.desertakal.model.dto.refreshToken.ActiveSessionDTO;
-import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenDTO;
-import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenFullDTO;
-import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
+import com.desertakal.desertakal.model.dto.refreshToken.*;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -16,5 +13,6 @@ public interface RefreshTokenService {
     LoginDTO refresh(@NonNull String token, @NonNull RefreshTokenRequestDTO dto);
     List<ActiveSessionDTO> getActiveSessions(@NonNull UUID userUuid);
     RefreshTokenFullDTO find(@NonNull String token);
+    void remoteLogout(@NonNull UUID userUuid, @NonNull RemoteLogoutRequestDTO dto);
 
 }
