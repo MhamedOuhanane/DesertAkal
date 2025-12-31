@@ -25,20 +25,20 @@ public class EmailVerificationTokenServiceImpl implements EmailVerificationToken
     private final UserRepository userRepository;
 
     @Override
-    public void createVerificationToken(@NonNull UUID userUuid) {
-        log.info("Initiating email verification process for User UUID: {}", userUuid);
+    public void createVerificationToken(@NonNull String email) {
+        log.info("Initiating email verification process for User email: {}", email);
 
-        User user = userRepository.findByUuid(userUuid)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                    log.warn("Verification failed: User not found for UUID: {}", userUuid);
-                    return new ResourceNotFoundException("User", "identifier", userUuid.toString());
+                    log.warn("Verification failed: User not found for email: {}", email);
+                    return new ResourceNotFoundException("User", "email", email);
                 });
 
         try {
             repository.deleteByUser(user);
-            log.debug("Cleared existing verification tokens for user: {}", user.getEmail());
+            log.debug("Cleared existing verification tokens for user: {}", email);
         } catch (Exception e) {
-            log.error("Failed to delete old tokens for user {}: {}", user.getEmail(), e.getMessage());
+            log.error("Failed to delete old tokens for user {}: {}", email, e.getMessage());
         }
 
 

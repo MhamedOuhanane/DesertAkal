@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
         tourist.setRole(role);
 
         repository.save(tourist);
-        emailVerificationTokenService.createVerificationToken(tourist.getUuid());
+        emailVerificationTokenService.createVerificationToken(tourist.getEmail());
 
         log.info("Tourist registered successfully! User UUID: {}, Email: {}",
                 tourist.getUuid(), tourist.getEmail());

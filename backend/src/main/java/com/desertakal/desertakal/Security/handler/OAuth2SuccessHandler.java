@@ -3,15 +3,15 @@ package com.desertakal.desertakal.Security.handler;
 import com.desertakal.desertakal.Security.jwt.JwtService;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.auth.LoginDTO;
-import com.desertakal.desertakal.model.entity.Role;
-import com.desertakal.desertakal.model.entity.Tourist;
-import com.desertakal.desertakal.model.entity.User;
-import com.desertakal.desertakal.model.entity.UserOAuth;
+import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenDTO;
+import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
+import com.desertakal.desertakal.model.entity.*;
 import com.desertakal.desertakal.model.enums.OauthProvider;
 import com.desertakal.desertakal.model.enums.UserStatus;
 import com.desertakal.desertakal.repository.RoleRepository;
 import com.desertakal.desertakal.repository.UserOAuthRepository;
 import com.desertakal.desertakal.repository.UserRepository;
+import com.desertakal.desertakal.service.interfaces.RefreshTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,6 +41,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final UserOAuthRepository oAuthRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenService refreshTokenService;
     private final JwtService jwtService;
     private final ObjectMapper mapper;
 
@@ -99,8 +100,19 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         log.info("JWT generated for OAuth2 user: {}", user.getEmail());
 
+        String userAgent = request.getHeader("User-Agent");
+        String ipAddress = request.getRemoteAddr();
+        String deviceId = request.getHeader("X-Device-ID") != null ? request.getHeader("X-Device-ID") : "OAuth2-Session";
+
         String accessToken = jwtService.generateAccessToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
+        RefreshTokenDTO refreshToken = refreshTokenService.create(
+                RefreshTokenRequestDTO.builder()
+                        .userUuid(user.getUuid())
+                        .deviceId(deviceId)
+                        .userAgent(userAgent)
+                        .ipAddress(ipAddress)
+                        .build()
+        );
 
         LoginDTO login = LoginDTO.builder()
                 .uuid(user.getUuid())
@@ -108,7 +120,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 .fullName(user.getFullName())
                 .role(role.getName())
                 .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                .refreshToken(refreshToken.getToken())
                 .build();
 
         user.setLastLoginAt(LocalDateTime.now());

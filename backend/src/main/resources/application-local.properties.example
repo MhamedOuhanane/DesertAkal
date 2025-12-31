@@ -5,10 +5,13 @@ spring.datasource.driver-class-name=org.postgresql.Driver
 
 app.api.base-url=
 
-spring.mail.host=
-spring.mail.port=
-spring.mail.properties.mail.smtp.auth=
-spring.mail.properties.mail.smtp.starttls.enable=
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=
+spring.mail.password=
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.smtp.starttls.required=true
 
 security.jwt.secret=
 security.jwt.access.expiration=900000
