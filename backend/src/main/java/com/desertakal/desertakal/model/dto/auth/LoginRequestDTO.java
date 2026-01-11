@@ -20,6 +20,9 @@ public class LoginRequestDTO {
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
+    @NotBlank(message = "DeviceId is required")
+    private String deviceId;
+
     private OauthProvider provider;
     private String providerId;
 }

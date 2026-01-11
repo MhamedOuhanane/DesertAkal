@@ -5,6 +5,8 @@ import com.desertakal.desertakal.model.dto.error.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -56,6 +58,38 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<?> handleDisabledException(
+            DisabledException exception,
+            HttpServletRequest request
+    ) {
+        var error = ErrorResponse.<String>builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("Account Disabled")
+                .message("Sorry, this account is not activated. Please check your email or contact the administration.")
+                .path(request.getServletPath())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<?> handleLockedException(
+            LockedException exception,
+            HttpServletRequest request
+    ) {
+        var error = ErrorResponse.<String>builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("Account Locked")
+                .message("This account has been banned. Please contact administration for support.")
+                .path(request.getServletPath())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 
     @ExceptionHandler(Exception.class)

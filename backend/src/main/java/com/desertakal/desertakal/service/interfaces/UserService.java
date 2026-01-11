@@ -7,5 +7,5 @@ import org.jspecify.annotations.NonNull;
 
 public interface UserService {
     void register(@NonNull RegisterDTO dto);
-    LoginDTO login(@NonNull LoginRequestDTO dto);
+    LoginDTO login(@NonNull LoginRequestDTO dto, @NonNull String ipAddress, @NonNull String userAgent);
 }

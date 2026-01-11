@@ -1,24 +1,32 @@
 package com.desertakal.desertakal.service.impl;
 
+import com.desertakal.desertakal.Security.jwt.JwtService;
+import com.desertakal.desertakal.exception.custom.AuthenticationException;
 import com.desertakal.desertakal.exception.custom.BadRequestException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
+import com.desertakal.desertakal.exception.custom.UnauthorizedActionException;
 import com.desertakal.desertakal.model.dto.auth.LoginDTO;
 import com.desertakal.desertakal.model.dto.auth.LoginRequestDTO;
 import com.desertakal.desertakal.model.dto.auth.RegisterDTO;
+import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenDTO;
+import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
 import com.desertakal.desertakal.model.entity.Role;
 import com.desertakal.desertakal.model.entity.Tourist;
+import com.desertakal.desertakal.model.entity.User;
+import com.desertakal.desertakal.model.enums.UserStatus;
 import com.desertakal.desertakal.model.mapper.TouristMapper;
 import com.desertakal.desertakal.model.mapper.UserMapper;
-import com.desertakal.desertakal.repository.RefreshTokenRepository;
 import com.desertakal.desertakal.repository.RoleRepository;
 import com.desertakal.desertakal.repository.UserRepository;
 import com.desertakal.desertakal.service.interfaces.EmailVerificationTokenService;
+import com.desertakal.desertakal.service.interfaces.RefreshTokenService;
 import com.desertakal.desertakal.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +35,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenService refreshTokenService;
+    private final JwtService jwtService;
     private final UserMapper mapper;
     private final TouristMapper touristMapper;
     private final EmailVerificationTokenService emailVerificationTokenService;
@@ -67,8 +76,49 @@ public class UserServiceImpl implements UserService {
                 tourist.getUuid(), tourist.getEmail());
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public LoginDTO login(@NonNull LoginRequestDTO dto) {
-        return null;
+    public LoginDTO login(@NonNull LoginRequestDTO dto, @NonNull String ipAddress, @NonNull String userAgent) {
+        User user = repository.findByEmailOrUsernameWithSecurity(dto.getUsername())
+                .orElseThrow(() -> {
+                    log.warn("Login failed: User not found with username/email: {}", dto.getUsername());
+                    return new AuthenticationException("Invalid username or password.");
+                });
+
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+            log.warn("Login failed: Wrong password for user {}", dto.getUsername());
+            throw new AuthenticationException("Invalid username or password.");
+        }
+
+        if (user.getStatus() == UserStatus.BANNED) {
+            log.warn("Login failed: User {} is BANNED", dto.getUsername());
+            throw new UnauthorizedActionException("This account has been banned. Please contact administration.");
+        }
+
+        if (user.getStatus() != UserStatus.ACTIVE || !user.getEmailVerified()) {
+            log.warn("Login failed: User {} is not active or not verified", dto.getUsername());
+            throw new AuthenticationException("Account is disabled. Please verify your email.");
+        }
+
+        log.info("Login successful for user: {}", user.getEmail());
+
+        String accessToken = jwtService.generateAccessToken(user);
+
+        RefreshTokenRequestDTO refRequestDTO = RefreshTokenRequestDTO.builder()
+                .userUuid(user.getUuid())
+                .deviceId(dto.getDeviceId())
+                .userAgent(userAgent)
+                .ipAddress(ipAddress)
+                .build();
+        RefreshTokenDTO refreshToken = refreshTokenService.create(refRequestDTO);
+
+        return LoginDTO.builder()
+                .uuid(user.getUuid())
+                .username(user.getUsername())
+                .fullName(user.getFullName())
+                .role(user.getRole().getName())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken.getToken())
+                .build();
     }
 }
