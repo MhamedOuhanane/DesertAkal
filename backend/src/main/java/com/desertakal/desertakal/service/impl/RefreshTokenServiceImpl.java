@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -73,7 +74,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return mapper.toDto(refreshToken);
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = BadRequestException.class)
     @Override
     public LoginDTO refresh(@NonNull String token, @NonNull RefreshTokenRequestDTO dto) {
         log.info("Attempting to refresh token for device: {} from IP: {}", dto.getDeviceId(), dto.getIpAddress());
@@ -83,11 +84,18 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             return new ResourceNotFoundException("Refresh token", "token", token);
         });
 
-        if (oldToken.isUsed() || oldToken.isReuseDetected()) {
+        if (oldToken.isUsed()) {
             log.error("SECURITY ALERT: Reuse detected for User: {}. FamilyId: {}. ParentToken: {}",
                     oldToken.getUser().getEmail(), oldToken.getFamilyId().toString(), oldToken.getParentToken());
             handleSecurityBreach(oldToken);
             throw new BadRequestException("Security Alert: This token has already been used. All related sessions revoked.");
+        }
+
+        if (oldToken.isReuseDetected()) {
+            log.warn("BLOCKED ACCESS: Attempt to use an already flagged compromised token. User: {}. FamilyId: {}",
+                    oldToken.getUser().getEmail(), oldToken.getFamilyId());
+
+            throw new BadRequestException("This session is no longer valid due to a previous security breach. Please login again.");
         }
 
         if (oldToken.isRevoked()){
@@ -227,8 +235,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         compromisedToken.setRevoked(true);
         compromisedToken.setRevokedAt(LocalDateTime.now());
 
-        repository.deleteByFamilyId(compromisedToken.getFamilyId());
-
+        repository.save(compromisedToken);
+        repository.flush();
         log.info("Family {} has been purged from the system.", compromisedToken.getFamilyId().toString());
     }
 }

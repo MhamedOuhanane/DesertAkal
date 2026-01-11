@@ -23,7 +23,7 @@
             </column>
 
             <column name="family_id" type="UUID">
-                <constraints nullable="false" unique="true"/>
+                <constraints nullable="false"/>
             </column>
 
             <column name="parent_token" type="VARCHAR(500)"/>
