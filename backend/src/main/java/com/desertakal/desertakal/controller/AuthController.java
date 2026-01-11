@@ -74,7 +74,7 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie.from("refreshToken", result.getRefreshToken())
                         .httpOnly(true)
                         .secure(cookieConfig.isSecure())
-                        .path("/api/auth/refresh")
+                        .path("/api/auth")
                         .maxAge(cookieConfig.getMaxAge())
                         .sameSite(cookieConfig.getSameSite())
                         .build();
@@ -117,7 +117,7 @@ public class AuthController {
         ResponseCookie newCookie = ResponseCookie.from("refreshToken", result.getRefreshToken())
                         .httpOnly(true)
                         .secure(cookieConfig.isSecure())
-                        .path("/api/auth/refresh")
+                        .path("/api/auth")
                         .maxAge(cookieConfig.getMaxAge())
                         .sameSite(cookieConfig.getSameSite())
                         .build();
@@ -231,5 +231,34 @@ public class AuthController {
         );
     }
 
+    @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> remoteLogout(
+            @NonNull @CookieValue(name = "refreshToken") String token,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("Logout request received for path: {}", request.getServletPath());
+
+        refreshTokenService.logout(token);
+
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(cookieConfig.isSecure())
+                .path("/api/auth")
+                .maxAge(0)
+                .sameSite(cookieConfig.getSameSite())
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(
+                        Map.of(
+                                "timestamp", LocalDateTime.now().toString(),
+                                "message", "Logout successful. Session cleared.",
+                                "status", 200,
+                                "path", request.getServletPath()
+                        )
+                );
+    }
 
 }

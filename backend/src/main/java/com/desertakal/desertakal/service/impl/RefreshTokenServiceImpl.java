@@ -227,6 +227,17 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 familyId.toString(), user.getEmail());
     }
 
+    @Override
+    public void logout(@NonNull String token) {
+        RefreshToken refreshToken = repository.findByToken(token).orElseThrow(() -> {
+            log.warn("Refresh attempt failed: Token not found in database.");
+            return new ResourceNotFoundException("Refresh token", "token", token);
+        });
+
+        repository.deleteByFamilyId(refreshToken.getFamilyId());
+        log.info("User logging out. Revoking family: {}", refreshToken.getFamilyId());
+    }
+
     private void handleSecurityBreach(RefreshToken compromisedToken) {
         log.error("BREACH HANDLER: Revoking entire family {} for user {}",
                 compromisedToken.getFamilyId(), compromisedToken.getUser().getEmail());
@@ -239,4 +250,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         repository.flush();
         log.info("Family {} has been purged from the system.", compromisedToken.getFamilyId().toString());
     }
+
+
 }

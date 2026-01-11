@@ -14,5 +14,6 @@ public interface RefreshTokenService {
     List<ActiveSessionDTO> getActiveSessions(@NonNull UUID userUuid);
     RefreshTokenFullDTO find(@NonNull String token);
     void remoteLogout(@NonNull UUID userUuid, @NonNull RemoteLogoutRequestDTO dto);
+    void logout(@NonNull String token);
 
 }
