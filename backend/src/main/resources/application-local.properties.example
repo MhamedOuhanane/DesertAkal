@@ -17,6 +17,8 @@ security.jwt.secret=
 security.jwt.access.expiration=900000
 security.jwt.refresh.expiration=2592000000
 
+security.cookie.secure=
+
 spring.security.oauth2.client.registration.google.client-id=
 spring.security.oauth2.client.registration.google.client-secret=
 spring.security.oauth2.client.registration.google.scope=
@@ -34,3 +36,5 @@ spring.security.oauth2.client.provider.discord.authorization-uri=https://discord
 spring.security.oauth2.client.provider.discord.token-uri=https://discord.com/api/oauth2/token
 spring.security.oauth2.client.provider.discord.user-info-uri=https://discord.com/api/users/@me
 spring.security.oauth2.client.provider.discord.user-name-attribute=username
+
+app.oauth2.redirect-uri=

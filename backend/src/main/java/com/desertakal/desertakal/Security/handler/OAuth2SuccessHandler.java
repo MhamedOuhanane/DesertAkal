@@ -1,13 +1,13 @@
 package com.desertakal.desertakal.Security.handler;
 
 import com.desertakal.desertakal.Security.jwt.JwtService;
+import com.desertakal.desertakal.config.CookieConfig;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.auth.LoginDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
 import com.desertakal.desertakal.model.entity.*;
 import com.desertakal.desertakal.model.enums.OauthProvider;
-import com.desertakal.desertakal.model.enums.UserStatus;
 import com.desertakal.desertakal.repository.RoleRepository;
 import com.desertakal.desertakal.repository.UserOAuthRepository;
 import com.desertakal.desertakal.repository.UserRepository;
@@ -19,6 +19,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -26,6 +29,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -44,6 +48,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final RefreshTokenService refreshTokenService;
     private final JwtService jwtService;
     private final ObjectMapper mapper;
+    private final CookieConfig cookieConfig;
+
+    @Value("${app.oauth2.redirect-uri}")
+    private String redirectUri;
 
     @Override
     public void onAuthenticationSuccess(
@@ -114,21 +122,26 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                         .build()
         );
 
-        LoginDTO login = LoginDTO.builder()
-                .uuid(user.getUuid())
-                .username(user.getEmail())
-                .fullName(user.getFullName())
-                .role(role.getName())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken.getToken())
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken.getToken())
+                .httpOnly(true)
+                .secure(cookieConfig.isSecure())
+                .path("/api/auth/refresh")
+                .maxAge(cookieConfig.getMaxAge())
+                .sameSite(cookieConfig.getSameSite())
                 .build();
 
         user.setLastLoginAt(LocalDateTime.now());
         repository.save(user);
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        mapper.writeValue(response.getOutputStream(), login);
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
+                        .queryParam("token", accessToken)
+                        .build().toUriString();
+
+        log.info("OAuth2 Success: Redirecting user {} to frontend", user.getEmail());
+
+        response.sendRedirect(targetUrl);
     }
 
     private OauthUserInfo extractUserInfo(OAuth2AuthenticationToken authToken, String registrationId) {

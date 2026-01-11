@@ -1,8 +1,10 @@
 package com.desertakal.desertakal.controller;
 
+import com.desertakal.desertakal.config.CookieConfig;
 import com.desertakal.desertakal.model.dto.auth.EmailVerificationDTO;
 import com.desertakal.desertakal.model.dto.auth.LoginRequestDTO;
 import com.desertakal.desertakal.model.dto.auth.RegisterDTO;
+import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
 import com.desertakal.desertakal.service.interfaces.EmailVerificationTokenService;
 import com.desertakal.desertakal.service.interfaces.RefreshTokenService;
 import com.desertakal.desertakal.service.interfaces.UserService;
@@ -11,6 +13,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +29,7 @@ public class AuthController {
     private final UserService service;
     private final RefreshTokenService refreshTokenService;
     private final EmailVerificationTokenService emailVerificationTokenService;
+    private final CookieConfig cookieConfig;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(
@@ -61,17 +66,72 @@ public class AuthController {
 
         var result = service.login(dto, ipAddress, userAgent);
 
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", result.getRefreshToken())
+                        .httpOnly(true)
+                        .secure(cookieConfig.isSecure())
+                        .path("/api/auth/refresh")
+                        .maxAge(cookieConfig.getMaxAge())
+                        .sameSite(cookieConfig.getSameSite())
+                        .build();
+
+        result.setRefreshToken(null);
+
         log.info("Login successful for user: {} | Path: {}", dto.getUsername(), request.getServletPath());
 
-        return ResponseEntity.ok(
-                Map.of(
-                        "timestamp", LocalDateTime.now().toString(),
-                        "message", "Login successful!",
-                        "status", 200,
-                        "path", request.getServletPath(),
-                        "data", result
-                )
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(
+                    Map.of(
+                            "timestamp", LocalDateTime.now().toString(),
+                            "message", "Login successful!",
+                            "status", 200,
+                            "path", request.getServletPath(),
+                            "data", result
+                    )
+                );
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(
+            @NonNull @CookieValue(name = "refreshToken") String token,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to refresh token | IP: {} | Device: {}",
+                request.getRemoteAddr(),
+                request.getHeader("User-Agent"));
+
+        var result = refreshTokenService.refresh(
+                token,
+                RefreshTokenRequestDTO.builder()
+                        .userAgent(request.getHeader("User-Agent"))
+                        .ipAddress(request.getRemoteAddr())
+                        .deviceId(request.getHeader("X-Device-ID"))
+                        .build()
         );
+
+        ResponseCookie newCookie = ResponseCookie.from("refreshToken", result.getRefreshToken())
+                        .httpOnly(true)
+                        .secure(cookieConfig.isSecure())
+                        .path("/api/auth/refresh")
+                        .maxAge(cookieConfig.getMaxAge())
+                        .sameSite(cookieConfig.getSameSite())
+                        .build();
+
+        result.setRefreshToken(null);
+
+        log.info("Token refreshed successfully for user: {}", result.getUsername());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, newCookie.toString())
+                .body(
+                        Map.of(
+                                "timestamp", LocalDateTime.now().toString(),
+                                "message", "Token refreshed successfully!",
+                                "status", 200,
+                                "path", request.getServletPath(),
+                                "data", result
+                        )
+                );
     }
 
     @PostMapping("/verify-email")
