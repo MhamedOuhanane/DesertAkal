@@ -1,6 +1,7 @@
 package com.desertakal.desertakal.controller;
 
 import com.desertakal.desertakal.model.dto.auth.EmailVerificationDTO;
+import com.desertakal.desertakal.model.dto.auth.LoginRequestDTO;
 import com.desertakal.desertakal.model.dto.auth.RegisterDTO;
 import com.desertakal.desertakal.service.interfaces.EmailVerificationTokenService;
 import com.desertakal.desertakal.service.interfaces.RefreshTokenService;
@@ -38,9 +39,37 @@ public class AuthController {
         return ResponseEntity.status(201).body(
                 Map.of(
                         "timestamp", LocalDateTime.now().toString(),
-                        "message", "User registered successfully. Please check your email for activation.",
+                        "message", "Register successful. Please check your email for activation.",
                         "status", "201",
                         "path", request.getServletPath()
+                )
+        );
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(
+            @NonNull @Valid LoginRequestDTO dto,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to login user: {} | IP: {} | Device: {}",
+                dto.getUsername(),
+                request.getRemoteAddr(),
+                request.getHeader("User-Agent"));
+
+        String userAgent = request.getHeader("User-Agent");
+        String ipAddress = request.getRemoteAddr();
+
+        var result = service.login(dto, ipAddress, userAgent);
+
+        log.info("Login successful for user: {} | Path: {}", dto.getUsername(), request.getServletPath());
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "timestamp", LocalDateTime.now().toString(),
+                        "message", "Login successful!",
+                        "status", 200,
+                        "path", request.getServletPath(),
+                        "data", result
                 )
         );
     }
