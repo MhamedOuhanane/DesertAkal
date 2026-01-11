@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.controller;
 
+import com.desertakal.desertakal.Security.user.CustomUserDetails;
 import com.desertakal.desertakal.config.CookieConfig;
 import com.desertakal.desertakal.model.dto.auth.EmailVerificationDTO;
 import com.desertakal.desertakal.model.dto.auth.LoginRequestDTO;
@@ -16,10 +17,13 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -170,6 +174,31 @@ public class AuthController {
                         "message", "Your email has been verified successfully. You can now log in to your account.",
                         "status", "200",
                         "path", request.getServletPath()
+                )
+        );
+    }
+
+    @GetMapping("/sessions")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getMySessions(
+            @NonNull @AuthenticationPrincipal CustomUserDetails userDetails,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to fetch active sessions for user: {} | UUID: {} | IP: {}",
+                userDetails.getEmail(), userDetails.getUuid(), request.getRemoteAddr());
+
+        var activeSessions = refreshTokenService.getActiveSessions(userDetails.getUuid());
+
+        log.info("Successfully retrieved {} active sessions for user: {}",
+                activeSessions.size(), userDetails.getEmail());
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "timestamp", LocalDateTime.now().toString(),
+                        "message", "Active sessions retrieved successfully.",
+                        "status", 200,
+                        "path", request.getServletPath(),
+                        "data", activeSessions
                 )
         );
     }

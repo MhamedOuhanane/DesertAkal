@@ -3,6 +3,7 @@ package com.desertakal.desertakal.Security.jwt;
 import com.desertakal.desertakal.Security.user.CustomUserDetails;
 import com.desertakal.desertakal.model.entity.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -80,6 +81,10 @@ public class JwtService {
     }
 
     public boolean isTokenExpired(String token) {
-        return extractClaim(token, Claims::getExpiration).before(new Date());
+        try {
+            return extractClaim(token, Claims::getExpiration).before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
     }
 }

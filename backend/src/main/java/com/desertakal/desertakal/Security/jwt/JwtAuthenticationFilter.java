@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +19,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
@@ -32,25 +34,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
-            String uuid = jwtService.extractSub(token);
 
-            if (uuid != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                CustomUserDetails userDetails = userDetailsService.loadUserByUuid(uuid);
+            try {
 
-                if (jwtService.isValidToken(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken authenticationToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities()
-                            );
+                String uuid = jwtService.extractSub(token);
 
-                    authenticationToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
-                    );
+                if (uuid != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    CustomUserDetails userDetails = userDetailsService.loadUserByUuid(uuid);
 
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    if (jwtService.isValidToken(token, userDetails)) {
+                        UsernamePasswordAuthenticationToken authenticationToken =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails,
+                                        null,
+                                        userDetails.getAuthorities()
+                                );
+
+                        authenticationToken.setDetails(
+                                new WebAuthenticationDetailsSource().buildDetails(request)
+                        );
+
+                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    }
                 }
+            } catch (io.jsonwebtoken.ExpiredJwtException e) {
+                log.warn("JWT token expired: {}", e.getMessage());
+            } catch (Exception e) {
+                log.error("JWT validation failed: {}", e.getMessage());
             }
         }
 
