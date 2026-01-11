@@ -6,6 +6,7 @@ import com.desertakal.desertakal.model.dto.auth.EmailVerificationDTO;
 import com.desertakal.desertakal.model.dto.auth.LoginRequestDTO;
 import com.desertakal.desertakal.model.dto.auth.RegisterDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
+import com.desertakal.desertakal.model.dto.refreshToken.RemoteLogoutRequestDTO;
 import com.desertakal.desertakal.service.interfaces.EmailVerificationTokenService;
 import com.desertakal.desertakal.service.interfaces.RefreshTokenService;
 import com.desertakal.desertakal.service.interfaces.UserService;
@@ -202,5 +203,33 @@ public class AuthController {
                 )
         );
     }
+
+    @PostMapping("/remote-logout")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> remoteLogout(
+            @NonNull @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @NonNull @RequestBody RemoteLogoutRequestDTO dto,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to remote logout session: {} for user: {}",
+                dto.getSessionUuid(), userDetails.getEmail());
+
+        UUID userUuid = userDetails.getUuid();
+
+        refreshTokenService.remoteLogout(userUuid, dto);
+
+        log.info("Session {} successfully revoked by user: {}",
+                dto.getSessionUuid(), userDetails.getEmail());
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "timestamp", LocalDateTime.now().toString(),
+                        "message", "Session has been successfully revoked.",
+                        "status", 200,
+                        "path", request.getServletPath()
+                )
+        );
+    }
+
 
 }
