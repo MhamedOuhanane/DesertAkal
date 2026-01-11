@@ -51,7 +51,7 @@ public class JwtService {
                 .compact();
     }
 
-    public String extractSub(String token) {return extractClaim(token, Claims::getAudience);}
+    public String extractSub(String token) {return extractClaim(token, Claims::getSubject);}
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
@@ -62,7 +62,7 @@ public class JwtService {
         return Jwts.parserBuilder()
                 .setSigningKey(getSecretKey())
                 .build()
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token)
                 .getBody();
     }
 

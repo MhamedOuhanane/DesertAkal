@@ -40,7 +40,7 @@ public class RefreshToken implements Serializable {
     private User user;
 
     @Column(name = "family_id", nullable = false, length = 100)
-    private String familyId;
+    private UUID familyId;
 
     @Column(name = "parent_token", length = 500)
     private String parentToken;
@@ -87,6 +87,12 @@ public class RefreshToken implements Serializable {
 
     @PrePersist
     public void prePersist() {
+        if (this.uuid == null)
+            this.uuid = UUID.randomUUID();
+
+        if (this.familyId == null)
+            this.familyId = UUID.randomUUID();
+
         if (expiresAt == null)
             expiresAt = LocalDateTime.now().plusDays(30);
     }

@@ -58,7 +58,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
         refreshToken.setToken(token);
         refreshToken.setUser(user);
-        refreshToken.setFamilyId(UUID.randomUUID().toString());
+        refreshToken.setFamilyId(UUID.randomUUID());
         refreshToken.setExpiresAt(
                 expiration.toInstant()
                         .atZone(ZoneId.systemDefault())
@@ -85,14 +85,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
         if (oldToken.isUsed() || oldToken.isReuseDetected()) {
             log.error("SECURITY ALERT: Reuse detected for User: {}. FamilyId: {}. ParentToken: {}",
-                    oldToken.getUser().getEmail(), oldToken.getFamilyId(), oldToken.getParentToken());
+                    oldToken.getUser().getEmail(), oldToken.getFamilyId().toString(), oldToken.getParentToken());
             handleSecurityBreach(oldToken);
             throw new BadRequestException("Security Alert: This token has already been used. All related sessions revoked.");
         }
 
         if (oldToken.isRevoked()){
             log.warn("Revoked token access attempt: FamilyId {}, User {}",
-                    oldToken.getFamilyId(), oldToken.getUser().getEmail());
+                    oldToken.getFamilyId().toString(), oldToken.getUser().getEmail());
             throw new BadRequestException("This session has been revoked. Please login again.");
         }
 
@@ -212,11 +212,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                     return new ResourceNotFoundException("Session", "id", dto.getSessionUuid().toString());
                 });
 
-        String familyId = targetToken.getFamilyId();
+        UUID familyId = targetToken.getFamilyId();
         repository.deleteByFamilyId(familyId);
 
         log.info("Successfully revoked all tokens in family: {} for user: {}",
-                familyId, user.getEmail());
+                familyId.toString(), user.getEmail());
     }
 
     private void handleSecurityBreach(RefreshToken compromisedToken) {
@@ -229,6 +229,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
         repository.deleteByFamilyId(compromisedToken.getFamilyId());
 
-        log.info("Family {} has been purged from the system.", compromisedToken.getFamilyId());
+        log.info("Family {} has been purged from the system.", compromisedToken.getFamilyId().toString());
     }
 }

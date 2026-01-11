@@ -48,7 +48,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @NonNull @Valid LoginRequestDTO dto,
+            @NonNull @Valid @RequestBody LoginRequestDTO dto,
             @NonNull HttpServletRequest request
     ) {
         log.info("REST request to login user: {} | IP: {} | Device: {}",

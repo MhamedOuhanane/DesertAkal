@@ -20,7 +20,7 @@ public interface RefreshTokenRepository extends JpaRepository<@NonNull RefreshTo
 
     List<RefreshToken> findByUserAndDeviceId(User user, String deviceId);
 
-    List<RefreshToken> findAllByFamilyId(String familyId);
+    List<RefreshToken> findAllByFamilyId(UUID familyId);
 
     Optional<RefreshToken> findByTokenAndRevoked(String token, boolean Revoked);
     Optional<RefreshToken> findByTokenAndUsed(String token, boolean Used);
@@ -35,7 +35,7 @@ public interface RefreshTokenRepository extends JpaRepository<@NonNull RefreshTo
     @Transactional
     void deleteByUser(User user);
     @Transactional
-    void deleteByFamilyId(String familyId);
+    void deleteByFamilyId(UUID familyId);
 
     @Transactional
     void deleteByExpiresAtBefore(LocalDateTime dateTime);

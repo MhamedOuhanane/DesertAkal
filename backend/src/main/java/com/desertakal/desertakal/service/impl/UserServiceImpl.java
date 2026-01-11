@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
                 tourist.getUuid(), tourist.getEmail());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     @Override
     public LoginDTO login(@NonNull LoginRequestDTO dto, @NonNull String ipAddress, @NonNull String userAgent) {
         User user = repository.findByEmailOrUsernameWithSecurity(dto.getUsername())

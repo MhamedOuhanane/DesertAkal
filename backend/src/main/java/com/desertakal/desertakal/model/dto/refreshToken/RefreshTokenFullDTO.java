@@ -15,7 +15,7 @@ public class RefreshTokenFullDTO {
     private String token;
     private UUID userUuid;
     private String userName;
-    private String familyId;
+    private UUID familyId;
     private String parentToken;
     private LocalDateTime createdAt;
     private LocalDateTime expiresAt;

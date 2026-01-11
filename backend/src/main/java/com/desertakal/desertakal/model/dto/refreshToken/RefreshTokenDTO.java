@@ -14,7 +14,7 @@ public class RefreshTokenDTO {
     private UUID uuid;
     private String token;
     private UUID userUuid;
-    private String familyId;
+    private UUID familyId;
     private String deviceId;
     private String userAgent;
     private String ipAddress;
