@@ -10,6 +10,8 @@ import com.desertakal.desertakal.model.dto.auth.LoginRequestDTO;
 import com.desertakal.desertakal.model.dto.auth.RegisterDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
+import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
+import com.desertakal.desertakal.model.dto.user.UserDTO;
 import com.desertakal.desertakal.model.entity.Role;
 import com.desertakal.desertakal.model.entity.Tourist;
 import com.desertakal.desertakal.model.entity.User;
@@ -24,11 +26,15 @@ import com.desertakal.desertakal.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -123,6 +129,30 @@ public class UserServiceImpl implements UserService {
                 .role(user.getRole().getName())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken.getToken())
+                .build();
+    }
+
+    @Override
+    public PaginationDTO findAll(@NonNull Map<String, Object> map) {
+        int page = (int) map.getOrDefault("page", 0);
+        int size = (int) map.getOrDefault("size", 10);
+        String sortBy = (String) map.getOrDefault("sortBy", "last_login_at");
+        String order = (String) map.getOrDefault("order", "asc");
+
+        Sort sort = Sort.by(Sort.Direction.fromString(order), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        var userPages = repository.findAll(pageable);
+
+
+        return PaginationDTO.builder()
+                .content(mapper.toDtos(userPages.getContent()))
+                .page(userPages.getNumber())
+                .size(userPages.getSize())
+                .totalElements(userPages.getTotalElements())
+                .totalPages(userPages.getTotalPages())
+                .isFirst(userPages.isFirst())
+                .isLast(userPages.isLast())
                 .build();
     }
 }
