@@ -12,6 +12,7 @@ import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.user.UserFindDTO;
+import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
 import com.desertakal.desertakal.model.entity.Role;
 import com.desertakal.desertakal.model.entity.Tourist;
 import com.desertakal.desertakal.model.entity.User;
@@ -32,7 +33,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -163,6 +163,26 @@ public class UserServiceImpl implements UserService {
                 });
 
         log.debug("User successfully retrieved: {} (UUID: {})", user.getEmail(), userUuid);
+
+        return mapper.toFindDto(user);
+    }
+
+    @Override
+    @Transactional
+    public UserFindDTO update(@NonNull UUID userUuid, @NonNull UserUpdateDTO dto) {
+        log.info("Starting update process for user with UUID: {}", userUuid);
+
+        User user = repository.findWithSecurityByUuid(userUuid)
+                .orElseThrow(() -> {
+                    log.warn("Update failed: User with UUID {} not found", userUuid);
+                    return new ResourceNotFoundException("User", "identifier", userUuid.toString());
+                });
+
+        log.debug("Mapping UpdateDTO to User entity for UUID: {}", userUuid);
+
+        mapper.updateEntityFromDto(dto, user);
+
+        log.info("User with UUID: {} successfully updated", userUuid);
 
         return mapper.toFindDto(user);
     }
