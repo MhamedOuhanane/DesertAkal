@@ -11,7 +11,6 @@ import com.desertakal.desertakal.model.dto.auth.RegisterDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
-import com.desertakal.desertakal.model.dto.user.UserDTO;
 import com.desertakal.desertakal.model.entity.Role;
 import com.desertakal.desertakal.model.entity.Tourist;
 import com.desertakal.desertakal.model.entity.User;
@@ -26,9 +25,7 @@ import com.desertakal.desertakal.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -133,17 +130,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PaginationDTO findAll(@NonNull Map<String, Object> map) {
-        int page = (int) map.getOrDefault("page", 0);
-        int size = (int) map.getOrDefault("size", 10);
-        String sortBy = (String) map.getOrDefault("sortBy", "last_login_at");
-        String order = (String) map.getOrDefault("order", "asc");
-
-        Sort sort = Sort.by(Sort.Direction.fromString(order), sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public PaginationDTO findAll(@NonNull Pageable pageable) {
+        log.info("Fetching users list - Page: {}, Size: {}, Sort: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
 
         var userPages = repository.findAll(pageable);
 
+        log.debug("Successfully retrieved {} users from database", userPages.getNumberOfElements());
 
         return PaginationDTO.builder()
                 .content(mapper.toDtos(userPages.getContent()))
