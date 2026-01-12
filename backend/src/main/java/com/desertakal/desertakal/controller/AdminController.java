@@ -2,6 +2,7 @@ package com.desertakal.desertakal.controller;
 
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
+import com.desertakal.desertakal.model.dto.user.UserFindDTO;
 import com.desertakal.desertakal.service.interfaces.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -11,12 +12,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -26,7 +25,7 @@ public class AdminController {
     private final UserService userService;
 
     @GetMapping("/users")
-    public ResponseEntity<@NonNull StandardResponseDTO<PaginationDTO>> getUsers(
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> getUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "last_login_at") String sortBy,
@@ -50,6 +49,28 @@ public class AdminController {
                 .build();
 
         log.info("Successfully processed users request for path: {}", request.getServletPath());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/users/{uuid}")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull UserFindDTO>> getUser(
+            @NonNull @PathVariable UUID uuid,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to get User by UUID: {} [Path: {}]", uuid, request.getServletPath());
+
+        var result = userService.find(uuid);
+
+        var response = StandardResponseDTO.<UserFindDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("User details retrieved successfully")
+                .status(200)
+                .path(request.getServletPath())
+                .data(result)
+                .build();
+
+        log.info("Successfully retrieved user details for UUID: {}", uuid);
 
         return ResponseEntity.ok(response);
     }

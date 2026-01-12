@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StandardResponseDTO<T> {
+public class StandardResponseDTO<@NonNull T> {
     private LocalDateTime timestamp;
     private String message;
     private int status;
