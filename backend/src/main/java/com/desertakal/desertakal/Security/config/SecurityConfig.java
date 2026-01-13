@@ -41,9 +41,9 @@ public class SecurityConfig {
                                 "/error",
                                 "/favicon.ico"
                         ).permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/guide/**").hasAnyRole("ADMIN", "GUIDE")
-                        .requestMatchers("/api/tourist/**").hasAnyRole("ADMIN", "TOURIST")
+                        .requestMatchers("/api/admins/**").hasRole("ADMIN")
+                        .requestMatchers("/api/guides/**").hasAnyRole("ADMIN", "GUIDE")
+                        .requestMatchers("/api/tourists/**").hasAnyRole("ADMIN", "TOURIST")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

@@ -3,8 +3,10 @@ package com.desertakal.desertakal.controller;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.dto.user.UserFindDTO;
+import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
 import com.desertakal.desertakal.service.interfaces.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -18,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admins")
 @RequiredArgsConstructor
 @Slf4j
 public class AdminController {
@@ -28,7 +30,7 @@ public class AdminController {
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> getUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "last_login_at") String sortBy,
+            @RequestParam(defaultValue = "lastLoginAt") String sortBy,
             @RequestParam(defaultValue = "asc") String order,
             @NonNull HttpServletRequest request
     ) {
@@ -71,6 +73,31 @@ public class AdminController {
                 .build();
 
         log.info("Successfully retrieved user details for UUID: {}", uuid);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/users/{uuid}")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull UserFindDTO>> updateUser(
+            @NonNull @PathVariable UUID uuid,
+            @NonNull @Valid @RequestBody UserUpdateDTO dto,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to patch User : {} [Path: {}]", uuid, request.getServletPath());
+
+        log.debug("Update payload for user {}: {}", uuid, dto);
+
+        var result = userService.update(uuid, dto);
+
+        var response = StandardResponseDTO.<UserFindDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("")
+                .status(200)
+                .path(request.getServletPath())
+                .data(result)
+                .build();
+
+        log.info("User with UUID: {} has been successfully patched via {}", uuid, request.getServletPath());
 
         return ResponseEntity.ok(response);
     }

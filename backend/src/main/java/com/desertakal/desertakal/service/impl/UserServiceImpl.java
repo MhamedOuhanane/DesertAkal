@@ -162,6 +162,10 @@ public class UserServiceImpl implements UserService {
                     return new ResourceNotFoundException("User", "identifier", userUuid.toString());
                 });
 
+        if (user.getOAuths() != null) {
+            log.debug("User OAuths detected, count: {}", user.getOAuths().size());
+        }
+
         log.debug("User successfully retrieved: {} (UUID: {})", user.getEmail(), userUuid);
 
         return mapper.toFindDto(user);
@@ -177,6 +181,10 @@ public class UserServiceImpl implements UserService {
                     log.warn("Update failed: User with UUID {} not found", userUuid);
                     return new ResourceNotFoundException("User", "identifier", userUuid.toString());
                 });
+
+        if (user.getOAuths() != null) {
+            log.debug("Update: User OAuths detected, count: {}", user.getOAuths().size());
+        }
 
         log.debug("Mapping UpdateDTO to User entity for UUID: {}", userUuid);
 
