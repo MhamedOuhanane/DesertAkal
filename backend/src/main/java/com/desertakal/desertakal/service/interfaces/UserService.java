@@ -21,7 +21,7 @@ public interface UserService {
     PaginationDTO findAll(@NonNull Pageable pageable);
     UserFindDTO find(@NonNull UUID userUuid);
     UserFindDTO update(@NonNull UUID userUuid, @NonNull UserUpdateDTO dto);
-//    UserFindDTO updateStatus(@NonNull UUID userUuid, @NonNull UserStatus status);
+    UserFindDTO updateStatus(@NonNull UUID userUuid, @NonNull UserStatus status);
 //    UserFindDTO updatePhoto(@NonNull UUID userUuid, @NonNull MultipartFile photo);
 //    void delete(@NonNull UUID userUuid);
 }

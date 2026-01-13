@@ -3,6 +3,7 @@ package com.desertakal.desertakal.controller;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.dto.user.UserFindDTO;
+import com.desertakal.desertakal.model.dto.user.UserStatusUpdateDTO;
 import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
 import com.desertakal.desertakal.service.interfaces.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -100,5 +101,27 @@ public class AdminController {
         log.info("User with UUID: {} has been successfully patched via {}", uuid, request.getServletPath());
 
         return ResponseEntity.ok(response);
+    }
+
+
+    @PatchMapping("/users/{uuid}/status")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull UserFindDTO>> updateStatus(
+            @NonNull @PathVariable UUID uuid,
+            @NonNull @Valid UserStatusUpdateDTO dto,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to update status of user {} to {}", uuid, dto.getStatus());
+
+        var result = userService.updateStatus(uuid, dto.getStatus());
+
+        return ResponseEntity.ok(
+                StandardResponseDTO.<UserFindDTO>builder()
+                        .timestamp(LocalDateTime.now())
+                        .message("User status updated successfully")
+                        .status(200)
+                        .path(request.getServletPath())
+                        .data(result)
+                        .build()
+        );
     }
 }

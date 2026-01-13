@@ -194,4 +194,27 @@ public class UserServiceImpl implements UserService {
 
         return mapper.toFindDto(user);
     }
+
+    @Override
+    @Transactional
+    public UserFindDTO updateStatus(@NonNull UUID userUuid, @NonNull UserStatus newStatus) {
+        log.info("Request to update status for user {} to {}", userUuid, newStatus);
+
+        User user = repository.findWithSecurityByUuid(userUuid)
+                .orElseThrow(() -> {
+                    log.warn("Status update failed: User {} not found", userUuid);
+                    return new ResourceNotFoundException("User", "identifier", userUuid.toString());
+                });
+
+        if (user.getStatus() == newStatus) {
+            log.info("User {} is already in status {}", userUuid, newStatus);
+            return mapper.toFindDto(user);
+        }
+
+        log.debug("Changing status from {} to {}", user.getStatus(), newStatus);
+        user.setStatus(newStatus);
+
+        log.info("Status for user {} successfully updated to {}", userUuid, newStatus);
+        return mapper.toFindDto(user);
+    }
 }
