@@ -5,6 +5,7 @@ import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.dto.user.UserFindDTO;
 import com.desertakal.desertakal.model.dto.user.UserStatusUpdateDTO;
 import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
+import com.desertakal.desertakal.model.enums.UserStatus;
 import com.desertakal.desertakal.service.interfaces.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -30,6 +31,9 @@ public class AdminController {
 
     @GetMapping("/users")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> getUsers(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) UserStatus status,
+            @RequestParam(required = false) String roleName,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "lastLoginAt") String sortBy,
@@ -42,7 +46,7 @@ public class AdminController {
         Sort sort = Sort.by(Sort.Direction.fromString(order), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        var result = userService.findAll(pageable);
+        var result = userService.findAll(search, status, roleName, pageable);
 
         var response = StandardResponseDTO.<PaginationDTO>builder()
                 .timestamp(LocalDateTime.now())

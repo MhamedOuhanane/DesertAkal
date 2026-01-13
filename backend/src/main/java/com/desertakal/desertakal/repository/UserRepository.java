@@ -4,13 +4,14 @@ import com.desertakal.desertakal.model.entity.User;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepository extends JpaRepository<@NonNull User, @NonNull UUID> {
+public interface UserRepository extends JpaRepository<@NonNull User, @NonNull UUID>, JpaSpecificationExecutor<@NonNull User> {
 
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);

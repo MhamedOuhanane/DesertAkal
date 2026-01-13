@@ -24,15 +24,21 @@ import com.desertakal.desertakal.repository.UserRepository;
 import com.desertakal.desertakal.service.interfaces.EmailVerificationTokenService;
 import com.desertakal.desertakal.service.interfaces.RefreshTokenService;
 import com.desertakal.desertakal.service.interfaces.UserService;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -133,11 +139,31 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginationDTO findAll(@NonNull Pageable pageable) {
+    public PaginationDTO findAll(String search, UserStatus status, String roleName, @NonNull Pageable pageable) {
         log.info("Fetching users list - Page: {}, Size: {}, Sort: {}",
                 pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
 
-        var userPages = repository.findAll(pageable);
+        Specification<@NonNull User> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+
+            if (roleName != null && !roleName.isEmpty()) {
+                Join<User, Role> roleJoin = root.join("role");
+                predicates.add(cb.equal(roleJoin.get("name"), roleName));
+            }
+
+            if (search != null && !search.isEmpty()) {
+                Expression<String> fullName = cb.concat(cb.concat(root.get("firstName"), " "), root.get("lastName"));
+                predicates.add(cb.like(cb.lower(fullName), "%" + search.toLowerCase() + "%"));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        var userPages = repository.findAll(spec, pageable);
 
         log.debug("Successfully retrieved {} users from database", userPages.getNumberOfElements());
 
