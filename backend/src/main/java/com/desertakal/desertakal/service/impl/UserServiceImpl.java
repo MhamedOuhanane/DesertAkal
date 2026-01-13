@@ -132,6 +132,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginationDTO findAll(@NonNull Pageable pageable) {
         log.info("Fetching users list - Page: {}, Size: {}, Sort: {}",
                 pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
@@ -152,6 +153,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserFindDTO find(@NonNull UUID userUuid) {
 
         log.info("Attempting to find user with UUID: {}", userUuid);
@@ -216,5 +218,24 @@ public class UserServiceImpl implements UserService {
 
         log.info("Status for user {} successfully updated to {}", userUuid, newStatus);
         return mapper.toFindDto(user);
+    }
+
+    @Override
+    public void delete(@NonNull UUID userUuid) {
+        log.info("Starting deletion process for user with UUID: {}", userUuid);
+
+        User user = repository.findWithSecurityByUuid(userUuid)
+                .orElseThrow(() -> {
+                    log.warn("Delete failed: User with UUID {} not found", userUuid);
+                    return new ResourceNotFoundException("User", "identifier", userUuid.toString());
+                });
+
+        log.warn("User identified for deletion - Email: {}, Role: {}, Registered at: {}",
+                user.getEmail(), user.getRole().getName(), user.getCreatedAt());
+
+        repository.delete(user);
+
+        log.info("User with UUID: {} and Email: {} successfully deleted from system",
+                userUuid, user.getEmail());
     }
 }

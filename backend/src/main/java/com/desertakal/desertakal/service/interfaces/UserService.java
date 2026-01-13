@@ -23,5 +23,5 @@ public interface UserService {
     UserFindDTO update(@NonNull UUID userUuid, @NonNull UserUpdateDTO dto);
     UserFindDTO updateStatus(@NonNull UUID userUuid, @NonNull UserStatus status);
 //    UserFindDTO updatePhoto(@NonNull UUID userUuid, @NonNull MultipartFile photo);
-//    void delete(@NonNull UUID userUuid);
+    void delete(@NonNull UUID userUuid);
 }

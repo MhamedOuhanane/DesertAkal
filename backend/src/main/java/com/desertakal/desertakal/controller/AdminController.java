@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -123,5 +124,28 @@ public class AdminController {
                         .data(result)
                         .build()
         );
+    }
+
+    @DeleteMapping("/users/{uuid}")
+    public ResponseEntity<@NonNull StandardResponseDTO<Void>> delete(
+            @NonNull @PathVariable UUID uuid,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to delete User : {} [Path: {}]", uuid, request.getServletPath());
+
+        userService.delete(uuid);
+
+        var response = StandardResponseDTO.<Void>builder()
+                .timestamp(LocalDateTime.now())
+                .message("User has been successfully deleted")
+                .status(200)
+                .path(request.getServletPath())
+                .data(null)
+                .build();
+
+
+        log.info("User with UUID: {} deleted successfully", uuid);
+
+        return ResponseEntity.ok(response);
     }
 }
