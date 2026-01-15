@@ -13,6 +13,12 @@ spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 spring.mail.properties.mail.smtp.starttls.required=true
 
+
+minio.url=
+minio.accessKey=
+minio.secretKey=
+minio.bucketName=
+
 security.jwt.secret=
 security.jwt.access.expiration=900000
 security.jwt.refresh.expiration=2592000000
