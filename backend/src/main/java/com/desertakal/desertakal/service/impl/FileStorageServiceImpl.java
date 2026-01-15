@@ -2,10 +2,7 @@ package com.desertakal.desertakal.service.impl;
 
 import com.desertakal.desertakal.exception.custom.FileUploadException;
 import com.desertakal.desertakal.service.interfaces.FileStorageService;
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
 import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,12 +56,27 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public void deleteFile(@NonNull String filePath) {
+        if (filePath.isEmpty()) return;
 
+        try {
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(filePath)
+                            .build()
+            );
+            log.info("File deleted successfully: {}", filePath);
+        } catch (Exception e) {
+            log.error("Failed to delete file {}: {}", filePath, e.getMessage());
+        }
     }
 
     @Override
     public String getPublicUrl(@NonNull String filePath) {
-        return "";
+        if (filePath.isEmpty())
+            return baseUrl + "/" + bucketName + "/defaults/default-profile.png";
+
+        return String.format("%s/%s/%s", baseUrl, baseUrl, filePath);
     }
 
     private void ensureBucketExists() throws Exception {
