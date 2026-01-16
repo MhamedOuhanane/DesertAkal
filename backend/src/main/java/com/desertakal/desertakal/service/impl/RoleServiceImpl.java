@@ -2,11 +2,11 @@ package com.desertakal.desertakal.service.impl;
 
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.role.RoleCreateDTO;
-import com.desertakal.desertakal.model.dto.role.RoleDTO;
 import com.desertakal.desertakal.model.dto.role.RoleFindDTO;
 import com.desertakal.desertakal.model.dto.role.RoleUpdateDTO;
 import com.desertakal.desertakal.model.entity.Role;
 import com.desertakal.desertakal.model.mapper.RoleMapper;
+import com.desertakal.desertakal.repository.PermissionRepository;
 import com.desertakal.desertakal.repository.RoleRepository;
 import com.desertakal.desertakal.service.interfaces.RoleService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +24,7 @@ import java.util.UUID;
 public class RoleServiceImpl implements RoleService {
     private final RoleRepository repository;
     private final RoleMapper mapper;
+    private final PermissionRepository permissionRepository;
 
     @Override
     public PaginationDTO findAll(String search, @NonNull Pageable pageable) {
@@ -55,7 +56,20 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleFindDTO create(@NonNull RoleCreateDTO dto) {
-        return null;
+        log.info("Starting creation of new Role: '{}' with {} permissions",
+                dto.getName(), (dto.getPermissionUuids() != null ? dto.getPermissionUuids().size() : 0));
+
+        Role role = mapper.toEntity(dto);
+
+        var permissions = permissionRepository.findDistinctByUuidIn(dto.getPermissionUuids());
+
+        role.setPermissions(permissions);
+
+        Role savedRole = repository.save(role);
+
+        log.info("Successfully created Role: '{}' with UUID: {}", savedRole.getName(), savedRole.getUuid());
+
+        return mapper.toFindDto(savedRole);
     }
 
     @Override

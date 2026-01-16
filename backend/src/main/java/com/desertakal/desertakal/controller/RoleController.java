@@ -61,8 +61,8 @@ public class RoleController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/permissions")
+    @PreAuthorize("hasRole('ADMIN') or #roleName == authentication.principal.roleName()")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> showsPermissions(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String roleName,
