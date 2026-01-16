@@ -35,7 +35,7 @@ public class RoleServiceImpl implements RoleService {
             }
 
             String pattern = "%" + search.toLowerCase() + "%";
-            return cb.like(root.get("name"), pattern);
+            return cb.like(cb.lower(root.get("name")), pattern);
         };
 
         var roles = repository.findAll(spec, pageable);
