@@ -7,10 +7,12 @@ import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface PermissionService {
     PermissionDTO create(@NonNull PermissionRequestDTO dto);
+    List<PermissionDTO> createMultiple(@NonNull List<PermissionRequestDTO> requestDTOS);
     PermissionDTO update(@NonNull UUID permissionUuid, @NonNull PermissionUpdateDTO dto);
     PaginationDTO findAll(String search, @NonNull Pageable pageable);
     PaginationDTO findByRole(String search, @NonNull String roleName, @NonNull Pageable pageable);

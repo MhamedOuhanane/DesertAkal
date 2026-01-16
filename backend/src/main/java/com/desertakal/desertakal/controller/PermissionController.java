@@ -19,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/permissions")
@@ -79,6 +80,27 @@ public class PermissionController {
                 .build();
 
         log.info("Permission successfully created with UUID: {} [Status: 201]", result.getUuid());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/batch")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<List<PermissionDTO>>> createMultiple(
+            @RequestBody @Valid List<PermissionRequestDTO> requestDTOS,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to create multiple permissions [Count: {}]", requestDTOS.size());
+
+        var results = service.createMultiple(requestDTOS);
+
+        var response = StandardResponseDTO.<List<PermissionDTO>>builder()
+                .timestamp(LocalDateTime.now())
+                .message(results.size() + " Permissions created successfully")
+                .status(201)
+                .data(results)
+                .path(request.getServletPath())
+                .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

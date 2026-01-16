@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -42,6 +43,21 @@ public class PermissionServiceImpl implements PermissionService {
                 newPermission.getUuid(), newPermission.getName());
 
         return mapper.toDto(newPermission);
+    }
+
+    @Override
+    public List<PermissionDTO> createMultiple(@NonNull List<PermissionRequestDTO> requestDTOS) {
+        log.info("Request to create {} new permissions", requestDTOS.size());
+
+        List<Permission> permissions = requestDTOS.stream()
+                .map(mapper::toEntity)
+                .toList();
+
+        List<Permission> savedPermissions = repository.saveAll(permissions);
+
+        log.info("Successfully created {} permissions", savedPermissions.size());
+
+        return mapper.toDtos(savedPermissions);
     }
 
     @Override
