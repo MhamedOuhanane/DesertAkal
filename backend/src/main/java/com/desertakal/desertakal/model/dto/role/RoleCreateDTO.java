@@ -1,5 +1,7 @@
 package com.desertakal.desertakal.model.dto.role;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -14,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class RoleCreateDTO {
-
+    @NotBlank(message = "Role name is required")
     @Size(min = 8, max = 50, message = "Role name must be between 8 and 50 characters")
     @Pattern(
             regexp = "^ROLE_[A-Z_]+$",
@@ -22,5 +24,6 @@ public class RoleCreateDTO {
     )
     private String name;
 
+    @NotEmpty(message = "At least one permission is required")
     List<UUID> permissionUuids;
 }

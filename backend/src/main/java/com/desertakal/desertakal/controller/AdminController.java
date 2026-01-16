@@ -131,7 +131,7 @@ public class AdminController {
         );
     }
 
-    @PatchMapping("/users/{uuid}/status")
+    @PatchMapping("/users/{uuid}/photo")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull UserFindDTO>> updatePhoto(
             @NonNull @PathVariable UUID uuid,
             @NonNull @RequestParam(value = "photo") MultipartFile photo,
