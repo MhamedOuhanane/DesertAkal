@@ -77,13 +77,13 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional
-    public RoleFindDTO update(@NonNull UUID roleUuid, @NonNull RoleUpdateDTO dto) {
-        log.info("Request to update Role UUID: {} with data: {}", roleUuid, dto.getName());
+    public RoleFindDTO update(@NonNull String roleName, @NonNull RoleUpdateDTO dto) {
+        log.info("Request to update Role name: {} with data: {}", roleName, dto.getName());
 
-        Role role = repository.findByUuid(roleUuid)
+        Role role = repository.findByName(roleName)
             .orElseThrow(() -> {
-                log.warn("Update failed: Role not found for UUID: {}", roleUuid);
-                return new ResourceNotFoundException("Role", "identifier", roleUuid.toString());
+                log.warn("Update failed: Role not found for name: {}", roleName);
+                return new ResourceNotFoundException("Role", "name", roleName);
             });
 
         String oldName = role.getName();
@@ -115,25 +115,25 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional
-    public void delete(@NonNull UUID roleUuid) {
-        log.info("Request to delete Role with UUID: {}", roleUuid);
+    public void delete(@NonNull String roleName) {
+        log.info("Request to delete Role with name: {}", roleName);
 
-        Role role = repository.findByUuid(roleUuid)
+        Role role = repository.findByName(roleName)
                 .orElseThrow(() -> {
-                    log.warn("Delete failed: Role not found for UUID: {}", roleUuid);
-                    return new ResourceNotFoundException("Role", "identifier", roleUuid.toString());
+                    log.warn("Delete failed: Role not found for name: {}", roleName);
+                    return new ResourceNotFoundException("Role", "name", roleName);
                 });
 
         var users = role.getUsers();
         if (!users.isEmpty()) {
             if (!role.getUsers().isEmpty()) {
                 log.warn("Security Alert: Attempt to delete Role '{}' (UUID: {}) failed because it is still assigned to {} users.",
-                        role.getName(), roleUuid, role.getUsers().size());
+                        roleName, role.getUuid(), role.getUsers().size());
                 throw new BusinessRuleException("Cannot delete role: It is still assigned to " + role.getUsers().size() + " users.");
             }
         }
 
-        String roleName = role.getName();
+        UUID roleUuid = role.getUuid();
         repository.delete(role);
 
         log.info("Successfully deleted Role: '{}' [UUID: {}]", roleName, roleUuid);

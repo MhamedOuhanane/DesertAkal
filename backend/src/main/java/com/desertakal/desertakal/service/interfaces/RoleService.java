@@ -13,6 +13,6 @@ import java.util.UUID;
 public interface RoleService {
     PaginationDTO findAll(String search, @NonNull Pageable pageable);
     RoleFindDTO create(@NonNull RoleCreateDTO dto);
-    RoleFindDTO update(@NonNull UUID roleUuid, @NonNull RoleUpdateDTO dto);
-    void delete(@NonNull UUID roleUuid);
+    RoleFindDTO update(@NonNull String roleName, @NonNull RoleUpdateDTO dto);
+    void delete(@NonNull String roleName);
 }
