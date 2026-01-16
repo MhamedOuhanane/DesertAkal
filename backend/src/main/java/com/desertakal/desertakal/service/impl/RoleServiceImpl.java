@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.service.impl;
 
+import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.role.RoleCreateDTO;
 import com.desertakal.desertakal.model.dto.role.RoleFindDTO;
@@ -15,6 +16,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -73,8 +75,41 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional
     public RoleFindDTO update(@NonNull UUID roleUuid, @NonNull RoleUpdateDTO dto) {
-        return null;
+        log.info("Request to update Role UUID: {} with data: {}", roleUuid, dto.getName());
+
+        Role role = repository.findByUuid(roleUuid)
+            .orElseThrow(() -> {
+                log.warn("Update failed: Role not found for UUID: {}", roleUuid);
+                return new ResourceNotFoundException("Role", "identifier", roleUuid.toString());
+            });
+
+        String oldName = role.getName();
+        int oldPermissionsCount = role.getPermissions().size();
+
+        mapper.updateEntityFromDto(dto, role);
+
+        if (dto.getPermissionUuids() != null) {
+            log.debug("Updating permissions for role '{}'. New count requested: {}", role.getName(), dto.getPermissionUuids().size());
+
+            var newPermissions = permissionRepository.findDistinctByUuidIn(dto.getPermissionUuids());
+
+            if (newPermissions.size() != dto.getPermissionUuids().size()) {
+                log.warn("Missing Permissions! Requested: {}, Found: {}", dto.getPermissionUuids().size(), newPermissions.size());
+            }
+
+            role.getPermissions().clear();
+            role.getPermissions().addAll(newPermissions);
+        }
+
+        Role updatedRole = repository.save(role);
+
+        log.info("Role '{}' (UUID: {}) updated. Name: [{} -> {}], Permissions: [{} -> {}]",
+                roleUuid, updatedRole.getName(), oldName, updatedRole.getName(),
+                oldPermissionsCount, updatedRole.getPermissions().size());
+
+        return mapper.toFindDto(updatedRole);
     }
 
     @Override

@@ -47,9 +47,10 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public PaginationDTO findByRole(String search, @NonNull String roleName, @NonNull Pageable pageable) {
+        System.out.printf(roleName);
         Role role = roleRepository.findByName(roleName)
                 .orElseThrow(() -> {
-                    log.warn("Role not found for UUID: {}", roleName);
+                    log.warn("Role not found for name: {}", roleName);
                     return new ResourceNotFoundException("Role", "name", roleName);
                 });
 

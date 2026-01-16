@@ -21,6 +21,8 @@ public interface GuideMapper {
     GuideDTO toDto(Guide guide);
 
     @Mapping(source = "role.name", target = "role")
+    @Mapping(target = "oauthProviders", expression = "java(guide.getOAuths() != null ? " +
+            "guide.getOAuths().stream().map(auth -> auth.getProvider().name()).toList() : null)")
     GuideFindDTO toFindDto(Guide guide);
 
     @Mapping(target = "id", ignore = true)

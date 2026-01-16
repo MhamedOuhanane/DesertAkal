@@ -7,7 +7,6 @@ import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface PermissionService {

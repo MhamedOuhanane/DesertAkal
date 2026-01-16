@@ -17,6 +17,8 @@ import java.util.List;
 public interface TouristMapper {
 
     @Mapping(source = "role.name", target = "role")
+    @Mapping(target = "oauthProviders", expression = "java(tourist.getOAuths() != null ? " +
+            "tourist.getOAuths().stream().map(auth -> auth.getProvider().name()).toList() : null)")
     TouristDTO toDto(Tourist tourist);
 
     @Mapping(target = "id", ignore = true)

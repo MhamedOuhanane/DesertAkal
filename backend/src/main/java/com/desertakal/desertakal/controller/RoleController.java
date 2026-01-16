@@ -85,7 +85,7 @@ public class RoleController {
 
         Pageable pageable = getPageable(page, size, sortBy, order);
 
-        var result = permissionService.findByRole(roleName, search, pageable);
+        var result = permissionService.findByRole(search, roleName, pageable);
 
         var response = StandardResponseDTO.<PaginationDTO>builder()
                 .timestamp(LocalDateTime.now())
