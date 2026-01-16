@@ -19,8 +19,8 @@ public class RoleCreateDTO {
     @NotBlank(message = "Role name is required")
     @Size(min = 8, max = 50, message = "Role name must be between 8 and 50 characters")
     @Pattern(
-            regexp = "^ROLE_[A-Z_]+$",
-            message = "Role name must start with 'ROLE_' and contain only uppercase letters and underscores"
+            regexp = "^[A-Z_]+$",
+            message = "Role name contain only uppercase letters and underscores"
     )
     private String name;
 

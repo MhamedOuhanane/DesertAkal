@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -40,6 +39,8 @@ public class RoleServiceImpl implements RoleService {
         };
 
         var roles = repository.findAll(spec, pageable);
+
+        log.debug("Found {} roles in current page", roles.getNumberOfElements());
 
         return PaginationDTO.builder()
                 .content(mapper.toDtos(roles.getContent()))
