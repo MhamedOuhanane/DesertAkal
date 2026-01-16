@@ -22,6 +22,7 @@ import com.desertakal.desertakal.model.mapper.UserMapper;
 import com.desertakal.desertakal.repository.RoleRepository;
 import com.desertakal.desertakal.repository.UserRepository;
 import com.desertakal.desertakal.service.interfaces.EmailVerificationTokenService;
+import com.desertakal.desertakal.service.interfaces.FileStorageService;
 import com.desertakal.desertakal.service.interfaces.RefreshTokenService;
 import com.desertakal.desertakal.service.interfaces.UserService;
 import jakarta.persistence.criteria.Expression;
@@ -35,6 +36,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -53,6 +55,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper mapper;
     private final TouristMapper touristMapper;
     private final EmailVerificationTokenService emailVerificationTokenService;
+    private final FileStorageService fileStorageService;
 
 
     @Override
@@ -243,6 +246,30 @@ public class UserServiceImpl implements UserService {
         user.setStatus(newStatus);
 
         log.info("Status for user {} successfully updated to {}", userUuid, newStatus);
+        return mapper.toFindDto(user);
+    }
+
+    @Override
+    @Transactional
+    public UserFindDTO updatePhoto(@NonNull UUID userUuid, @NonNull MultipartFile photo) {
+        log.info("Request to update photo for user: {}", userUuid);
+
+        User user = repository.findByUuid(userUuid)
+                .orElseThrow(() -> {
+                    log.warn("Photo update failed: User {} not found", userUuid);
+                    return new ResourceNotFoundException("User", "identifier", userUuid.toString());
+                });
+
+        if (photo.getSize() <= 0) {
+            String newPhotoPath = fileStorageService.uploadDocument(photo, "users/profiles");
+            if (user.getPhoto() != null && !user.getPhoto().isEmpty()) {
+                fileStorageService.deleteFile(user.getPhoto());
+            }
+
+            user.setPhoto(newPhotoPath);
+        }
+
+        log.info("User {} updated successfully", userUuid);
         return mapper.toFindDto(user);
     }
 

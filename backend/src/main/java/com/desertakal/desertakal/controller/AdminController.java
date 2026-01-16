@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -123,6 +124,27 @@ public class AdminController {
                 StandardResponseDTO.<UserFindDTO>builder()
                         .timestamp(LocalDateTime.now())
                         .message("User status updated successfully")
+                        .status(200)
+                        .path(request.getServletPath())
+                        .data(result)
+                        .build()
+        );
+    }
+
+    @PatchMapping("/users/{uuid}/status")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull UserFindDTO>> updatePhoto(
+            @NonNull @PathVariable UUID uuid,
+            @NonNull @RequestParam(value = "photo") MultipartFile photo,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to update Photo of user {}", uuid);
+
+        var result = userService.updatePhoto(uuid, photo);
+
+        return ResponseEntity.ok(
+                StandardResponseDTO.<UserFindDTO>builder()
+                        .timestamp(LocalDateTime.now())
+                        .message("User photo updated successfully")
                         .status(200)
                         .path(request.getServletPath())
                         .data(result)
