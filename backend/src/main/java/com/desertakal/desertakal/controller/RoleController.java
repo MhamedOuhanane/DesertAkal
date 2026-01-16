@@ -134,17 +134,40 @@ public class RoleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PatchMapping("/{roleName}")
+    @GetMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull RoleFindDTO>> find(
+            @NonNull @PathVariable UUID uuid,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to Fetching details for Role UUID: {} ", uuid);
+
+        var result = service.find(uuid);
+
+        var response = StandardResponseDTO.<RoleFindDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Role fount successfully: " + result.getName())
+                .status(200)
+                .data(result)
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Successfully found Role with UUID: {} [Status: 200 OK]", uuid);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull RoleFindDTO>> update(
-            @NonNull @PathVariable String roleName,
+            @NonNull @PathVariable UUID uuid,
             @NonNull @Valid @RequestBody RoleUpdateDTO dto,
             @NonNull HttpServletRequest request
     ) {
         log.info("REST request to PATCH Role: {} [Data provided: {}]",
-                roleName, dto.getName() != null ? "Name: " + dto.getName() : "Partial update (no name change)");
+                uuid, dto.getName() != null ? "Name: " + dto.getName() : "Partial update (no name change)");
 
-        var result = service.update(roleName, dto);
+        var result = service.update(uuid, dto);
 
         var response = StandardResponseDTO.<RoleFindDTO>builder()
                 .timestamp(LocalDateTime.now())
@@ -154,21 +177,21 @@ public class RoleController {
                 .path(request.getServletPath())
                 .build();
 
-        log.info("Successfully updated Role with UUID: {} [Status: 200 OK]", roleName);
+        log.info("Successfully updated Role with UUID: {} [Status: 200 OK]", uuid);
 
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{roleName}")
+    @DeleteMapping("/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<@NonNull StandardResponseDTO<Void>> delete(
-            @NonNull @PathVariable String roleName,
+            @NonNull @PathVariable UUID uuid,
             @NonNull HttpServletRequest request
     ) {
-        log.info("REST request to DELETE Role with name: {} [Requested by Path: {}]",
-                roleName, request.getServletPath());
+        log.info("REST request to DELETE Role with UUID: {} [Requested by Path: {}]",
+                uuid, request.getServletPath());
 
-        service.delete(roleName);
+        service.delete(uuid);
 
         var response = StandardResponseDTO.<Void>builder()
                 .timestamp(LocalDateTime.now())
@@ -177,7 +200,7 @@ public class RoleController {
                 .path(request.getServletPath())
                 .build();
 
-        log.info("Successfully deleted Role with name: {} [Status: 200 OK]", roleName);
+        log.info("Successfully deleted Role with UUID: {} [Status: 200 OK]", uuid);
 
         return ResponseEntity.ok(response);
     }

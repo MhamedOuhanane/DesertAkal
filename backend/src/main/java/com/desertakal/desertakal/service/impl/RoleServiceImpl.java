@@ -77,13 +77,13 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional
-    public RoleFindDTO update(@NonNull String roleName, @NonNull RoleUpdateDTO dto) {
-        log.info("Request to update Role name: {} with data: {}", roleName, dto.getName());
+    public RoleFindDTO update(@NonNull UUID roleUuid, @NonNull RoleUpdateDTO dto) {
+        log.info("Request to update Role UUID: {} with data: {}", roleUuid, dto.getName());
 
-        Role role = repository.findByName(roleName)
+        Role role = repository.findByUuid(roleUuid)
             .orElseThrow(() -> {
-                log.warn("Update failed: Role not found for name: {}", roleName);
-                return new ResourceNotFoundException("Role", "name", roleName);
+                log.warn("Update failed: Role not found for UUID: {}", roleUuid);
+                return new ResourceNotFoundException("Role", "identifier", roleUuid.toString());
             });
 
         String oldName = role.getName();
@@ -114,26 +114,43 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @Transactional
-    public void delete(@NonNull String roleName) {
-        log.info("Request to delete Role with name: {}", roleName);
+    public RoleFindDTO find(@NonNull UUID roleUuid) {
+        log.info("Fetching details for Role UUID: '{}'", roleUuid.toString());
 
-        Role role = repository.findByName(roleName)
+        Role role = repository.findRoleByUuid(roleUuid)
                 .orElseThrow(() -> {
-                    log.warn("Delete failed: Role not found for name: {}", roleName);
-                    return new ResourceNotFoundException("Role", "name", roleName);
+                    log.warn("Lookup failed: Role UUID'{}' not found in database", roleUuid);
+                    return new ResourceNotFoundException("Role", "identifier", roleUuid.toString());
+                });
+
+        log.info("Successfully found Role: '{}' with {} permissions",
+                role.getName(),
+                (role.getPermissions() != null ? role.getPermissions().size() : 0));
+
+        return mapper.toFindDto(role);
+    }
+
+    @Override
+    @Transactional
+    public void delete(@NonNull UUID roleUuid) {
+        log.info("Request to delete Role with UUID: {}", roleUuid);
+
+        Role role = repository.findByUuid(roleUuid)
+                .orElseThrow(() -> {
+                    log.warn("Delete failed: Role not found for UUID: {}", roleUuid);
+                    return new ResourceNotFoundException("Role", "identifier", roleUuid.toString());
                 });
 
         var users = role.getUsers();
         if (!users.isEmpty()) {
             if (!role.getUsers().isEmpty()) {
                 log.warn("Security Alert: Attempt to delete Role '{}' (UUID: {}) failed because it is still assigned to {} users.",
-                        roleName, role.getUuid(), role.getUsers().size());
+                        role.getName(), roleUuid, role.getUsers().size());
                 throw new BusinessRuleException("Cannot delete role: It is still assigned to " + role.getUsers().size() + " users.");
             }
         }
 
-        UUID roleUuid = role.getUuid();
+        String roleName = role.getName();
         repository.delete(role);
 
         log.info("Successfully deleted Role: '{}' [UUID: {}]", roleName, roleUuid);
