@@ -158,4 +158,27 @@ public class RoleController {
 
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<Void>> delete(
+            @NonNull @PathVariable UUID uuid,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to DELETE Role with UUID: {} [Requested by Path: {}]",
+                uuid, request.getServletPath());
+
+        service.delete(uuid);
+
+        var response = StandardResponseDTO.<Void>builder()
+                .timestamp(LocalDateTime.now())
+                .status(200)
+                .message("Role has been successfully deleted")
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Successfully deleted Role with UUID: {} [Status: 200 OK]", uuid);
+
+        return ResponseEntity.ok(response);
+    }
 }
