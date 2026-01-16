@@ -14,6 +14,6 @@ public interface PermissionService {
     PermissionDTO create(@NonNull PermissionRequestDTO dto);
     PermissionDTO update(@NonNull UUID permissionUuid, @NonNull PermissionUpdateDTO dto);
     PaginationDTO findAll(String search, @NonNull Pageable pageable);
-    PaginationDTO findByRole(String search, @NonNull UUID roleUuid, @NonNull Pageable pageable);
+    PaginationDTO findByRole(String search, @NonNull String roleName, @NonNull Pageable pageable);
     void delete(@NonNull UUID permissionUuid);
 }

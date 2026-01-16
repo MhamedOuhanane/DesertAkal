@@ -46,16 +46,16 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public PaginationDTO findByRole(String search, @NonNull UUID roleUuid, @NonNull Pageable pageable) {
-        Role role = roleRepository.findRoleByUuid(roleUuid)
+    public PaginationDTO findByRole(String search, @NonNull String roleName, @NonNull Pageable pageable) {
+        Role role = roleRepository.findByName(roleName)
                 .orElseThrow(() -> {
-                    log.warn("Role not found for UUID: {}", roleUuid);
-                    return new ResourceNotFoundException("Role", "identifier", roleUuid.toString());
+                    log.warn("Role not found for UUID: {}", roleName);
+                    return new ResourceNotFoundException("Role", "name", roleName);
                 });
 
         Specification<@NonNull Permission> spec = (root, query, cb) -> {
             Join<Permission, Role> roleJoin = root.join("roles");
-            Predicate rolePredicate =cb.equal(roleJoin.get("uuid"), roleUuid);
+            Predicate rolePredicate =cb.equal(roleJoin.get("uuid"), role.getUuid());
 
             if (search != null && !search.isEmpty()) {
                 String pattern = "%" + search.toLowerCase() + "%";
