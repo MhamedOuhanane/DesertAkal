@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.service.impl;
 
+import com.desertakal.desertakal.exception.custom.BusinessRuleException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.role.RoleCreateDTO;
@@ -113,7 +114,28 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional
     public void delete(@NonNull UUID roleUuid) {
+        log.info("Request to delete Role with UUID: {}", roleUuid);
 
+        Role role = repository.findByUuid(roleUuid)
+                .orElseThrow(() -> {
+                    log.warn("Delete failed: Role not found for UUID: {}", roleUuid);
+                    return new ResourceNotFoundException("Role", "identifier", roleUuid.toString());
+                });
+
+        var users = role.getUsers();
+        if (!users.isEmpty()) {
+            if (!role.getUsers().isEmpty()) {
+                log.warn("Security Alert: Attempt to delete Role '{}' (UUID: {}) failed because it is still assigned to {} users.",
+                        role.getName(), roleUuid, role.getUsers().size());
+                throw new BusinessRuleException("Cannot delete role: It is still assigned to " + role.getUsers().size() + " users.");
+            }
+        }
+
+        String roleName = role.getName();
+        repository.delete(role);
+
+        log.info("Successfully deleted Role: '{}' [UUID: {}]", roleName, roleUuid);
     }
 }
