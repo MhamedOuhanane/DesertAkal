@@ -42,15 +42,43 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public PaginationDTO findAll(String search, @NonNull Pageable pageable) {
-        return null;
+        log.info("Fetching permissions : [Search: '{}', Page: {}]",
+                 search != null ? search : "NONE", pageable.getPageNumber());
+
+        Specification<@NonNull Permission> spec = (root, query, cb) -> {
+            if (search != null && !search.isEmpty()) {
+                String pattern = "%" + search.toLowerCase() + "%";
+                return cb.like(cb.lower(root.get("name")), pattern);
+            }
+
+            return cb.conjunction();
+        };
+
+        var permissionsPage = repository.findAll(spec, pageable);
+
+        log.info("Success: Retrieved {} permissions (Total elements in DB: {})",
+                permissionsPage.getNumberOfElements(),
+                permissionsPage.getTotalElements());
+
+        return PaginationDTO.builder()
+                .content(mapper.toDtos(permissionsPage.getContent()))
+                .page(permissionsPage.getNumber())
+                .size(permissionsPage.getSize())
+                .totalElements(permissionsPage.getTotalElements())
+                .totalPages(permissionsPage.getTotalPages())
+                .isFirst(permissionsPage.isFirst())
+                .isLast(permissionsPage.isLast())
+                .build();
     }
 
     @Override
     public PaginationDTO findByRole(String search, @NonNull String roleName, @NonNull Pageable pageable) {
-        System.out.printf(roleName);
+        log.info("Fetching permissions for role: '{}' [Search: '{}', Page: {}]",
+                roleName, search != null ? search : "NONE", pageable.getPageNumber());
+
         Role role = roleRepository.findByName(roleName)
                 .orElseThrow(() -> {
-                    log.warn("Role not found for name: {}", roleName);
+                    log.warn("Lookup failed: Role name '{}' does not exist in database", roleName);
                     return new ResourceNotFoundException("Role", "name", roleName);
                 });
 
@@ -69,10 +97,13 @@ public class PermissionServiceImpl implements PermissionService {
 
         var permissionsPage = repository.findAll(spec, pageable);
 
-        log.info("Found {} permissions for role '{}'", permissionsPage.getTotalElements(), role.getName());
+        log.info("Success: Retrieved {} permissions for role '{}' (Total elements in DB: {})",
+                permissionsPage.getNumberOfElements(),
+                role.getName(),
+                permissionsPage.getTotalElements());
 
         return PaginationDTO.builder()
-                .content(permissionsPage.getContent())
+                .content(mapper.toDtos(permissionsPage.getContent()))
                 .page(permissionsPage.getNumber())
                 .size(permissionsPage.getSize())
                 .totalElements(permissionsPage.getTotalElements())
