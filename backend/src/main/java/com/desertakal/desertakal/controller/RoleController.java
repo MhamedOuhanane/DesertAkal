@@ -5,6 +5,7 @@ import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.dto.role.RoleCreateDTO;
 import com.desertakal.desertakal.model.dto.role.RoleFindDTO;
+import com.desertakal.desertakal.model.dto.role.RoleUpdateDTO;
 import com.desertakal.desertakal.service.interfaces.PermissionService;
 import com.desertakal.desertakal.service.interfaces.RoleService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/roles")
@@ -130,5 +132,30 @@ public class RoleController {
         log.info("Role successfully created with UUID: {} [Status: 201]", result.getUuid());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PatchMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull RoleFindDTO>> update(
+            @NonNull @PathVariable UUID uuid,
+            @NonNull @Valid @RequestBody RoleUpdateDTO dto,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to PATCH Role: {} [Data provided: {}]",
+                uuid, dto.getName() != null ? "Name: " + dto.getName() : "Partial update (no name change)");
+
+        var result = service.update(uuid, dto);
+
+        var response = StandardResponseDTO.<RoleFindDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Role updated successfully: " + result.getName())
+                .status(200)
+                .data(result)
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Successfully updated Role with UUID: {} [Status: 200 OK]", uuid);
+
+        return ResponseEntity.ok(response);
     }
 }
