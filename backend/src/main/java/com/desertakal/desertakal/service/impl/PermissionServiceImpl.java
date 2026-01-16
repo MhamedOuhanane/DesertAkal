@@ -32,7 +32,16 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public PermissionDTO create(@NonNull PermissionRequestDTO dto) {
-        return null;
+        log.info("Request to create new Permission with name: '{}'", dto.getName());
+
+        Permission permission = mapper.toEntity(dto);
+
+        Permission newPermission = repository.save(permission);
+
+        log.info("Permission successfully created. Assigned UUID: {} [Name: '{}']",
+                newPermission.getUuid(), newPermission.getName());
+
+        return mapper.toDto(newPermission);
     }
 
     @Override

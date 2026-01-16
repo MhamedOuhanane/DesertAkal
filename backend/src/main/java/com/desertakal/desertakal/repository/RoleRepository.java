@@ -12,10 +12,4 @@ import java.util.UUID;
 public interface RoleRepository extends JpaRepository<@NonNull Role, @NonNull UUID>, JpaSpecificationExecutor<@NonNull Role> {
     Optional<Role> findByUuid(UUID uuid);
     Optional<Role> findByName(String name);
-
-    @EntityGraph(attributePaths = {"role.permissions"})
-    Optional<Role> findRoleByUuid(UUID uuid);
-
-    @EntityGraph(attributePaths = {"role.permissions"})
-    Optional<Role> findRoleByName(String name);
 }

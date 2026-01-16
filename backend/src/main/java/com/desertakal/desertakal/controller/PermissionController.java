@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/permissions")
+@RequestMapping("/api/permissions")
 @RequiredArgsConstructor
 @Slf4j
 public class PermissionController {

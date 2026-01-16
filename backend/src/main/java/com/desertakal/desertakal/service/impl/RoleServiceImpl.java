@@ -114,10 +114,11 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional
     public RoleFindDTO find(@NonNull UUID roleUuid) {
         log.info("Fetching details for Role UUID: '{}'", roleUuid.toString());
 
-        Role role = repository.findRoleByUuid(roleUuid)
+        Role role = repository.findByUuid(roleUuid)
                 .orElseThrow(() -> {
                     log.warn("Lookup failed: Role UUID'{}' not found in database", roleUuid);
                     return new ResourceNotFoundException("Role", "identifier", roleUuid.toString());
