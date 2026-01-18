@@ -35,6 +35,11 @@ public class PermissionServiceImpl implements PermissionService {
     public PermissionDTO create(@NonNull PermissionRequestDTO dto) {
         log.info("Request to create new Permission with name: '{}'", dto.getName());
 
+        if (repository.existsByName(dto.getName())) {
+            log.warn("Create failed: Permission name '{}' already exists", dto.getName());
+            throw new DuplicateResourceException("Permission", "name", dto.getName());
+        }
+
         Permission permission = mapper.toEntity(dto);
 
         Permission newPermission = repository.save(permission);
@@ -48,6 +53,14 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public List<PermissionDTO> createMultiple(@NonNull List<PermissionRequestDTO> requestDTOS) {
         log.info("Request to create {} new permissions", requestDTOS.size());
+
+        List<String> names = requestDTOS.stream()
+                .map(PermissionRequestDTO::getName).toList();
+
+        if (repository.existsByNameIn(names)) {
+            log.warn("Batch create failed: Some permission names already exist in {}", names);
+            throw new DuplicateResourceException("One or more permissions already exist");
+        }
 
         List<Permission> permissions = requestDTOS.stream()
                 .map(mapper::toEntity)

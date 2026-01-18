@@ -5,6 +5,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,4 +15,7 @@ public interface PermissionRepository extends JpaRepository<@NonNull Permission,
     Optional<Permission> findByName(String name);
 
     List<@NonNull Permission> findDistinctByUuidIn(List<@NonNull UUID> uuids);
+
+    boolean existsByNameIn(List<String> names);
+    boolean existsByName(String name);
 }
