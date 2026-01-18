@@ -62,6 +62,11 @@ public class RoleServiceImpl implements RoleService {
         log.info("Starting creation of new Role: '{}' with {} permissions",
                 dto.getName(), (dto.getPermissionUuids() != null ? dto.getPermissionUuids().size() : 0));
 
+        if (repository.existsByName(dto.getName())) {
+            log.warn("Create failed: Role name '{}' already exists", dto.getName());
+            throw new DuplicateResourceException("Role", "name", dto.getName());
+        }
+
         Role role = mapper.toEntity(dto);
 
         var permissions = permissionRepository.findDistinctByUuidIn(dto.getPermissionUuids());
@@ -85,6 +90,11 @@ public class RoleServiceImpl implements RoleService {
                 log.warn("Update failed: Role not found for UUID: {}", roleUuid);
                 return new ResourceNotFoundException("Role", "identifier", roleUuid.toString());
             });
+
+        if (!dto.getName().equals(role.getName()) && repository.existsByName(dto.getName())) {
+            log.warn("Update failed: Role name '{}' already exists", dto.getName());
+            throw new DuplicateResourceException("Role", "name", dto.getName());
+        }
 
         String oldName = role.getName();
         int oldPermissionsCount = role.getPermissions().size();
