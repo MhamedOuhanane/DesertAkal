@@ -2,6 +2,7 @@ package com.desertakal.desertakal.controller;
 
 import com.desertakal.desertakal.model.dto.permission.PermissionDTO;
 import com.desertakal.desertakal.model.dto.permission.PermissionRequestDTO;
+import com.desertakal.desertakal.model.dto.permission.PermissionUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.service.interfaces.PermissionService;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/permissions")
@@ -103,5 +105,30 @@ public class PermissionController {
                 .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+    @PatchMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PermissionDTO>> update(
+            @NonNull @PathVariable UUID uuid,
+            @NonNull @Valid @RequestBody PermissionUpdateDTO dto,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to PATCH Permission: {} [Data provided: {}]",
+                uuid, dto.getName() != null ? "Name: " + dto.getName() : "Partial update (no name change)");
+
+        var result = service.update(uuid, dto);
+
+        var response = StandardResponseDTO.<PermissionDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Permission updated successfully: " + result.getName())
+                .status(200)
+                .data(result)
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Successfully updated Permission with UUID: {} [Status: 200 OK]", uuid);
+
+        return ResponseEntity.ok(response);
     }
 }
