@@ -17,7 +17,7 @@ import java.util.UUID;
 @EqualsAndHashCode
 public class RoleCreateDTO {
     @NotBlank(message = "Role name is required")
-    @Size(min = 8, max = 50, message = "Role name must be between 8 and 50 characters")
+    @Size(min = 4, max = 50, message = "Role name must be between 4 and 50 characters")
     @Pattern(
             regexp = "^[A-Z_]+$",
             message = "Role name contain only uppercase letters and underscores"
