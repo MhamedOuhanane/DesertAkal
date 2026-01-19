@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.service.impl;
 
+import com.desertakal.desertakal.exception.custom.BusinessRuleException;
 import com.desertakal.desertakal.exception.custom.DuplicateResourceException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.permission.PermissionDTO;
@@ -20,6 +21,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -174,7 +176,26 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void delete(@NonNull UUID permissionUuid) {
+        log.info("Request to delete Permission with UUID: {}", permissionUuid);
 
+        Permission permission = repository.findByUuid(permissionUuid)
+                .orElseThrow(() -> {
+                    log.warn("Delete failed: Permission not found for UUID: {}", permissionUuid);
+                    return new ResourceNotFoundException("Permission", "identifier", permissionUuid.toString());
+                });
+
+        var roles = permission.getRoles();
+        if (!roles.isEmpty()) {
+            log.warn("Security Alert: Attempt to delete Permission '{}' (UUID: {}) failed because it is still assigned to {} roles.",
+                    permission.getName(), permissionUuid, permission.getRoles().size());
+            throw new BusinessRuleException("Cannot delete permission: It is still assigned to " + permission.getRoles().size() + " roles.");
+        }
+
+        String permissionName = permission.getName();
+        repository.delete(permission);
+
+        log.info("Successfully deleted Permission: '{}' [UUID: {}]", permissionName, permissionUuid);
     }
 }
