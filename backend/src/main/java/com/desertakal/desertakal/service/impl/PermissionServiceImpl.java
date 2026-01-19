@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.service.impl;
 
+import com.desertakal.desertakal.exception.custom.DuplicateResourceException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.permission.PermissionDTO;
 import com.desertakal.desertakal.model.dto.permission.PermissionRequestDTO;
@@ -75,7 +76,28 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public PermissionDTO update(@NonNull UUID permissionUuid, @NonNull PermissionUpdateDTO dto) {
-        return null;
+        log.info("Request to update Permission UUID: {} with data: {}", permissionUuid, dto.getName());
+
+        Permission permission = repository.findByUuid(permissionUuid)
+                .orElseThrow(() -> {
+                    log.warn("Update failed: Permission not found for UUID: {}", permissionUuid);
+                    return new ResourceNotFoundException("Permission", "identifier", permissionUuid.toString());
+                });
+
+        if (!dto.getName().equals(permission.getName()) && repository.existsByName(dto.getName())) {
+            log.warn("Update failed: Permission name '{}' already exists", dto.getName());
+            throw new DuplicateResourceException("Permission", "name", dto.getName());
+        }
+
+        String oldName = permission.getName();
+        mapper.updateEntityFromDto(dto, permission);
+
+        Permission updatedPermission = repository.save(permission);
+
+        log.info("Permission '{}' (UUID: {}) updated. Name: [{} -> {}]",
+                updatedPermission.getName(), permissionUuid, oldName, updatedPermission.getName());
+
+        return mapper.toDto(updatedPermission);
     }
 
     @Override

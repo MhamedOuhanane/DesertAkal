@@ -1,6 +1,7 @@
 package com.desertakal.desertakal.service.impl;
 
 import com.desertakal.desertakal.exception.custom.BusinessRuleException;
+import com.desertakal.desertakal.exception.custom.DuplicateResourceException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.role.RoleCreateDTO;
@@ -117,7 +118,7 @@ public class RoleServiceImpl implements RoleService {
         Role updatedRole = repository.save(role);
 
         log.info("Role '{}' (UUID: {}) updated. Name: [{} -> {}], Permissions: [{} -> {}]",
-                roleUuid, updatedRole.getName(), oldName, updatedRole.getName(),
+                updatedRole.getName(), roleUuid, oldName, updatedRole.getName(),
                 oldPermissionsCount, updatedRole.getPermissions().size());
 
         return mapper.toFindDto(updatedRole);
