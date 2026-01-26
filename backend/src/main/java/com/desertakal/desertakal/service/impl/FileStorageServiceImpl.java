@@ -76,7 +76,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         if (filePath.isEmpty())
             return baseUrl + "/" + bucketName + "/defaults/default-profile.png";
 
-        return String.format("%s/%s/%s", baseUrl, baseUrl, filePath);
+        return String.format("%s/%s/%s", baseUrl, bucketName, filePath);
     }
 
     private void ensureBucketExists() throws Exception {

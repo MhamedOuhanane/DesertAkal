@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,13 +25,14 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/admins")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Slf4j
-public class AdminController {
+public class UserController {
     private final UserService userService;
 
-    @GetMapping("/users")
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> getUsers(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) UserStatus status,
@@ -62,7 +64,8 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/users/{uuid}")
+    @GetMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull UserFindDTO>> getUser(
             @NonNull @PathVariable UUID uuid,
             @NonNull HttpServletRequest request
@@ -84,7 +87,8 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/users/{uuid}")
+    @PatchMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN') or #uuid == principal.username")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull UserFindDTO>> updateUser(
             @NonNull @PathVariable UUID uuid,
             @NonNull @Valid @RequestBody UserUpdateDTO dto,
@@ -110,7 +114,8 @@ public class AdminController {
     }
 
 
-    @PatchMapping("/users/{uuid}/status")
+    @PatchMapping("/{uuid}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull UserFindDTO>> updateStatus(
             @NonNull @PathVariable UUID uuid,
             @NonNull @Valid UserStatusUpdateDTO dto,
@@ -131,7 +136,8 @@ public class AdminController {
         );
     }
 
-    @PatchMapping("/users/{uuid}/photo")
+    @PatchMapping("/{uuid}/photo")
+    @PreAuthorize("hasRole('ADMIN') or #uuid == principal.username")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull UserFindDTO>> updatePhoto(
             @NonNull @PathVariable UUID uuid,
             @NonNull @RequestParam(value = "photo") MultipartFile photo,
@@ -152,7 +158,8 @@ public class AdminController {
         );
     }
 
-    @DeleteMapping("/users/{uuid}")
+    @DeleteMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<@NonNull StandardResponseDTO<Void>> delete(
             @NonNull @PathVariable UUID uuid,
             @NonNull HttpServletRequest request
