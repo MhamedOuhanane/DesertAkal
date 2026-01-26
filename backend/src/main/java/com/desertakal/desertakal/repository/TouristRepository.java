@@ -5,8 +5,9 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface TouristRepository extends JpaRepository<@NonNull Tourist, @NonNull UUID>, JpaSpecificationExecutor<@NonNull Tourist> {
-    
+    Optional<@NonNull Tourist> findByUuid(@NonNull UUID uuid);
 }

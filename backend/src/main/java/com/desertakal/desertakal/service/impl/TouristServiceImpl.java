@@ -1,10 +1,13 @@
 package com.desertakal.desertakal.service.impl;
 
+import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
+import com.desertakal.desertakal.model.dto.tourist.TouristDTO;
 import com.desertakal.desertakal.model.entity.Tourist;
 import com.desertakal.desertakal.model.enums.UserStatus;
 import com.desertakal.desertakal.model.mapper.TouristMapper;
 import com.desertakal.desertakal.repository.TouristRepository;
+import com.desertakal.desertakal.service.interfaces.FileStorageService;
 import com.desertakal.desertakal.service.interfaces.TouristService;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
@@ -14,9 +17,12 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +30,7 @@ import java.util.List;
 public class TouristServiceImpl implements TouristService {
     private final TouristRepository repository;
     private final TouristMapper mapper;
+    private final FileStorageService fileStorageService;
 
     @Override
     public PaginationDTO findAll(String search, UserStatus status, String nationality, @NonNull Pageable pageable) {
@@ -60,5 +67,31 @@ public class TouristServiceImpl implements TouristService {
                 .isFirst(touristPages.isFirst())
                 .isLast(touristPages.isLast())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public TouristDTO updateAvatar(@NonNull UUID touristUuid, @NonNull MultipartFile avatar) {
+        log.info("Request to update Avatar for tourist: {}", touristUuid);
+
+        Tourist tourist = repository.findByUuid(touristUuid)
+                .orElseThrow(() -> {
+                    log.warn("Avatar update failed: Tourist {} not found", touristUuid);
+                    return new ResourceNotFoundException("Tourist", "identifier", touristUuid.toString());
+                });
+
+        if (!avatar.isEmpty() && avatar.getSize() > 0) {
+            String newAvatarUrl = fileStorageService.uploadDocument(avatar, "tourists/avatars");
+
+            if (tourist.getAvatarUrl() != null && !tourist.getAvatarUrl().isBlank()) {
+                fileStorageService.deleteFile(tourist.getAvatarUrl());
+            }
+            tourist.setAvatarUrl(newAvatarUrl);
+        } else {
+            log.warn("Update skipped: Provided avatar file is empty for tourist {}", touristUuid);
+        }
+
+        log.info("Tourist {} updated successfully", touristUuid);
+        return mapper.toDto(tourist);
     }
 }

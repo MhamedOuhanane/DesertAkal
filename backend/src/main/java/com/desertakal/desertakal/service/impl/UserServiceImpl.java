@@ -260,7 +260,7 @@ public class UserServiceImpl implements UserService {
                     return new ResourceNotFoundException("User", "identifier", userUuid.toString());
                 });
 
-        if (photo.getSize() <= 0) {
+        if (photo.getSize() > 0 && !photo.isEmpty()) {
             String newPhotoPath = fileStorageService.uploadDocument(photo, "users/profiles");
             if (user.getPhoto() != null && !user.getPhoto().isEmpty()) {
                 fileStorageService.deleteFile(user.getPhoto());
