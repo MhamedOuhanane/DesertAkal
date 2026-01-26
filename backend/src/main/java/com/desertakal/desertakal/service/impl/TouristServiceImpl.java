@@ -3,6 +3,8 @@ package com.desertakal.desertakal.service.impl;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.tourist.TouristDTO;
+import com.desertakal.desertakal.model.dto.tourist.TouristUpdateDTO;
+import com.desertakal.desertakal.model.dto.user.UserFindDTO;
 import com.desertakal.desertakal.model.entity.Tourist;
 import com.desertakal.desertakal.model.enums.UserStatus;
 import com.desertakal.desertakal.model.mapper.TouristMapper;
@@ -92,6 +94,26 @@ public class TouristServiceImpl implements TouristService {
         }
 
         log.info("Tourist {} updated successfully", touristUuid);
+        return mapper.toDto(tourist);
+    }
+
+    @Override
+    @Transactional
+    public UserFindDTO update(@NonNull UUID touristUuid, @NonNull TouristUpdateDTO dto) {
+        log.info("Starting update process for user with UUID: {}", touristUuid);
+
+        Tourist tourist = repository.findByUuid(touristUuid)
+                .orElseThrow(() -> {
+                    log.warn("Update failed: Tourist with UUID {} not found", touristUuid);
+                    return new ResourceNotFoundException("Tourist", "identifier", touristUuid.toString());
+                });
+
+        log.debug("Mapping UpdateDTO to Tourist entity for UUID: {}", touristUuid);
+
+        mapper.updateEntityFromDto(dto, tourist);
+
+        log.info("Tourist with UUID: {} successfully updated", touristUuid);
+
         return mapper.toDto(tourist);
     }
 }

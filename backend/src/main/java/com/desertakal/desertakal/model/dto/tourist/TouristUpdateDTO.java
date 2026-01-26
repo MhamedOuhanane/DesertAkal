@@ -13,8 +13,6 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class TouristUpdateDTO extends UserUpdateDTO {
-    private String avatarUrl;
-
     @Size(max = 50, message = "Nationality name is too long")
     private String nationality;
 
