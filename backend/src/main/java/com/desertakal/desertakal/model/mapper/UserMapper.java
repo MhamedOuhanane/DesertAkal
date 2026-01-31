@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public abstract class UserMapper {
 
     @Autowired
@@ -52,8 +52,8 @@ public abstract class UserMapper {
     @IterableMapping(qualifiedByName = "toDto")
     public abstract List<UserDTO> toDtos(List<User> users);
 
-    @Named("toAvatarUrl")
-    protected String toAvatarUrl(String avatarPath) {
-        return fileStorageService.getPublicUrl(avatarPath);
+    @Named("toPhotoUrl")
+    protected String toPhotoUrl(String photo) {
+        return fileStorageService.getPublicUrl(photo);
     }
 }

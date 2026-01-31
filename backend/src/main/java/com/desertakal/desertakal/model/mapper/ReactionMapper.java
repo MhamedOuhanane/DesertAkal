@@ -13,7 +13,7 @@ public interface ReactionMapper {
     @Mapping(source = "user.uuid", target = "userUuid")
     @Mapping(source = "article.uuid", target = "articleUuid")
     @Mapping(source = "reaction.desc", target = "emoji")
-    @Mapping(expression = "java(article.getUser().getFullName())", target = "userName")
+    @Mapping(expression = "java(reaction.getUser().getFullName())", target = "userName")
     @Mapping(source = "user.photo", target = "userPhoto")
     ReactionDTO toDto(Reaction reaction);
 

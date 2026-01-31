@@ -13,6 +13,7 @@ import java.util.List;
 
 @Mapper(
         componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
         uses = {LanguageMapper.class, UserMapper.class},
         builder = @Builder(disableBuilder = true)
 )
@@ -53,9 +54,4 @@ public abstract class GuideMapper {
 
     @IterableMapping(qualifiedByName = "toDto")
     public abstract List<GuideDTO> toDtos(List<Guide> guides);
-
-    @Named("toPhotoUrl")
-    protected String toPhotoUrl(String photoPath) {
-        return fileStorageService.getPublicUrl(photoPath);
-    }
 }

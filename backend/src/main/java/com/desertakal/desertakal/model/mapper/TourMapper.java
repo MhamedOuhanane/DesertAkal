@@ -13,6 +13,7 @@ import java.util.List;
 
 @Mapper(
         componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
         uses = {CityTourMapper.class},
         builder = @Builder(disableBuilder = true)
 )

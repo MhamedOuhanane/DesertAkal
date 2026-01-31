@@ -7,12 +7,12 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CommentMapper {
 
     @Mapping(source = "user.uuid", target = "userUuid")
     @Mapping(source = "article.uuid", target = "articleUuid")
-    @Mapping(expression = "java(article.getUser().getFullName())", target = "userName")
+    @Mapping(expression = "java(comment.getUser().getFullName())", target = "userName")
     @Mapping(source = "user.photo", target = "userPhoto")
     CommentDTO toDto(Comment comment);
 

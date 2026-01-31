@@ -12,6 +12,8 @@ import java.util.List;
 
 @Mapper(
         componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses = {LanguageMapper.class, UserMapper.class},
         builder = @Builder(disableBuilder = true)
 )
 public abstract class TouristMapper {
@@ -30,7 +32,7 @@ public abstract class TouristMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "photo", ignore = true)
-    @Mapping(target = "avatarPath", ignore = true)
+    @Mapping(target = "avatarUrl", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "role", ignore = true)
     public abstract Tourist toEntity(RegisterDTO dto);
@@ -40,7 +42,7 @@ public abstract class TouristMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "photo", ignore = true)
-    @Mapping(target = "avatarPath", ignore = true)
+    @Mapping(target = "avatarUrl", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "emailVerified", ignore = true)
@@ -53,13 +55,8 @@ public abstract class TouristMapper {
 
     public abstract List<TouristDTO> toDtos(List<Tourist> tourists);
 
-    @Named("toPhotoUrl")
-    protected String toPhotoUrl(String photoPath) {
-        return fileStorageService.getPublicUrl(photoPath);
-    }
-
     @Named("toAvatarUrl")
-    protected String toAvatarUrl(String avatarPath) {
-        return fileStorageService.getPublicUrl(avatarPath);
+    protected String toAvatarUrl(String avatarUrl) {
+        return fileStorageService.getPublicUrl(avatarUrl);
     }
 }
