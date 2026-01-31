@@ -3,6 +3,7 @@ package com.desertakal.desertakal.model.mapper;
 import com.desertakal.desertakal.model.dto.article.ArticleCreateDTO;
 import com.desertakal.desertakal.model.dto.article.ArticleDTO;
 import com.desertakal.desertakal.model.entity.Article;
+import com.desertakal.desertakal.model.enums.FileType;
 import com.desertakal.desertakal.service.interfaces.FileStorageService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,6 @@ public abstract class ArticleMapper {
 
     @Named("toPublicUrl")
     protected String toPublicUrl(String path) {
-        return fileStorageService.getPublicUrl(path);
+        return fileStorageService.getPublicUrl(path, FileType.ARTICLE);
     }
 }

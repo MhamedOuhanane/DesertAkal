@@ -5,6 +5,7 @@ import com.desertakal.desertakal.model.dto.user.UserDTO;
 import com.desertakal.desertakal.model.dto.user.UserFindDTO;
 import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
 import com.desertakal.desertakal.model.entity.User;
+import com.desertakal.desertakal.model.enums.FileType;
 import com.desertakal.desertakal.service.interfaces.FileStorageService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public abstract class UserMapper {
     @Mapping(target = "oauthProviders", expression = "java(user.getOAuths() != null ? " +
             "user.getOAuths().stream().map(auth -> auth.getProvider().name()).toList() : null)")
     @Mapping(source = "role.name", target = "role")
-    @Mapping(target = "photo", expression = "java(fileStorageService.getPublicUrl(user.getPhoto()))")
+    @Mapping(target = "photo", source = "photo", qualifiedByName = "toPhotoUrl")
     public abstract UserFindDTO toFindDto(User user);
 
     @Mapping(target = "id", ignore = true)
@@ -54,6 +55,6 @@ public abstract class UserMapper {
 
     @Named("toPhotoUrl")
     protected String toPhotoUrl(String photo) {
-        return fileStorageService.getPublicUrl(photo);
+        return fileStorageService.getPublicUrl(photo, FileType.PROFILE);
     }
 }

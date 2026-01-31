@@ -2,6 +2,7 @@ package com.desertakal.desertakal.model.mapper;
 
 import com.desertakal.desertakal.model.dto.image.ImageDTO;
 import com.desertakal.desertakal.model.entity.Image;
+import com.desertakal.desertakal.model.enums.FileType;
 import com.desertakal.desertakal.service.interfaces.FileStorageService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -24,6 +25,6 @@ public abstract class ImageMapper {
 
     @Named("toPublicUrl")
     protected String toPublicUrl(String imagePath) {
-        return fileStorageService.getPublicUrl(imagePath);
+        return fileStorageService.getPublicUrl(imagePath, FileType.CITY);
     }
 }

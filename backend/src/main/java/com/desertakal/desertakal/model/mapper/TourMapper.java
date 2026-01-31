@@ -5,6 +5,7 @@ import com.desertakal.desertakal.model.dto.tour.TourDTO;
 import com.desertakal.desertakal.model.dto.tour.TourFindDTO;
 import com.desertakal.desertakal.model.dto.tour.TourUpdateDTO;
 import com.desertakal.desertakal.model.entity.Tour;
+import com.desertakal.desertakal.model.enums.FileType;
 import com.desertakal.desertakal.service.interfaces.FileStorageService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,6 @@ public abstract class TourMapper {
 
     @Named("toPublicUrl")
     protected String toPublicUrl(String imagePath) {
-        return fileStorageService.getPublicUrl(imagePath);
+        return fileStorageService.getPublicUrl(imagePath, FileType.TOUR);
     }
 }

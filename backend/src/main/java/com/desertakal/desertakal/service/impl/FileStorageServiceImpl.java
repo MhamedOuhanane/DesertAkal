@@ -1,6 +1,7 @@
 package com.desertakal.desertakal.service.impl;
 
 import com.desertakal.desertakal.exception.custom.FileUploadException;
+import com.desertakal.desertakal.model.enums.FileType;
 import com.desertakal.desertakal.service.interfaces.FileStorageService;
 import io.minio.*;
 import io.minio.errors.*;
@@ -72,11 +73,25 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public String getPublicUrl(@NonNull String filePath) {
-        if (filePath.isEmpty())
-            return baseUrl + "/" + bucketName + "/defaults/default-profile.png";
+    public String getPublicUrl(String filePath, FileType type) {
+        if (filePath == null || filePath.isBlank()) {
+            return getUrl(getDefaultImage(type));
+        }
+        return getUrl(filePath);
+    }
 
-        return String.format("%s/%s/%s", baseUrl, bucketName, filePath);
+    private String getDefaultImage(FileType type) {
+        return switch (type) {
+            case AVATAR -> "defaults/default-avatar.png";
+            case PROFILE -> "defaults/default-profile.png";
+            case TOUR -> "defaults/default-tour.png";
+            case CITY -> "defaults/default-city.png";
+            case ARTICLE -> "defaults/default-article.png";
+        };
+    }
+
+    private String getUrl(String path) {
+        return String.format("%s/%s/%s", baseUrl, bucketName, path);
     }
 
     private void ensureBucketExists() throws Exception {

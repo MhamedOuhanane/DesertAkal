@@ -262,7 +262,8 @@ public class UserServiceImpl implements UserService {
 
         if (photo.getSize() > 0 && !photo.isEmpty()) {
             String newPhotoPath = fileStorageService.uploadDocument(photo, "users/profiles");
-            if (user.getPhoto() != null && !user.getPhoto().isEmpty()) {
+
+            if (user.getPhoto() != null && !user.getPhoto().isEmpty() && !user.getPhoto().contains("defaults/")) {
                 fileStorageService.deleteFile(user.getPhoto());
             }
 

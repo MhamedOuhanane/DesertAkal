@@ -4,6 +4,7 @@ import com.desertakal.desertakal.model.dto.auth.RegisterDTO;
 import com.desertakal.desertakal.model.dto.tourist.TouristDTO;
 import com.desertakal.desertakal.model.dto.tourist.TouristUpdateDTO;
 import com.desertakal.desertakal.model.entity.Tourist;
+import com.desertakal.desertakal.model.enums.FileType;
 import com.desertakal.desertakal.service.interfaces.FileStorageService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,6 @@ public abstract class TouristMapper {
 
     @Named("toAvatarUrl")
     protected String toAvatarUrl(String avatarUrl) {
-        return fileStorageService.getPublicUrl(avatarUrl);
+        return fileStorageService.getPublicUrl(avatarUrl, FileType.AVATAR);
     }
 }

@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.controller;
 
+import com.desertakal.desertakal.exception.custom.FileUploadException;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.dto.tourist.TouristDTO;
 import com.desertakal.desertakal.service.interfaces.TouristService;
@@ -9,10 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -46,6 +45,36 @@ public class TouristController {
                 .build();
 
         log.info("Successfully retrieved tourist for UUID: {}", uuid);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{uuid}/avatar")
+    @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, false )")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull TouristDTO>> updateAvatar(
+            @PathVariable UUID uuid,
+            @RequestParam MultipartFile avatar,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to update avatar for Tourist: {} [File: {}, Size: {} bytes]",
+                uuid, avatar.getOriginalFilename(), avatar.getSize());
+
+        if (avatar.isEmpty()) {
+            log.warn("Attempt to upload empty file for Tourist: {}", uuid);
+            throw new FileUploadException("The uploaded file is empty. Please select a valid image.");
+        }
+
+        var result = service.updateAvatar(uuid, avatar);
+
+        log.info("Successfully updated avatar for Tourist: {}. New Path stored.", uuid);
+
+        var response = StandardResponseDTO.<TouristDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Avatar updated successfully")
+                .status(200)
+                .data(result)
+                .path(request.getServletPath())
+                .build();
 
         return ResponseEntity.ok(response);
     }

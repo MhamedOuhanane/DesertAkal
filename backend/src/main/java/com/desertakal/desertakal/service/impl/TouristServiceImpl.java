@@ -54,9 +54,10 @@ public class TouristServiceImpl implements TouristService {
                 });
 
         if (!avatar.isEmpty() && avatar.getSize() > 0) {
+
             String newAvatarUrl = fileStorageService.uploadDocument(avatar, "tourists/avatars");
 
-            if (tourist.getAvatarUrl() != null && !tourist.getAvatarUrl().isBlank()) {
+            if (tourist.getAvatarUrl() != null && !tourist.getAvatarUrl().isBlank() && !tourist.getAvatarUrl().contains("defaults/")) {
                 fileStorageService.deleteFile(tourist.getAvatarUrl());
             }
             tourist.setAvatarUrl(newAvatarUrl);
