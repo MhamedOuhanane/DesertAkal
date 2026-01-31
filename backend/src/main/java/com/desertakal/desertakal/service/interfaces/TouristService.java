@@ -11,5 +11,5 @@ import java.util.UUID;
 public interface TouristService {
     TouristDTO find(UUID touristUuid);
     TouristDTO updateAvatar(@NonNull UUID touristUuid, @NonNull MultipartFile avatar);
-    UserFindDTO update(@NonNull UUID touristUuid, @NonNull TouristUpdateDTO dto);
+    TouristDTO update(@NonNull UUID touristUuid, @NonNull TouristUpdateDTO dto);
 }

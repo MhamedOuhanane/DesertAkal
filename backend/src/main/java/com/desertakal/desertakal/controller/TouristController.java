@@ -3,8 +3,12 @@ package com.desertakal.desertakal.controller;
 import com.desertakal.desertakal.exception.custom.FileUploadException;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.dto.tourist.TouristDTO;
+import com.desertakal.desertakal.model.dto.tourist.TouristUpdateDTO;
+import com.desertakal.desertakal.model.dto.user.UserFindDTO;
+import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
 import com.desertakal.desertakal.service.interfaces.TouristService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -70,11 +74,37 @@ public class TouristController {
 
         var response = StandardResponseDTO.<TouristDTO>builder()
                 .timestamp(LocalDateTime.now())
-                .message("Avatar updated successfully")
+                .message("Profile updated successfully")
                 .status(200)
                 .data(result)
                 .path(request.getServletPath())
                 .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{uuid}")
+    @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true)")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull TouristDTO>> update(
+            @NonNull @PathVariable UUID uuid,
+            @NonNull @Valid @RequestBody TouristUpdateDTO dto,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to patch Tourist : {} [Path: {}]", uuid, request.getServletPath());
+
+        log.debug("Update payload for Tourist {}: {}", uuid, dto);
+
+        var result = service.update(uuid, dto);
+
+        var response = StandardResponseDTO.<TouristDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("")
+                .status(200)
+                .path(request.getServletPath())
+                .data(result)
+                .build();
+
+        log.info("Tourist with UUID: {} has been successfully patched via {}", uuid, request.getServletPath());
 
         return ResponseEntity.ok(response);
     }

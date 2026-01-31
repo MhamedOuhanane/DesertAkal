@@ -102,7 +102,7 @@ public class UserController {
 
         var response = StandardResponseDTO.<UserFindDTO>builder()
                 .timestamp(LocalDateTime.now())
-                .message("")
+                .message("User info updated successfully")
                 .status(200)
                 .path(request.getServletPath())
                 .data(result)

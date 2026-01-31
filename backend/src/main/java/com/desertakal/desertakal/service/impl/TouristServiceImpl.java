@@ -72,7 +72,7 @@ public class TouristServiceImpl implements TouristService {
 
     @Override
     @Transactional
-    public UserFindDTO update(@NonNull UUID touristUuid, @NonNull TouristUpdateDTO dto) {
+    public TouristDTO update(@NonNull UUID touristUuid, @NonNull TouristUpdateDTO dto) {
         log.info("Starting update process for user with UUID: {}", touristUuid);
 
         Tourist tourist = repository.findByUuid(touristUuid)
