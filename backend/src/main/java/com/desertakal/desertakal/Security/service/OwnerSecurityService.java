@@ -17,6 +17,11 @@ public class OwnerSecurityService {
         if (authentication == null || !authentication.isAuthenticated())
             return false;
 
+
+        System.out.print("OwnerSecurityService");
+        System.out.print(authentication.isAuthenticated());
+        System.out.print(authentication.getAuthorities());
+
         if (allowAdmin) {
             boolean isAdmin = authentication.getAuthorities().stream()
                     .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN"));

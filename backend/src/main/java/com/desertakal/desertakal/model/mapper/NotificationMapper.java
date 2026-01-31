@@ -12,7 +12,7 @@ import java.util.List;
 public interface NotificationMapper {
 
     @Mapping(target = "userUuid", source = "user.uuid")
-    @Mapping(target = "userName", expression = "java(notification.getUser().getFirstName() + \" \" + notification.getUser().getLastName())")
+    @Mapping(target = "userName", expression = "java(article.getUser().getFullName())")
     NotificationDTO toDto(Notification notification);
 
     @Mapping(target = "id", ignore = true)

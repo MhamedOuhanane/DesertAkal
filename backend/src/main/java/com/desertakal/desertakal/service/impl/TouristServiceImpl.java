@@ -27,6 +27,7 @@ public class TouristServiceImpl implements TouristService {
     private final FileStorageService fileStorageService;
 
     @Override
+    @Transactional(readOnly = true)
     public TouristDTO find(UUID touristUuid) {
         log.info("Attempting to find tourist with UUID: {}", touristUuid);
 

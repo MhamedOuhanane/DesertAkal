@@ -12,7 +12,7 @@ public interface CommentMapper {
 
     @Mapping(source = "user.uuid", target = "userUuid")
     @Mapping(source = "article.uuid", target = "articleUuid")
-    @Mapping(expression = "java(comment.getUser().getFirstName() + \" \" + comment.getUser().getLastName())", target = "userName")
+    @Mapping(expression = "java(article.getUser().getFullName())", target = "userName")
     @Mapping(source = "user.photo", target = "userPhoto")
     CommentDTO toDto(Comment comment);
 
