@@ -2,7 +2,6 @@ package com.desertakal.desertakal.controller;
 
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.dto.tourist.TouristDTO;
-import com.desertakal.desertakal.model.dto.user.UserFindDTO;
 import com.desertakal.desertakal.service.interfaces.TouristService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,7 @@ public class TouristController {
     private final TouristService service;
 
     @GetMapping("/{uuid}")
-    @PreAuthorize("#uuid == principal.username")
+    @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true)")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull TouristDTO>> find(
             @NonNull @PathVariable UUID uuid,
             @NonNull HttpServletRequest request

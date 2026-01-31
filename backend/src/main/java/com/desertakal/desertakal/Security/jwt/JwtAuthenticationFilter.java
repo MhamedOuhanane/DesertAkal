@@ -1,7 +1,7 @@
 package com.desertakal.desertakal.Security.jwt;
 
 import com.desertakal.desertakal.Security.user.CustomUserDetails;
-import com.desertakal.desertakal.Security.user.CustomUserDetailsService;
+import com.desertakal.desertakal.Security.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

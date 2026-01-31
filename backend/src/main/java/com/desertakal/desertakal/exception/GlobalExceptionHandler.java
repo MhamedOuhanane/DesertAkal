@@ -5,6 +5,7 @@ import com.desertakal.desertakal.model.dto.error.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.validation.FieldError;
@@ -86,6 +87,22 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.FORBIDDEN.value())
                 .error("Account Locked")
                 .message("This account has been banned. Please contact administration for support.")
+                .path(request.getServletPath())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleSpringSecurityAccessDeniedException(
+            AccessDeniedException exception,
+            HttpServletRequest request
+    ) {
+        var error = ErrorResponse.<String>builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("Forbidden")
+                .message("Access Denied: You don't have enough permissions.")
                 .path(request.getServletPath())
                 .build();
 

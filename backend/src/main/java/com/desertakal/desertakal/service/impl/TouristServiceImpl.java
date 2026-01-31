@@ -64,6 +64,7 @@ public class TouristServiceImpl implements TouristService {
         }
 
         log.info("Tourist {} updated successfully", touristUuid);
+
         return mapper.toDto(tourist);
     }
 

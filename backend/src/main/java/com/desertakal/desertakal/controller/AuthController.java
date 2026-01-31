@@ -239,6 +239,11 @@ public class AuthController {
     ) {
         log.info("Logout request received for path: {}", request.getServletPath());
 
+        if (token.isEmpty()) {
+            log.warn("Logout attempted without refreshToken cookie");
+            return ResponseEntity.status(400).body(Map.of("message", "No refresh token found in cookies"));
+        }
+
         refreshTokenService.logout(token);
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", "")

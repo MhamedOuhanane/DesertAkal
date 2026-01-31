@@ -65,7 +65,7 @@ public class UserController {
     }
 
     @GetMapping("/{uuid}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true)")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull UserFindDTO>> getUser(
             @NonNull @PathVariable UUID uuid,
             @NonNull HttpServletRequest request
@@ -88,7 +88,7 @@ public class UserController {
     }
 
     @PatchMapping("/{uuid}")
-    @PreAuthorize("hasRole('ADMIN') or #uuid == principal.username")
+    @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true)")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull UserFindDTO>> updateUser(
             @NonNull @PathVariable UUID uuid,
             @NonNull @Valid @RequestBody UserUpdateDTO dto,
@@ -137,7 +137,7 @@ public class UserController {
     }
 
     @PatchMapping("/{uuid}/photo")
-    @PreAuthorize("hasRole('ADMIN') or #uuid == principal.username")
+    @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true)")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull UserFindDTO>> updatePhoto(
             @NonNull @PathVariable UUID uuid,
             @NonNull @RequestParam(value = "photo") MultipartFile photo,
