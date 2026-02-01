@@ -118,7 +118,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull UserFindDTO>> updateStatus(
             @NonNull @PathVariable UUID uuid,
-            @NonNull @Valid UserStatusUpdateDTO dto,
+            @NonNull @Valid @RequestBody UserStatusUpdateDTO dto,
             @NonNull HttpServletRequest request
     ) {
         log.info("REST request to update status of user {} to {}", uuid, dto.getStatus());
