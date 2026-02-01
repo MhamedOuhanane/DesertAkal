@@ -23,8 +23,8 @@ public class GuideCreateDTO extends RegisterDTO {
 
     @NotBlank(message = "Phone number is required")
     @Pattern(
-            regexp = "^(\\+\\d{1,3}[- ]?)?\\d{6,15}$",
-            message = "Invalid phone number format"
+            regexp = "^\\+\\d{1,3}[- ]?\\d{6,15}$",
+            message = "Phone number must start with '+' followed by country code (ex: +212600000000)"
     )
     private String phone;
 

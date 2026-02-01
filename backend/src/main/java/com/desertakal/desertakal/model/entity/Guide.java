@@ -34,7 +34,7 @@ public class Guide extends User implements Reviewable {
     @Builder.Default
     @ManyToMany
     @JoinTable(
-            name = "guide_language",
+            name = "guide_languages",
             joinColumns = @JoinColumn(name = "guide_id"),
             inverseJoinColumns = @JoinColumn(name = "language_id")
     )

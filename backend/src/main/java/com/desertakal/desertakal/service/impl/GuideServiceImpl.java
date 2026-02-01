@@ -14,6 +14,7 @@ import com.desertakal.desertakal.model.mapper.GuideMapper;
 import com.desertakal.desertakal.repository.GuideRepository;
 import com.desertakal.desertakal.repository.LanguageRepository;
 import com.desertakal.desertakal.repository.RoleRepository;
+import com.desertakal.desertakal.repository.UserRepository;
 import com.desertakal.desertakal.service.interfaces.EmailVerificationTokenService;
 import com.desertakal.desertakal.service.interfaces.GuideService;
 import jakarta.persistence.criteria.Expression;
@@ -39,6 +40,7 @@ import java.util.UUID;
 public class GuideServiceImpl implements GuideService {
     private final GuideRepository repository;
     private final GuideMapper mapper;
+    private final UserRepository userRepository;
     private final LanguageRepository languageRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -47,11 +49,11 @@ public class GuideServiceImpl implements GuideService {
 
     @Override
     public GuideFindDTO create(@NonNull GuideCreateDTO dto) {
-        if (repository.existsByEmail(dto.getEmail())) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
             log.warn("Create failed: Email {} is already registered", dto.getEmail());
             throw new DuplicateResourceException("User", "Email", dto.getEmail());
         }
-        if (repository.existsByUsername(dto.getUsername())) {
+        if (userRepository.existsByUsername(dto.getUsername())) {
             log.warn("Create failed: Username {} is already taken", dto.getUsername());
             throw new DuplicateResourceException("User", "Username", dto.getEmail());
         }
@@ -62,10 +64,10 @@ public class GuideServiceImpl implements GuideService {
         }
 
         log.debug("Fetching role with UUID: {}", dto.getRoleUuid());
-        Role role = roleRepository.findByName("Guide")
+        Role role = roleRepository.findByName("GUIDE")
                 .orElseThrow(() -> {
-                    log.error("Create failed: Role UUID {} not found", "Guide");
-                    return new ResourceNotFoundException("Role", "name", "Guide");
+                    log.error("Create failed: Role UUID {} not found", "GUIDE");
+                    return new ResourceNotFoundException("Role", "name", "GUIDE");
                 });
 
         Guide guide = mapper.toEntity(dto);
@@ -159,7 +161,7 @@ public class GuideServiceImpl implements GuideService {
                     return new ResourceNotFoundException("Guide", "identifier", guideUuid.toString());
                 });
 
-        if (dto.getEmail() != null && repository.existsByEmail(dto.getEmail())) {
+        if (dto.getEmail() != null && userRepository.existsByEmail(dto.getEmail())) {
             log.warn("Update failed: Guide email '{}' already exists", dto.getEmail());
             throw new DuplicateResourceException("Guide", "Email", dto.getEmail());
         }
