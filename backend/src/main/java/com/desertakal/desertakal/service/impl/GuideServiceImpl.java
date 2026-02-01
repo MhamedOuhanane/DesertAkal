@@ -97,6 +97,7 @@ public class GuideServiceImpl implements GuideService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginationDTO findAll(String search, String language, @NonNull Pageable pageable) {
         log.info("Fetching guides list - Page: {}, Size: {}, Sort: {}",
                 pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
