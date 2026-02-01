@@ -11,4 +11,8 @@ import java.util.UUID;
 
 public interface GuideRepository extends JpaRepository<@NonNull Guide, @NonNull UUID>, JpaSpecificationExecutor<@NonNull Guide> {
     Optional<@NonNull Guide> findByUuid(@NonNull UUID uuid);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByUsername(String username);
 }

@@ -1,5 +1,7 @@
 package com.desertakal.desertakal.service.impl;
 
+import com.desertakal.desertakal.exception.custom.BadRequestException;
+import com.desertakal.desertakal.exception.custom.DuplicateResourceException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.guide.GuideCreateDTO;
 import com.desertakal.desertakal.model.dto.guide.GuideFindDTO;
@@ -7,9 +9,12 @@ import com.desertakal.desertakal.model.dto.guide.GuideUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.entity.Guide;
 import com.desertakal.desertakal.model.entity.Language;
+import com.desertakal.desertakal.model.entity.Role;
 import com.desertakal.desertakal.model.mapper.GuideMapper;
 import com.desertakal.desertakal.repository.GuideRepository;
 import com.desertakal.desertakal.repository.LanguageRepository;
+import com.desertakal.desertakal.repository.RoleRepository;
+import com.desertakal.desertakal.service.interfaces.EmailVerificationTokenService;
 import com.desertakal.desertakal.service.interfaces.GuideService;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
@@ -19,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,10 +40,58 @@ public class GuideServiceImpl implements GuideService {
     private final GuideRepository repository;
     private final GuideMapper mapper;
     private final LanguageRepository languageRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationTokenService emailVerificationTokenService;
+    private final MailService mailService;
 
     @Override
     public GuideFindDTO create(@NonNull GuideCreateDTO dto) {
-        return null;
+        if (repository.existsByEmail(dto.getEmail())) {
+            log.warn("Create failed: Email {} is already registered", dto.getEmail());
+            throw new DuplicateResourceException("User", "Email", dto.getEmail());
+        }
+        if (repository.existsByUsername(dto.getUsername())) {
+            log.warn("Create failed: Username {} is already taken", dto.getUsername());
+            throw new DuplicateResourceException("User", "Username", dto.getEmail());
+        }
+
+        if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+            log.warn("Create failed: Password confirmation does not match for email: {}", dto.getEmail());
+            throw new BadRequestException("Passwords do not match. Please ensure both passwords are identical.");
+        }
+
+        log.debug("Fetching role with UUID: {}", dto.getRoleUuid());
+        Role role = roleRepository.findByName("Guide")
+                .orElseThrow(() -> {
+                    log.error("Create failed: Role UUID {} not found", "Guide");
+                    return new ResourceNotFoundException("Role", "name", "Guide");
+                });
+
+        Guide guide = mapper.toEntity(dto);
+        String rawPassword = dto.getPassword();
+        guide.setPassword(passwordEncoder.encode(rawPassword));
+        guide.setRole(role);
+
+        log.debug("Create languages for guide '{}'. New count requested: {}", guide.getEmail(), dto.getLanguageUsUuids().size());
+
+        var languages = languageRepository.findDistinctByUuidIn(dto.getLanguageUsUuids());
+
+        if (!Objects.equals(languages.size(), dto.getLanguageUsUuids().size())) {
+            log.error("Create failed: Some language UUIDs are invalid for guide {}", guide.getEmail());
+            throw new ResourceNotFoundException("Languages", "uuids", dto.getLanguageUsUuids().toString());
+        }
+
+        guide.setLanguages(languages);
+
+        repository.save(guide);
+        emailVerificationTokenService.createVerificationToken(guide.getEmail());
+
+        mailService.sendGuideWelcomeEmail(guide.getEmail(), rawPassword);
+
+        log.info("Guide created successfully and welcome email sent to: {}", guide.getEmail());
+
+        return mapper.toFindDto(guide);
     }
 
     @Override
@@ -105,11 +159,14 @@ public class GuideServiceImpl implements GuideService {
                     return new ResourceNotFoundException("Guide", "identifier", guideUuid.toString());
                 });
 
+        if (dto.getEmail() != null && repository.existsByEmail(dto.getEmail())) {
+            log.warn("Update failed: Guide email '{}' already exists", dto.getEmail());
+            throw new DuplicateResourceException("Guide", "Email", dto.getEmail());
+        }
+
         log.debug("Mapping UpdateDTO to Guide entity for UUID: {}", guideUuid);
 
         mapper.updateEntityFromDto(dto, guide);
-
-        int oldLanguagesCount = guide.getLanguages().size();
 
         if (dto.getLanguageUsUuids() != null && !dto.getLanguageUsUuids().isEmpty()) {
             log.debug("Updating languages for guide '{}'. New count requested: {}", guide.getEmail(), dto.getLanguageUsUuids().size());

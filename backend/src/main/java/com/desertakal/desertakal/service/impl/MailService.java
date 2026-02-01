@@ -45,4 +45,30 @@ public class MailService {
             log.error("Failed to send verification email to {}: {}", to, e.getMessage());
         }
     }
+
+    @Async
+    public void sendGuideWelcomeEmail(String to, String rawPassword) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Welcome to DesertAkal - Your Guide Account Details");
+
+        String emailText = "Hello,\n\n" +
+                "Welcome to the DesertAkal family! Your account as a Guide has been created successfully.\n\n" +
+                "Here are your login credentials:\n" +
+                "Email: " + to + "\n" +
+                "Password: " + rawPassword + "\n\n" +
+                "For security reasons, we recommend that you change your password after your first login.\n\n" +
+                "You can log in at: " + apiBaseUrl + "/login\n\n" +
+                "Best regards,\n" +
+                "The DesertAkal Team";
+
+        message.setText(emailText);
+
+        try {
+            mailSender.send(message);
+            log.info("Guide welcome email with credentials sent to: {}", to);
+        } catch (Exception e) {
+            log.error("Failed to send welcome email to {}: {}", to, e.getMessage());
+        }
+    }
 }

@@ -1,10 +1,7 @@
 package com.desertakal.desertakal.service.impl;
 
 import com.desertakal.desertakal.Security.jwt.JwtService;
-import com.desertakal.desertakal.exception.custom.AuthenticationException;
-import com.desertakal.desertakal.exception.custom.BadRequestException;
-import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
-import com.desertakal.desertakal.exception.custom.UnauthorizedActionException;
+import com.desertakal.desertakal.exception.custom.*;
 import com.desertakal.desertakal.model.dto.auth.LoginDTO;
 import com.desertakal.desertakal.model.dto.auth.LoginRequestDTO;
 import com.desertakal.desertakal.model.dto.auth.RegisterDTO;
@@ -62,11 +59,11 @@ public class UserServiceImpl implements UserService {
     public void register(@NonNull RegisterDTO dto) {
         if (repository.existsByEmail(dto.getEmail())) {
             log.warn("Registration failed: Email {} is already registered", dto.getEmail());
-            throw new BadRequestException("Email is already taken.");
+            throw new DuplicateResourceException("User", "Email", dto.getEmail());
         }
         if (repository.existsByUsername(dto.getUsername())) {
             log.warn("Registration failed: Username {} is already taken", dto.getUsername());
-            throw new BadRequestException("Username is already taken.");
+            throw new DuplicateResourceException("User", "Username", dto.getEmail());
         }
 
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {
@@ -215,6 +212,11 @@ public class UserServiceImpl implements UserService {
 
         if (user.getOAuths() != null) {
             log.debug("Update: User OAuths detected, count: {}", user.getOAuths().size());
+        }
+
+        if (dto.getEmail() != null && repository.existsByEmail(dto.getEmail())) {
+            log.warn("Update failed: User email '{}' already exists", dto.getEmail());
+            throw new DuplicateResourceException("User", "Email", dto.getEmail());
         }
 
         log.debug("Mapping UpdateDTO to User entity for UUID: {}", userUuid);
