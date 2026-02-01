@@ -2,9 +2,11 @@ package com.desertakal.desertakal.controller;
 
 import com.desertakal.desertakal.model.dto.guide.GuideCreateDTO;
 import com.desertakal.desertakal.model.dto.guide.GuideFindDTO;
+import com.desertakal.desertakal.model.dto.guide.GuideUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.dto.user.UserFindDTO;
+import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
 import com.desertakal.desertakal.model.enums.UserStatus;
 import com.desertakal.desertakal.service.interfaces.GuideService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -103,6 +105,32 @@ public class GuideController {
                 .build();
 
         log.info("Successfully processed Guides request for path: {}", request.getServletPath());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull GuideFindDTO>> update(
+            @NonNull @PathVariable UUID uuid,
+            @NonNull @Valid @RequestBody GuideUpdateDTO dto,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to patch Guide : {} [Path: {}]", uuid, request.getServletPath());
+
+        log.debug("Update payload for Guide {}: {}", uuid, dto);
+
+        var result = service.update(uuid, dto);
+
+        var response = StandardResponseDTO.<GuideFindDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Guide info updated successfully")
+                .status(200)
+                .path(request.getServletPath())
+                .data(result)
+                .build();
+
+        log.info("Guide with UUID: {} has been successfully patched via {}", uuid, request.getServletPath());
 
         return ResponseEntity.ok(response);
     }

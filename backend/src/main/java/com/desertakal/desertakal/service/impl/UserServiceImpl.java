@@ -214,11 +214,6 @@ public class UserServiceImpl implements UserService {
             log.debug("Update: User OAuths detected, count: {}", user.getOAuths().size());
         }
 
-        if (dto.getEmail() != null && repository.existsByEmail(dto.getEmail())) {
-            log.warn("Update failed: User email '{}' already exists", dto.getEmail());
-            throw new DuplicateResourceException("User", "Email", dto.getEmail());
-        }
-
         log.debug("Mapping UpdateDTO to User entity for UUID: {}", userUuid);
 
         mapper.updateEntityFromDto(dto, user);

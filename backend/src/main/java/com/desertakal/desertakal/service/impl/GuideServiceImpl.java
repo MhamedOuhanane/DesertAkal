@@ -163,11 +163,6 @@ public class GuideServiceImpl implements GuideService {
                     return new ResourceNotFoundException("Guide", "identifier", guideUuid.toString());
                 });
 
-        if (dto.getEmail() != null && userRepository.existsByEmail(dto.getEmail())) {
-            log.warn("Update failed: Guide email '{}' already exists", dto.getEmail());
-            throw new DuplicateResourceException("Guide", "Email", dto.getEmail());
-        }
-
         log.debug("Mapping UpdateDTO to Guide entity for UUID: {}", guideUuid);
 
         mapper.updateEntityFromDto(dto, guide);

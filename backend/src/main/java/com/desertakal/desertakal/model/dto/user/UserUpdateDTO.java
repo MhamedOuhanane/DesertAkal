@@ -19,10 +19,6 @@ public class UserUpdateDTO {
     @Size(min = 3, max = 50, message = "Last name must be between 3 and 50 characters")
     protected String lastName;
 
-    @Email(message = "Email should be valid")
-    @Size(max = 100, message = "Email must be at most 100 characters")
-    protected String email;
-
     @Pattern(
             regexp = "^(\\+\\d{1,3}[- ]?)?\\d{6,15}$",
             message = "Phone number is invalid"
