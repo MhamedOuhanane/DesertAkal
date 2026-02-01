@@ -9,6 +9,7 @@ import com.desertakal.desertakal.model.entity.Guide;
 import com.desertakal.desertakal.model.entity.Language;
 import com.desertakal.desertakal.model.mapper.GuideMapper;
 import com.desertakal.desertakal.repository.GuideRepository;
+import com.desertakal.desertakal.repository.LanguageRepository;
 import com.desertakal.desertakal.service.interfaces.GuideService;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
@@ -19,9 +20,11 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -30,6 +33,7 @@ import java.util.UUID;
 public class GuideServiceImpl implements GuideService {
     private final GuideRepository repository;
     private final GuideMapper mapper;
+    private final LanguageRepository languageRepository;
 
     @Override
     public GuideFindDTO create(@NonNull GuideCreateDTO dto) {
@@ -38,7 +42,7 @@ public class GuideServiceImpl implements GuideService {
 
     @Override
     public PaginationDTO findAll(String search, String language, @NonNull Pageable pageable) {
-        log.info("Fetching users list - Page: {}, Size: {}, Sort: {}",
+        log.info("Fetching guides list - Page: {}, Size: {}, Sort: {}",
                 pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
 
         Specification<@NonNull Guide> spec = (root, query, cb) -> {
@@ -91,8 +95,39 @@ public class GuideServiceImpl implements GuideService {
     }
 
     @Override
+    @Transactional
     public GuideFindDTO update(@NonNull UUID guideUuid, @NonNull GuideUpdateDTO dto) {
-        return null;
+        log.info("Starting update process for Guide with UUID: {}", guideUuid);
+
+        Guide guide = repository.findByUuid(guideUuid)
+                .orElseThrow(() -> {
+                    log.warn("Update failed: Guide with UUID {} not found", guideUuid);
+                    return new ResourceNotFoundException("Guide", "identifier", guideUuid.toString());
+                });
+
+        log.debug("Mapping UpdateDTO to Guide entity for UUID: {}", guideUuid);
+
+        mapper.updateEntityFromDto(dto, guide);
+
+        int oldLanguagesCount = guide.getLanguages().size();
+
+        if (dto.getLanguageUsUuids() != null && !dto.getLanguageUsUuids().isEmpty()) {
+            log.debug("Updating languages for guide '{}'. New count requested: {}", guide.getEmail(), dto.getLanguageUsUuids().size());
+
+            var newLanguages = languageRepository.findDistinctByUuidIn(dto.getLanguageUsUuids());
+
+            if (!Objects.equals(newLanguages.size(), dto.getLanguageUsUuids().size())) {
+                log.error("Update failed: Some language UUIDs are invalid for guide {}", guideUuid);
+                throw new ResourceNotFoundException("Languages", "uuids", dto.getLanguageUsUuids().toString());
+            }
+
+            guide.getLanguages().clear();
+            guide.getLanguages().addAll(newLanguages);
+        }
+
+        log.info("Guide with UUID: {} successfully updated", guideUuid);
+
+        return mapper.toFindDto(guide);
     }
 
     @Override

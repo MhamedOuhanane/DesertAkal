@@ -109,6 +109,7 @@ public class RoleServiceImpl implements RoleService {
 
             if (newPermissions.size() != dto.getPermissionUuids().size()) {
                 log.warn("Missing Permissions! Requested: {}, Found: {}", dto.getPermissionUuids().size(), newPermissions.size());
+                throw new ResourceNotFoundException("Permissions", "uuids", dto.getPermissionUuids().toString());
             }
 
             role.getPermissions().clear();
