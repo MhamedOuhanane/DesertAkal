@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface LanguageService {
     LanguageDTO create(@NonNull LanguageCreateDTO dto);
-    PaginationDTO findAll(String search, String language, @NonNull Pageable pageable);
+    PaginationDTO findAll(String search, @NonNull Pageable pageable);
     LanguageDTO find(@NonNull UUID languageUuid);
     LanguageDTO update(@NonNull UUID languageUuid, @NonNull LanguageUpdateDTO dto);
     void delete(@NonNull UUID languageUuid);
