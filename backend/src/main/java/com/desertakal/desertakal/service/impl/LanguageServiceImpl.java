@@ -80,7 +80,17 @@ public class LanguageServiceImpl implements LanguageService {
 
     @Override
     public LanguageDTO find(@NonNull UUID languageUuid) {
-        return null;
+        log.info("Fetching details for Language UUID: '{}'", languageUuid);
+
+        Language language = repository.findByUuid(languageUuid)
+                .orElseThrow(() -> {
+                    log.warn("Lookup failed: Language UUID '{}' not found in database", languageUuid);
+                    return new ResourceNotFoundException("Language", "identifier", languageUuid.toString());
+                });
+
+        log.info("Successfully found Language: '{}' ", language.getName());
+
+        return mapper.toDto(language);
     }
 
     @Override
