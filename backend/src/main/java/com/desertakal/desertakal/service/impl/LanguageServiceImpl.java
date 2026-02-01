@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.service.impl;
 
+import com.desertakal.desertakal.exception.custom.BusinessRuleException;
 import com.desertakal.desertakal.exception.custom.DuplicateResourceException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.language.LanguageCreateDTO;
@@ -7,7 +8,6 @@ import com.desertakal.desertakal.model.dto.language.LanguageDTO;
 import com.desertakal.desertakal.model.dto.language.LanguageUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.entity.Language;
-import com.desertakal.desertakal.model.entity.Permission;
 import com.desertakal.desertakal.model.mapper.LanguageMapper;
 import com.desertakal.desertakal.repository.LanguageRepository;
 import com.desertakal.desertakal.service.interfaces.LanguageService;
@@ -17,6 +17,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -108,7 +109,26 @@ public class LanguageServiceImpl implements LanguageService {
     }
 
     @Override
+    @Transactional
     public void delete(@NonNull UUID languageUuid) {
+        log.info("Request to delete Language with UUID: {}", languageUuid);
 
+        Language language = repository.findByUuid(languageUuid)
+                .orElseThrow(() -> {
+                    log.warn("Delete failed: Language not found for UUID: {}", languageUuid);
+                    return new ResourceNotFoundException("Language", "identifier", languageUuid.toString());
+                });
+
+        var guides = language.getGuides();
+        if (!guides.isEmpty()) {
+            log.warn("Security Alert: Attempt to delete Language '{}' (UUID: {}) failed because it is still assigned to {} guides.",
+                    language.getName(), languageUuid, language.getGuides().size());
+            throw new BusinessRuleException("Cannot delete language: It is still assigned to " + language.getGuides().size() + " guides.");
+        }
+
+        String languageName = language.getName();
+        repository.delete(language);
+
+        log.info("Successfully deleted Language: '{}' [UUID: {}]", languageName, languageUuid);
     }
 }
