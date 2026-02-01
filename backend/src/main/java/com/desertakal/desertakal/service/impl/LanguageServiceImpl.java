@@ -1,5 +1,7 @@
 package com.desertakal.desertakal.service.impl;
 
+import com.desertakal.desertakal.exception.custom.DuplicateResourceException;
+import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.language.LanguageCreateDTO;
 import com.desertakal.desertakal.model.dto.language.LanguageDTO;
 import com.desertakal.desertakal.model.dto.language.LanguageUpdateDTO;
@@ -67,7 +69,27 @@ public class LanguageServiceImpl implements LanguageService {
 
     @Override
     public LanguageDTO update(@NonNull UUID languageUuid, @NonNull LanguageUpdateDTO dto) {
-        return null;
+        log.info("Request to update Language UUID: {} with data: {}", languageUuid, dto.getName());
+
+        Language language = repository.findByUuid(languageUuid)
+                .orElseThrow(() -> {
+                    log.warn("Update failed: Language not found for UUID: {}", languageUuid);
+                    return new ResourceNotFoundException("Language", "identifier", languageUuid.toString());
+                });
+
+        if (!dto.getName().equals(language.getName()) && repository.existsByName(dto.getName())) {
+            log.warn("Update failed: Language name '{}' already exists", dto.getName());
+            throw new DuplicateResourceException("Language", "name", dto.getName());
+        }
+
+        mapper.updateEntityFromDto(dto, language);
+
+        Language updatedLanguage = repository.save(language);
+
+        log.info("Language '{}' (UUID: {}) updated. Name: {}]",
+                updatedLanguage.getName(), languageUuid, updatedLanguage.getName());
+
+        return mapper.toDto(updatedLanguage);
     }
 
     @Override
