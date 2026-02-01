@@ -136,6 +136,7 @@ public class GuideServiceImpl implements GuideService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public GuideFindDTO find(@NonNull UUID guideUuid) {
         log.info("Attempting to find Guide with UUID: {}", guideUuid);
 
