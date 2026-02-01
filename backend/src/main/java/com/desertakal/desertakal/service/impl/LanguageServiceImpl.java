@@ -7,6 +7,7 @@ import com.desertakal.desertakal.model.dto.language.LanguageDTO;
 import com.desertakal.desertakal.model.dto.language.LanguageUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.entity.Language;
+import com.desertakal.desertakal.model.entity.Permission;
 import com.desertakal.desertakal.model.mapper.LanguageMapper;
 import com.desertakal.desertakal.repository.LanguageRepository;
 import com.desertakal.desertakal.service.interfaces.LanguageService;
@@ -28,7 +29,21 @@ public class LanguageServiceImpl implements LanguageService {
 
     @Override
     public LanguageDTO create(@NonNull LanguageCreateDTO dto) {
-        return null;
+        log.info("Request to create new Language with name: '{}'", dto.getName());
+
+        if (repository.existsByName(dto.getName())) {
+            log.warn("Create failed: Language name '{}' already exists", dto.getName());
+            throw new DuplicateResourceException("Language", "name", dto.getName());
+        }
+
+        Language language = mapper.toEntity(dto);
+
+        Language newLanguage = repository.save(language);
+
+        log.info("Language successfully created. Assigned UUID: {} [Name: '{}']",
+                newLanguage.getUuid(), newLanguage.getName());
+
+        return mapper.toDto(newLanguage);
     }
 
     @Override
