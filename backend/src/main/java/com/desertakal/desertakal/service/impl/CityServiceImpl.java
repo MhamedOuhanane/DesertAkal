@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -121,7 +122,21 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public CityFIndDTO update(@NonNull UUID cityUuid, @NonNull CityUpdateDTO dto) {
-        return null;
+        log.info("Starting update process for City with UUID: {}", cityUuid);
+
+        City city = repository.findByUuid(cityUuid)
+                .orElseThrow(() -> {
+                    log.warn("Update failed: City with UUID {} not found", cityUuid);
+                    return new ResourceNotFoundException("City", "identifier", cityUuid.toString());
+                });
+
+        log.debug("Mapping UpdateDTO to City entity for UUID: {}", cityUuid);
+
+        mapper.updateEntityFromDto(dto, city);
+
+        log.info("City with UUID: {} successfully updated", cityUuid);
+
+        return mapper.toFindDto(city);
     }
 
     @Override
