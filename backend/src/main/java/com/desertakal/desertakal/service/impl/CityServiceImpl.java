@@ -1,24 +1,29 @@
 package com.desertakal.desertakal.service.impl;
 
 import com.desertakal.desertakal.exception.custom.DuplicateResourceException;
+import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.city.CityCreateDTO;
 import com.desertakal.desertakal.model.dto.city.CityDTO;
 import com.desertakal.desertakal.model.dto.city.CityFIndDTO;
 import com.desertakal.desertakal.model.dto.city.CityUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.entity.City;
+import com.desertakal.desertakal.model.entity.Image;
 import com.desertakal.desertakal.model.mapper.CityMapper;
 import com.desertakal.desertakal.repository.CityRepository;
 import com.desertakal.desertakal.service.interfaces.CityService;
+import com.desertakal.desertakal.service.interfaces.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +31,7 @@ import java.util.UUID;
 public class CityServiceImpl implements CityService {
     private final CityRepository repository;
     private final CityMapper mapper;
+    private final FileStorageService fileStorageService;
 
     @Override
     public CityFIndDTO create(@NonNull CityCreateDTO dto) {
@@ -71,8 +77,34 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
+    @Transactional
     public CityFIndDTO addImages(@NonNull UUID cityUuid, @NonNull List<MultipartFile> images) {
-        return null;
+        log.info("Starting to add {} images to city with UUID: {}", images.size(), cityUuid);
+
+        City city = repository.findByUuid(cityUuid)
+                .orElseThrow(() -> {
+                    log.error("Add images failed: City not found with UUID: {}", cityUuid);
+                    return new ResourceNotFoundException("City", "identifier", cityUuid.toString());
+                });
+
+        boolean hasCover = city.getImages().stream().anyMatch(Image::getIsCover);
+        log.debug("Current city cover status: {}", hasCover ? "Already has a cover" : "No cover found, setting first new image as cover");
+
+        List<Image> imagesEntity = IntStream.range(0, images.size())
+                .mapToObj(i -> {
+                    String path = fileStorageService.uploadDocument(images.get(i), "citys/");
+                    log.debug("Image {} uploaded successfully to path: {}", i + 1, path);
+
+                    return Image.builder()
+                            .image(path)
+                            .isCover(!hasCover && i == 0)
+                            .build();
+                }).toList();
+
+        city.getImages().addAll(imagesEntity);
+        log.info("Successfully linked {} new images to city: {}", imagesEntity.size(), city.getName());
+
+        return mapper.toFindDto(city);
     }
 
     @Override
