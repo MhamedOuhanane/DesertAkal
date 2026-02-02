@@ -49,3 +49,7 @@ databaseChangeLog:
       file: db/changelog/024_create_table_refresh_tokens.xml
   - include:
       file: db/changelog/025_insert_default_roles.xml
+  - include:
+      file: db/changelog/026_add_column_created_at_table_images.xml
+  - include:
+      file: db/changelog/027_add_column_updated_at_table_cities.xml

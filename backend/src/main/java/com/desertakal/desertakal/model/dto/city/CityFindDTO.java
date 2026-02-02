@@ -4,6 +4,7 @@ import com.desertakal.desertakal.model.dto.image.ImageDTO;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,5 +19,7 @@ public class CityFindDTO {
     private BigDecimal map_lat;
     private BigDecimal map_lng;
     private String description;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private List<ImageDTO> images;
 }

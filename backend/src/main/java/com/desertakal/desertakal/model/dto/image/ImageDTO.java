@@ -19,5 +19,6 @@ public class ImageDTO {
     private String image;
     private Boolean isCover;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private UUID cityUuid;
 }

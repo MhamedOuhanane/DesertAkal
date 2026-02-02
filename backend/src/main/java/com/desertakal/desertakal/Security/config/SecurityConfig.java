@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -41,6 +42,7 @@ public class SecurityConfig {
                                 "/error",
                                 "/favicon.ico"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/cities/**").permitAll()
                         .requestMatchers("/api/admins/**").hasRole("ADMIN")
                         .requestMatchers("/api/guides/**").hasAnyRole("ADMIN", "GUIDE")
                         .requestMatchers("/api/tourists/**").hasAnyRole("ADMIN", "TOURIST")

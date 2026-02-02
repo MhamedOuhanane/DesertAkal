@@ -25,6 +25,8 @@ public interface CityMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @InheritConfiguration(name = "toEntity")
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     void updateEntityFromDto(CityUpdateDTO dto, @MappingTarget City city);
 
     @IterableMapping(qualifiedByName = "toDto")

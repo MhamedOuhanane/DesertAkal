@@ -11,12 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/cities")
@@ -46,6 +44,29 @@ public class CityController {
         log.info("Successfully created City with UUID: {}", result.getUuid());
 
         return ResponseEntity.status(201).body(response);
+    }
+
+    @GetMapping("/{uuid}")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull CityFindDTO>> show(
+            @NonNull @PathVariable UUID uuid,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to get City by UUID: {} [Path: {}]", uuid, request.getServletPath());
+
+        var result = service.find(uuid);
+
+        var response = StandardResponseDTO.<CityFindDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("City details retrieved successfully")
+                .status(200)
+                .path(request.getServletPath())
+                .data(result)
+                .build();
+
+        log.info("Successfully retrieved city details for UUID: {}", uuid);
+
+        return ResponseEntity.ok(response);
     }
 
 }

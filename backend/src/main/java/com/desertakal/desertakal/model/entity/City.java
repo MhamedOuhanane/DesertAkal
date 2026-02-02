@@ -43,6 +43,10 @@ public class City {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @CreationTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
     @Builder.Default
     @OneToMany(mappedBy = "city", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
