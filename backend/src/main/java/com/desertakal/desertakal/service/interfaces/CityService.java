@@ -20,6 +20,6 @@ public interface CityService {
     CityFIndDTO update(@NonNull UUID cityUuid, @NonNull CityUpdateDTO dto);
     void delete(@NonNull UUID cityUuid);
     CityFIndDTO addImages(@NonNull UUID cityUuid, @NonNull List<MultipartFile> images);
-    void deleteImage(@NonNull UUID cityUuid, @NonNull UUID imageUuid);
+    void deleteImage(@NonNull UUID cityUuid, @NonNull List<UUID> imageUuids);
     void setCoverImage(@NonNull UUID cityUuid, @NonNull UUID imageUuid);
 }

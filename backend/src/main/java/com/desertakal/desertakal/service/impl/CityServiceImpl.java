@@ -108,8 +108,41 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
-    public void deleteImage(@NonNull UUID cityUuid, @NonNull UUID imageUuid) {
+    @Transactional
+    public void deleteImage(@NonNull UUID cityUuid, @NonNull List<UUID> imageUuids) {
+        log.info("Starting to delete {} images to city with UUID: {}", imageUuids.size(), cityUuid);
 
+        City city = repository.findByUuid(cityUuid)
+                .orElseThrow(() -> {
+                    log.error("Delete images failed: City not found with UUID: {}", cityUuid);
+                    return new ResourceNotFoundException("City", "identifier", cityUuid.toString());
+                });
+
+        List<Image> imagesToDelete = city.getImages().stream()
+                .filter(img -> imageUuids.contains(img.getUuid()))
+                .toList();
+
+        if (imagesToDelete.isEmpty()) {
+            log.warn("No matching images found for the provided UUIDs in City: {}", city.getName());
+            return;
+        }
+
+        boolean deletingCover = imagesToDelete.stream().anyMatch(Image::getIsCover);
+
+        city.getImages().removeAll(imagesToDelete);
+
+        imagesToDelete.forEach(image -> {
+            fileStorageService.deleteFile(image.getImage());
+            log.debug("Physical file deleted: {}", image.getImage());
+        });
+
+        if (deletingCover && !city.getImages().isEmpty()) {
+            city.getImages().get(0).setIsCover(true);
+            log.info("Current cover was deleted. Image [UUID: {}] is now the new cover for city: {}",
+                    city.getImages().get(0).getUuid(), city.getName());
+        }
+
+        log.info("Successfully deleted {} images from city: {}", imagesToDelete.size(), city.getName());
     }
 
     @Override
