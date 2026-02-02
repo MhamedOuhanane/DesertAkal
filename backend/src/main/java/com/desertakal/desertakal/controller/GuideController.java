@@ -5,9 +5,6 @@ import com.desertakal.desertakal.model.dto.guide.GuideFindDTO;
 import com.desertakal.desertakal.model.dto.guide.GuideUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
-import com.desertakal.desertakal.model.dto.user.UserFindDTO;
-import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
-import com.desertakal.desertakal.model.enums.UserStatus;
 import com.desertakal.desertakal.service.interfaces.GuideService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -56,7 +53,7 @@ public class GuideController {
 
     @GetMapping("/{uuid}")
     @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true)")
-    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull UserFindDTO>> show(
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull GuideFindDTO>> show(
             @NonNull @PathVariable UUID uuid,
             @NonNull HttpServletRequest request
     ) {
@@ -64,7 +61,7 @@ public class GuideController {
 
         var result = service.find(uuid);
 
-        var response = StandardResponseDTO.<UserFindDTO>builder()
+        var response = StandardResponseDTO.<GuideFindDTO>builder()
                 .timestamp(LocalDateTime.now())
                 .message("Guide details retrieved successfully")
                 .status(200)

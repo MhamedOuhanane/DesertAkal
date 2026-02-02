@@ -37,6 +37,11 @@ public class LanguageServiceImpl implements LanguageService {
             throw new DuplicateResourceException("Language", "name", dto.getName());
         }
 
+        if (repository.existsByCode(dto.getCode())) {
+            log.warn("Create failed: Language code '{}' already exists", dto.getCode());
+            throw new DuplicateResourceException("Language", "code", dto.getCode());
+        }
+
         Language language = mapper.toEntity(dto);
 
         Language newLanguage = repository.save(language);
@@ -103,17 +108,22 @@ public class LanguageServiceImpl implements LanguageService {
                     return new ResourceNotFoundException("Language", "identifier", languageUuid.toString());
                 });
 
-        if (!dto.getName().equals(language.getName()) && repository.existsByName(dto.getName())) {
+        if (dto.getName() != null && !dto.getName().equals(language.getName()) && repository.existsByName(dto.getName())) {
             log.warn("Update failed: Language name '{}' already exists", dto.getName());
             throw new DuplicateResourceException("Language", "name", dto.getName());
+        }
+
+        if (dto.getCode() != null && !dto.getCode().equals(language.getCode()) && repository.existsByCode(dto.getCode())) {
+            log.warn("Update failed: Language code '{}' already exists", dto.getCode());
+            throw new DuplicateResourceException("Language", "code", dto.getCode());
         }
 
         mapper.updateEntityFromDto(dto, language);
 
         Language updatedLanguage = repository.save(language);
 
-        log.info("Language '{}' (UUID: {}) updated. Name: {}]",
-                updatedLanguage.getName(), languageUuid, updatedLanguage.getName());
+        log.info("Language '{}' (UUID: {}) updated. Name: [{} -> {}]",
+                updatedLanguage.getName(), languageUuid, updatedLanguage.getName(), language.getName());
 
         return mapper.toDto(updatedLanguage);
     }

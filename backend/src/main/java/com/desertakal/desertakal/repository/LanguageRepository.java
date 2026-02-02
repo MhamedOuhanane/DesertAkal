@@ -16,4 +16,6 @@ public interface LanguageRepository extends JpaRepository<@NonNull Language, @No
     List<@NonNull Language> findDistinctByUuidIn(List<@NonNull UUID> uuids);
 
     boolean existsByName(String name);
+
+    boolean existsByCode(String code);
 }

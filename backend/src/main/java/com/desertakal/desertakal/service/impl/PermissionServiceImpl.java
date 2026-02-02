@@ -86,7 +86,7 @@ public class PermissionServiceImpl implements PermissionService {
                     return new ResourceNotFoundException("Permission", "identifier", permissionUuid.toString());
                 });
 
-        if (!dto.getName().equals(permission.getName()) && repository.existsByName(dto.getName())) {
+        if (dto.getName() != null && !dto.getName().equals(permission.getName()) && repository.existsByName(dto.getName())) {
             log.warn("Update failed: Permission name '{}' already exists", dto.getName());
             throw new DuplicateResourceException("Permission", "name", dto.getName());
         }
