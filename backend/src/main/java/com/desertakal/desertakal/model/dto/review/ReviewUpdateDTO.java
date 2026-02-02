@@ -19,6 +19,7 @@ public class ReviewUpdateDTO {
     @DecimalMax(value = "5.0", inclusive = true, message = "Rating must be at most 5")
     private BigDecimal rating;
 
-    @Size(max = 1000, message = "Comment must be at most 1000 characters")
+    @Size(min = 20, max = 1000, message = "Comment must be between 20 and 1000 characters")
     private String comment;
+
 }

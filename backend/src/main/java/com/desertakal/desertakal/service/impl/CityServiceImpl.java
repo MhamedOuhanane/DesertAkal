@@ -121,6 +121,7 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
+    @Transactional
     public CityFindDTO update(@NonNull UUID cityUuid, @NonNull CityUpdateDTO dto) {
         log.info("Starting update process for City with UUID: {}", cityUuid);
 

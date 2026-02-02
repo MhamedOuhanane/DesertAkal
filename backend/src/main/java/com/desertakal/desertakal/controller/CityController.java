@@ -2,6 +2,7 @@ package com.desertakal.desertakal.controller;
 
 import com.desertakal.desertakal.model.dto.city.CityCreateDTO;
 import com.desertakal.desertakal.model.dto.city.CityFindDTO;
+import com.desertakal.desertakal.model.dto.city.CityUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.service.interfaces.CityService;
@@ -105,4 +106,28 @@ public class CityController {
         return ResponseEntity.ok(response);
     }
 
+    @PatchMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull CityFindDTO>> update(
+            @NonNull @PathVariable UUID uuid,
+            @NonNull @Valid @RequestBody CityUpdateDTO dto,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to PATCH City: {} [Data provided: {}]",
+                uuid, dto.getName() != null ? "Name: " + dto.getName() : "Partial update (no name change)");
+
+        var result = service.update(uuid, dto);
+
+        var response = StandardResponseDTO.<CityFindDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("City updated successfully: " + result.getName())
+                .status(200)
+                .data(result)
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Successfully updated City with UUID: {} [Status: 200 OK]", uuid);
+
+        return ResponseEntity.ok(response);
+    }
 }
