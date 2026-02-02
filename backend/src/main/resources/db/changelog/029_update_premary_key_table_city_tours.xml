@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+
+    <changeSet id="029" author="mhamed">
+        <dropPrimaryKey tableName="city_tours" constraintName="pk_city_tours"/>
+
+        <addColumn tableName="city_tours">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addUniqueConstraint
+                tableName="city_tours"
+                columnNames="city_id, tour_id"
+                constraintName="uk_city_tour_relation"/>
+
+    </changeSet>
+</databaseChangeLog>

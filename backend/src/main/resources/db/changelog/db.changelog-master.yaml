@@ -53,3 +53,7 @@ databaseChangeLog:
       file: db/changelog/026_add_column_created_at_table_images.xml
   - include:
       file: db/changelog/027_add_column_updated_at_table_cities.xml
+  - include:
+      file: db/changelog/028_update_column_description_table_cities.xml
+  - include:
+      file: db/changelog/029_update_premary_key_table_city_tours.xml

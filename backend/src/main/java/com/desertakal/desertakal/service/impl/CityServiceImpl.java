@@ -191,12 +191,13 @@ public class CityServiceImpl implements CityService {
 
         List<Image> imagesEntity = IntStream.range(0, images.size())
                 .mapToObj(i -> {
-                    String path = fileStorageService.uploadDocument(images.get(i), "cities/");
+                    String path = fileStorageService.uploadDocument(images.get(i), "cities");
                     log.debug("Image {} uploaded successfully to path: {}", i + 1, path);
 
                     return Image.builder()
                             .image(path)
                             .isCover(!hasCover && i == 0)
+                            .city(city)
                             .build();
                 }).toList();
 

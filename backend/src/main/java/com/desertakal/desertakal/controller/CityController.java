@@ -17,8 +17,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -152,5 +154,27 @@ public class CityController {
         log.info("Successfully deleted City with UUID: {} [Status: 200 OK]", uuid);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{uuid}/images")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull CityFindDTO>> addImages(
+            @PathVariable UUID uuid,
+            @RequestPart("images") List<MultipartFile> images,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to add {} images to city: {}", images.size(), uuid);
+
+        var result = service.addImages(uuid, images);
+
+        return ResponseEntity.ok(
+                StandardResponseDTO.<CityFindDTO>builder()
+                        .timestamp(LocalDateTime.now())
+                        .message("Images added successfully")
+                        .status(200)
+                        .data(result)
+                        .path(request.getServletPath())
+                        .build()
+        );
     }
 }
