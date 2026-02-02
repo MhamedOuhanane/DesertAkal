@@ -10,8 +10,10 @@ import com.desertakal.desertakal.model.dto.city.CityUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.entity.City;
 import com.desertakal.desertakal.model.entity.Image;
+import com.desertakal.desertakal.model.entity.Tour;
 import com.desertakal.desertakal.model.mapper.CityMapper;
 import com.desertakal.desertakal.repository.CityRepository;
+import com.desertakal.desertakal.repository.TourRepository;
 import com.desertakal.desertakal.service.interfaces.CityService;
 import com.desertakal.desertakal.service.interfaces.FileStorageService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,7 @@ public class CityServiceImpl implements CityService {
     private final CityRepository repository;
     private final CityMapper mapper;
     private final FileStorageService fileStorageService;
+    private final TourRepository tourRepository;
 
     @Override
     public CityFIndDTO create(@NonNull CityCreateDTO dto) {
@@ -58,15 +61,15 @@ public class CityServiceImpl implements CityService {
     public CityFIndDTO find(@NonNull UUID cityUuid) {
         log.info("Attempting to find City with UUID: {}", cityUuid);
 
-        City guide = repository.findByUuid(cityUuid)
+        City city = repository.findByUuid(cityUuid)
                 .orElseThrow(() -> {
                     log.warn("Found failed: City {} not found", cityUuid);
                     return new ResourceNotFoundException("City", "identifier", cityUuid.toString());
                 });
 
-        log.debug("City successfully retrieved: {} (UUID: {})", guide.getName(), cityUuid);
+        log.debug("City successfully retrieved: {} (UUID: {})", city.getName(), cityUuid);
 
-        return mapper.toFindDto(guide);
+        return mapper.toFindDto(city);
     }
 
     @Override
@@ -102,7 +105,18 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public List<CityDTO> findByTour(@NonNull UUID tourUuid) {
-        return List.of();
+
+        Tour tour = tourRepository.findByUuid(tourUuid)
+                .orElseThrow(() -> {
+                    log.warn("Found failed: Tour {} not found", tourUuid);
+                    return new ResourceNotFoundException("Tour", "identifier", tourUuid.toString());
+                });
+
+        var cites = repository.findByCityToursTour(tour);
+
+        log.info("Success: Retrieved {} cities", cites.size());
+
+        return mapper.toDtos(cites);
     }
 
     @Override
