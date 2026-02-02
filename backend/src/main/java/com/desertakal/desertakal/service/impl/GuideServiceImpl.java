@@ -185,9 +185,4 @@ public class GuideServiceImpl implements GuideService {
 
         return mapper.toFindDto(guide);
     }
-
-    @Override
-    public void delete(@NonNull UUID guideUuid) {
-
-    }
 }
