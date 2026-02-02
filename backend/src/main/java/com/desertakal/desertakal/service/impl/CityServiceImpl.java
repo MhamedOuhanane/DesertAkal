@@ -1,6 +1,7 @@
 package com.desertakal.desertakal.service.impl;
 
 import com.desertakal.desertakal.exception.custom.DuplicateResourceException;
+import com.desertakal.desertakal.exception.custom.ResourceMismatchException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.city.CityCreateDTO;
 import com.desertakal.desertakal.model.dto.city.CityDTO;
@@ -146,7 +147,32 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
+    @Transactional
     public void setCoverImage(@NonNull UUID cityUuid, @NonNull UUID imageUuid) {
+        log.info("Request to set image [{}] as cover for city [{}]", imageUuid, cityUuid);
 
+        City city = repository.findByUuid(cityUuid)
+                .orElseThrow(() -> {
+                    log.error("Set cover failed: City not found with UUID: {}", cityUuid);
+                    return new ResourceNotFoundException("City", "identifier", cityUuid.toString());
+                });
+
+        boolean imageFound = false;
+        for (Image img : city.getImages()) {
+            if (img.getUuid().equals(imageUuid)) {
+                img.setIsCover(true);
+                imageFound = true;
+                log.debug("Image [{}] found and set as cover", imageUuid);
+            } else {
+                img.setIsCover(false);
+            }
+        }
+
+        if (!imageFound) {
+            log.warn("Target image [{}] not found in city [{}]", imageUuid, cityUuid);
+            throw new ResourceMismatchException("Image", "City", imageUuid.toString());
+        }
+
+        log.info("Successfully updated cover image for city: {}", city.getName());
     }
 }
