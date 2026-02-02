@@ -12,7 +12,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CityFIndDTO {
+public class CityFindDTO {
     private UUID uuid;
     private String name;
     private BigDecimal map_lat;

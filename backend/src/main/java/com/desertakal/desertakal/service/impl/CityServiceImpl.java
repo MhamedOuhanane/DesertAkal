@@ -6,7 +6,7 @@ import com.desertakal.desertakal.exception.custom.ResourceMismatchException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.city.CityCreateDTO;
 import com.desertakal.desertakal.model.dto.city.CityDTO;
-import com.desertakal.desertakal.model.dto.city.CityFIndDTO;
+import com.desertakal.desertakal.model.dto.city.CityFindDTO;
 import com.desertakal.desertakal.model.dto.city.CityUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.entity.City;
@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -41,7 +40,7 @@ public class CityServiceImpl implements CityService {
     private final TourRepository tourRepository;
 
     @Override
-    public CityFIndDTO create(@NonNull CityCreateDTO dto) {
+    public CityFindDTO create(@NonNull CityCreateDTO dto) {
         log.info("Starting creation of new City: '{}' ", dto.getName());
 
         if (repository.existsByName(dto.getName())) {
@@ -60,7 +59,7 @@ public class CityServiceImpl implements CityService {
 
     @Override
     @Transactional(readOnly = true)
-    public CityFIndDTO find(@NonNull UUID cityUuid) {
+    public CityFindDTO find(@NonNull UUID cityUuid) {
         log.info("Attempting to find City with UUID: {}", cityUuid);
 
         City city = repository.findByUuid(cityUuid)
@@ -122,7 +121,7 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
-    public CityFIndDTO update(@NonNull UUID cityUuid, @NonNull CityUpdateDTO dto) {
+    public CityFindDTO update(@NonNull UUID cityUuid, @NonNull CityUpdateDTO dto) {
         log.info("Starting update process for City with UUID: {}", cityUuid);
 
         City city = repository.findByUuid(cityUuid)
@@ -177,7 +176,7 @@ public class CityServiceImpl implements CityService {
 
     @Override
     @Transactional
-    public CityFIndDTO addImages(@NonNull UUID cityUuid, @NonNull List<MultipartFile> images) {
+    public CityFindDTO addImages(@NonNull UUID cityUuid, @NonNull List<MultipartFile> images) {
         log.info("Starting to add {} images to city with UUID: {}", images.size(), cityUuid);
 
         City city = repository.findByUuid(cityUuid)
