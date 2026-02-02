@@ -1,7 +1,6 @@
 package com.desertakal.desertakal.repository;
 
 import com.desertakal.desertakal.model.entity.Guide;
-import com.desertakal.desertakal.model.entity.Tour;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

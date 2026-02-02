@@ -7,6 +7,7 @@ import com.desertakal.desertakal.model.dto.city.CityUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,4 +19,7 @@ public interface CityService {
     List<CityDTO> findByTour(@NonNull UUID tourUuid);
     CityFIndDTO update(@NonNull UUID cityUuid, @NonNull CityUpdateDTO dto);
     void delete(@NonNull UUID cityUuid);
+    CityFIndDTO addImages(@NonNull UUID cityUuid, @NonNull List<MultipartFile> images);
+    void deleteImage(@NonNull UUID cityUuid, @NonNull UUID imageUuid);
+    void setCoverImage(@NonNull UUID cityUuid, @NonNull UUID imageUuid);
 }

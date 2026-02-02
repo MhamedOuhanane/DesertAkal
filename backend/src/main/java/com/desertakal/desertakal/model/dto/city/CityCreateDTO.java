@@ -26,7 +26,4 @@ public class CityCreateDTO {
     @NotNull(message = "Description is required")
     @Size(max = 5000, message = "Description must be at most 5000 characters")
     private String description;
-
-    @Size(max = 255, message = "Cover file name must be at most 255 characters")
-    private String coverFileName;
 }

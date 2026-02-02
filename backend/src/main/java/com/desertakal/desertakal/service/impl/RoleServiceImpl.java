@@ -63,7 +63,7 @@ public class RoleServiceImpl implements RoleService {
         log.info("Starting creation of new Role: '{}' with {} permissions",
                 dto.getName(), (dto.getPermissionUuids() != null ? dto.getPermissionUuids().size() : 0));
 
-        if (dto.getName() != null && repository.existsByName(dto.getName())) {
+        if (repository.existsByName(dto.getName())) {
             log.warn("Create failed: Role name '{}' already exists", dto.getName());
             throw new DuplicateResourceException("Role", "name", dto.getName());
         }
