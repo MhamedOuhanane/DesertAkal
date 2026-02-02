@@ -202,9 +202,12 @@ public class CityServiceImpl implements CityService {
                 }).toList();
 
         city.getImages().addAll(imagesEntity);
+
+        City saveCity = repository.saveAndFlush(city);
+
         log.info("Successfully linked {} new images to city: {}", imagesEntity.size(), city.getName());
 
-        return mapper.toFindDto(city);
+        return mapper.toFindDto(saveCity);
     }
 
     @Override

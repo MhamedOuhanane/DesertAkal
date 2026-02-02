@@ -8,6 +8,7 @@ import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.service.interfaces.CityService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -173,6 +174,48 @@ public class CityController {
                         .message("Images added successfully")
                         .status(200)
                         .data(result)
+                        .path(request.getServletPath())
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{uuid}/images")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<Void>> deleteImages(
+            @PathVariable UUID uuid,
+            @RequestBody @NotEmpty List<UUID> imageUuids,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to delete {} images from city: {}", imageUuids.size(), uuid);
+
+        service.deleteImage(uuid, imageUuids);
+
+        return ResponseEntity.ok(
+                StandardResponseDTO.<Void>builder()
+                        .timestamp(LocalDateTime.now())
+                        .message("Images deleted successfully")
+                        .status(200)
+                        .path(request.getServletPath())
+                        .build()
+        );
+    }
+
+    @PatchMapping("/{cityUuid}/images/{imageUuid}/set-cover")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<Void>> setCover(
+            @PathVariable UUID cityUuid,
+            @PathVariable UUID imageUuid,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to set image {} as cover for city {}", imageUuid, cityUuid);
+
+        service.setCoverImage(cityUuid, imageUuid);
+
+        return ResponseEntity.ok(
+                StandardResponseDTO.<Void>builder()
+                        .timestamp(LocalDateTime.now())
+                        .message("Cover image updated successfully")
+                        .status(200)
                         .path(request.getServletPath())
                         .build()
         );
