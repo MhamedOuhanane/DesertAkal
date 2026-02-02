@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -70,7 +71,33 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public PaginationDTO findAll(String search, @NonNull Pageable pageable) {
-        return null;
+        log.info("Fetching cities : [Search: '{}', Page: {}]",
+                search != null ? search : "NONE", pageable.getPageNumber());
+
+        Specification<@NonNull City> spec = (root, query, cb) -> {
+            if (search != null && !search.isEmpty()) {
+                String pattern = "%" + search.toLowerCase() + "%";
+                return cb.like(cb.lower(root.get("name")), pattern);
+            }
+
+            return cb.conjunction();
+        };
+
+        var cityPages = repository.findAll(spec, pageable);
+
+        log.info("Success: Retrieved {} cities (Total elements in DB: {})",
+                cityPages.getNumberOfElements(),
+                cityPages.getTotalElements());
+
+        return PaginationDTO.builder()
+                .content(mapper.toDtos(cityPages.getContent()))
+                .page(cityPages.getNumber())
+                .size(cityPages.getSize())
+                .totalElements(cityPages.getTotalElements())
+                .totalPages(cityPages.getTotalPages())
+                .isFirst(cityPages.isFirst())
+                .isLast(cityPages.isLast())
+                .build();
     }
 
     @Override
@@ -104,7 +131,7 @@ public class CityServiceImpl implements CityService {
 
         List<Image> imagesEntity = IntStream.range(0, images.size())
                 .mapToObj(i -> {
-                    String path = fileStorageService.uploadDocument(images.get(i), "citys/");
+                    String path = fileStorageService.uploadDocument(images.get(i), "cities/");
                     log.debug("Image {} uploaded successfully to path: {}", i + 1, path);
 
                     return Image.builder()
