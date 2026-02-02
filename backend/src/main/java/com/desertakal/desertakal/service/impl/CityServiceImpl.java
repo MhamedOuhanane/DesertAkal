@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.service.impl;
 
+import com.desertakal.desertakal.exception.custom.BusinessRuleException;
 import com.desertakal.desertakal.exception.custom.DuplicateResourceException;
 import com.desertakal.desertakal.exception.custom.ResourceMismatchException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
@@ -140,8 +141,38 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
+    @Transactional
     public void delete(@NonNull UUID cityUuid) {
+        log.info("Starting deletion process for city with UUID: {}", cityUuid);
 
+        City city = repository.findByUuid(cityUuid)
+                .orElseThrow(() -> {
+                    log.warn("Delete failed: City with UUID {} not found", cityUuid);
+                    return new ResourceNotFoundException("City", "identifier", cityUuid.toString());
+                });
+
+        if (!city.getCityTours().isEmpty()) {
+            int tourCount = city.getCityTours().size();
+            log.warn("Delete failed: City '{}' is linked to {} tour(s)", city.getName(), tourCount);
+            throw new BusinessRuleException(
+                    String.format("Cannot delete city '%s' because it is assigned to %d tour(s). Remove it from tours first.",
+                            city.getName(), tourCount)
+            );
+        }
+
+        log.warn("City identified for deletion - Name: {}, UUID: {}, Creating at: {}",
+                city.getName(), city.getUuid(), city.getCreatedAt());
+
+        List<String> filePaths = city.getImages().stream()
+                .map(Image::getImage)
+                .toList();
+
+        repository.delete(city);
+
+        filePaths.forEach(fileStorageService::deleteFile);
+
+        log.info("City with UUID: {} and Name: {} successfully deleted from system",
+                cityUuid, city.getName());
     }
 
     @Override
