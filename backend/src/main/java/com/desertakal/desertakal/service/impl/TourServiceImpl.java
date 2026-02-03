@@ -337,7 +337,7 @@ public class TourServiceImpl implements TourService {
             }
 
             if (durationStr != null && !durationStr.isBlank()) {
-                String cleanDuration = durationStr.trim(); // تنظيف السلسلة
+                String cleanDuration = durationStr.trim();
                 try {
                     if (cleanDuration.startsWith("+")) {
                         int val = Integer.parseInt(cleanDuration.substring(1).trim());
