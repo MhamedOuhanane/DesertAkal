@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.service.impl;
 
+import com.desertakal.desertakal.exception.custom.BusinessRuleException;
 import com.desertakal.desertakal.exception.custom.DuplicateResourceException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.cityTour.CityTourCreateDTO;
@@ -10,6 +11,7 @@ import com.desertakal.desertakal.model.dto.tour.TourFindDTO;
 import com.desertakal.desertakal.model.dto.tour.TourUpdateDTO;
 import com.desertakal.desertakal.model.entity.City;
 import com.desertakal.desertakal.model.entity.CityTour;
+import com.desertakal.desertakal.model.entity.Image;
 import com.desertakal.desertakal.model.entity.Tour;
 import com.desertakal.desertakal.model.mapper.CityTourMapper;
 import com.desertakal.desertakal.model.mapper.TourMapper;
@@ -181,7 +183,37 @@ public class TourServiceImpl implements TourService {
 
     @Override
     public void delete(@NonNull UUID tourUuid) {
+        log.info("Starting deletion process for tour with UUID: {}", tourUuid);
 
+        Tour tour = repository.findByUuid(tourUuid)
+                .orElseThrow(() -> {
+                    log.warn("Delete failed: Tour with UUID {} not found", tourUuid);
+                    return new ResourceNotFoundException("Tour", "identifier", tourUuid.toString());
+                });
+
+        if (!tour.getReservations().isEmpty()) {
+            int reservationCount = tour.getReservations().size();
+            log.warn("Constraint Violation: Attempt to delete Tour [UUID: {}, Title: '{}'] denied. Active reservations count: {}",
+                    tour.getUuid(), tour.getTitle(), reservationCount);
+
+            throw new BusinessRuleException(
+                    String.format("Action Refused: The tour '%s' is protected because it has %d associated reservation(s). " +
+                                    "To protect data integrity, you must process these reservations before deleting the tour.",
+                            tour.getTitle(), reservationCount)
+            );
+        }
+
+        log.warn("Tour identified for deletion - Title: {}, UUID: {}, Creating at: {}",
+                tour.getTitle(), tour.getUuid(), tour.getCreatedAt());
+
+        String imagePath = tour.getImage();
+
+        repository.delete(tour);
+
+        fileStorageService.deleteFile(imagePath);
+
+        log.info("Tour with UUID: {} and Title: {} successfully deleted from system",
+                tourUuid, tour.getTitle());
     }
 
     @Override

@@ -10,6 +10,7 @@ import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.user.UserFindDTO;
 import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
+import com.desertakal.desertakal.model.entity.Guide;
 import com.desertakal.desertakal.model.entity.Role;
 import com.desertakal.desertakal.model.entity.Tourist;
 import com.desertakal.desertakal.model.entity.User;
@@ -281,12 +282,28 @@ public class UserServiceImpl implements UserService {
                     return new ResourceNotFoundException("User", "identifier", userUuid.toString());
                 });
 
-        log.warn("User identified for deletion - Email: {}, Role: {}, Registered at: {}",
-                user.getEmail(), user.getRole().getName(), user.getCreatedAt());
+        int reservationCount = 0;
+
+        if (user instanceof Guide guide) {
+            reservationCount = guide.getReservations().size();
+            log.debug("User is a Guide. Found {} associated reservations", reservationCount);
+        } else if (user instanceof Tourist tourist) {
+            reservationCount = tourist.getReservations().size();
+            log.debug("User is a Tourist. Found {} associated reservations", reservationCount);
+        }
+
+        if (reservationCount > 0) {
+            log.warn("Delete blocked: User '{}' (Email: {}) has {} active reservation(s)",
+                    user.getUuid(), user.getEmail(), reservationCount);
+
+            throw new BusinessRuleException(
+                    String.format("Action impossible : L'utilisateur '%s' ne peut pas être supprimé car il est lié à %d réservation(s). " +
+                                    "Veuillez traiter ces réservations avant la suppression.",
+                            user.getEmail(), reservationCount)
+            );
+        }
 
         repository.delete(user);
-
-        log.info("User with UUID: {} and Email: {} successfully deleted from system",
-                userUuid, user.getEmail());
+        log.info("User {} [Role: {}] successfully removed from the system", user.getEmail(), user.getRole().getName());
     }
 }
