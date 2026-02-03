@@ -91,7 +91,7 @@ public class TourController {
             @RequestParam(defaultValue = "0") @Positive BigDecimal minRating,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "title") String sortBy,
             @RequestParam(defaultValue = "asc") String order,
             HttpServletRequest request
     ) {
@@ -117,4 +117,52 @@ public class TourController {
         return ResponseEntity.ok(response);
     }
 
+    @PatchMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull TourFindDTO>> update(
+            @PathVariable UUID uuid,
+            @Valid @RequestBody TourUpdateDTO dto,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to PATCH Tour: {} [Data provided: {}]",
+                uuid, dto.getTitle() != null ? "Title: " + dto.getTitle() : "Partial update (no title change)");
+
+        var result = service.update(uuid, dto);
+
+        var response = StandardResponseDTO.<TourFindDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Tour updated successfully: " + result.getTitle())
+                .status(200)
+                .data(result)
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Successfully updated Tour with UUID: {} [Status: 200 OK]", uuid);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{tourUuid}/image")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<TourFindDTO>> updateImage(
+            @PathVariable UUID tourUuid,
+            @RequestParam MultipartFile image,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to update image as cover for tour {}", tourUuid);
+
+        var result = service.updateImage(tourUuid, image);
+
+        var response = StandardResponseDTO.<TourFindDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Tour updated image successfully: " + result.getTitle())
+                .status(200)
+                .data(result)
+                .path(request.getServletPath())
+                .build();
+
+        log.info("The tour image was successfully updated using: {} [Status: 200 OK]", tourUuid);
+
+        return ResponseEntity.ok(response);
+    }
 }
