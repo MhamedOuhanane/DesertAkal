@@ -9,14 +9,13 @@ import com.desertakal.desertakal.model.dto.tour.TourCreateDTO;
 import com.desertakal.desertakal.model.dto.tour.TourDTO;
 import com.desertakal.desertakal.model.dto.tour.TourFindDTO;
 import com.desertakal.desertakal.model.dto.tour.TourUpdateDTO;
-import com.desertakal.desertakal.model.entity.City;
-import com.desertakal.desertakal.model.entity.CityTour;
-import com.desertakal.desertakal.model.entity.Image;
-import com.desertakal.desertakal.model.entity.Tour;
+import com.desertakal.desertakal.model.entity.*;
 import com.desertakal.desertakal.model.mapper.CityTourMapper;
 import com.desertakal.desertakal.model.mapper.TourMapper;
 import com.desertakal.desertakal.repository.CityRepository;
+import com.desertakal.desertakal.repository.GuideRepository;
 import com.desertakal.desertakal.repository.TourRepository;
+import com.desertakal.desertakal.repository.TouristRepository;
 import com.desertakal.desertakal.service.interfaces.FileStorageService;
 import com.desertakal.desertakal.service.interfaces.TourService;
 import jakarta.persistence.criteria.Join;
@@ -25,6 +24,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -46,6 +46,8 @@ public class TourServiceImpl implements TourService {
     private final FileStorageService fileStorageService;
     private final CityRepository cityRepository;
     private final CityTourMapper cityTourMapper;
+    private final TouristRepository touristRepository;
+    private final GuideRepository guideRepository;
 
     @Override
     @Transactional
@@ -235,7 +237,32 @@ public class TourServiceImpl implements TourService {
 
     @Override
     public PaginationDTO findAllByTourist(@NonNull UUID touristUuid, @NonNull Pageable pageable) {
-        return null;
+        log.info("Starting process to fetch tours for Tourist UUID: {} [Page: {}, Size: {}]",
+                touristUuid, pageable.getPageNumber(), pageable.getPageSize());
+
+        Tourist tourist = touristRepository.findByUuid(touristUuid)
+                .orElseThrow(() -> {
+                    log.error("Fetch Tours failed: Tourist with UUID {} not found", touristUuid);
+                    return new ResourceNotFoundException("Tourist", "identifier", touristUuid.toString());
+                });
+
+        log.debug("Tourist found: {} {}. Executing join query for tours.",
+                tourist.getFirstName(), tourist.getLastName());
+
+        Page<@NonNull Tour> tourPage = repository.findAllByTourist(tourist, pageable);
+
+        log.info("Search completed: Found {} tours for tourist {} on page {} of {}",
+                tourPage.getTotalElements(), touristUuid, tourPage.getNumber(), tourPage.getTotalPages());
+
+        return PaginationDTO.builder()
+                .content(mapper.toDtos(tourPage.getContent()))
+                .page(tourPage.getNumber())
+                .size(tourPage.getSize())
+                .totalElements(tourPage.getTotalElements())
+                .totalPages(tourPage.getTotalPages())
+                .isFirst(tourPage.isFirst())
+                .isLast(tourPage.isLast())
+                .build();
     }
 
     @Override

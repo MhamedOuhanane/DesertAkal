@@ -1,6 +1,8 @@
 package com.desertakal.desertakal.repository;
 
+import com.desertakal.desertakal.model.entity.Guide;
 import com.desertakal.desertakal.model.entity.Tour;
+import com.desertakal.desertakal.model.entity.Tourist;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
@@ -18,11 +20,11 @@ public interface TourRepository extends JpaRepository<@NonNull Tour, @NonNull UU
 
     List<@NonNull Tour> findTop5ByOrderByRatingDesc();
 
-    @Query("SELECT t FROM Tour t JOIN t.reservations r WHERE r.tourist.uuid = :touristUuid")
-    Page<@NonNull Tour> findAllByTouristUuid(@Param("touristUuid") UUID touristUuid, Pageable pageable);
+    @Query("SELECT t FROM Tour t JOIN t.reservations r WHERE r.tourist = :tourist")
+    Page<@NonNull Tour> findAllByTourist(@Param("tourist") Tourist tourist, Pageable pageable);
 
-    @Query("SELECT t FROM Tour t JOIN t.reservations r WHERE r.guide.uuid = :guideUuid")
-    Page<@NonNull Tour> findAllByGuideUuid(@Param("guideUuid") UUID guideUuid, Pageable pageable);
+    @Query("SELECT t FROM Tour t JOIN t.reservations r WHERE r.guide = :guide")
+    Page<@NonNull Tour> findAllByGuide(@Param("guide") Guide guide, Pageable pageable);
 
     boolean existsByTitle(String title);
 }
