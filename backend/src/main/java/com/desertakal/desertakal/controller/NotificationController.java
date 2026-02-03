@@ -1,5 +1,7 @@
 package com.desertakal.desertakal.controller;
 
+import com.desertakal.desertakal.model.dto.notif.NotificationDTO;
+import com.desertakal.desertakal.model.dto.notif.NotificationFindDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.service.interfaces.NotificationService;
@@ -56,6 +58,29 @@ public class NotificationController {
 
         log.info("Response sent: {} notifications found for User: {} [Path: {}]",
                 result.getTotalElements(), userUuid, request.getServletPath());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{uuid}")
+    @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, false)")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull NotificationFindDTO>> show(
+            @PathVariable UUID uuid,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to get Notification by UUID: {} [Path: {}]", uuid, request.getServletPath());
+
+        var result = service.find(uuid);
+
+        var response = StandardResponseDTO.<NotificationFindDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Notification details retrieved successfully")
+                .status(200)
+                .path(request.getServletPath())
+                .data(result)
+                .build();
+
+        log.info("Successfully retrieved Notification details for UUID: {}", uuid);
 
         return ResponseEntity.ok(response);
     }
