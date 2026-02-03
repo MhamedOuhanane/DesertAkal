@@ -23,4 +23,6 @@ public interface TourRepository extends JpaRepository<@NonNull Tour, @NonNull UU
 
     @Query("SELECT t FROM Tour t JOIN t.reservations r WHERE r.guide.uuid = :guideUuid")
     Page<@NonNull Tour> findAllByGuideUuid(@Param("guideUuid") UUID guideUuid, Pageable pageable);
+
+    boolean existsByTitle(String title);
 }

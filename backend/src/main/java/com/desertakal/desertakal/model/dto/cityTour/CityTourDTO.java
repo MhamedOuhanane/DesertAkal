@@ -11,6 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CityTourDTO {
     private Integer orderIndex;
+    private Integer daysCount;
     private UUID cityUuid;
     private String cityName;
 }

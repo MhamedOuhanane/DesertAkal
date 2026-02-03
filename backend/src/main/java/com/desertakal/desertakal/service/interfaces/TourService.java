@@ -15,6 +15,7 @@ import java.util.UUID;
 public interface TourService {
     TourFindDTO create(@NonNull TourCreateDTO dto, @NonNull MultipartFile image);
     TourFindDTO update(@NonNull UUID tourUuid, @NonNull TourUpdateDTO dto);
+    TourFindDTO updateImage(@NonNull UUID tourUuid, @NonNull MultipartFile image);
     TourFindDTO find(@NonNull UUID tourUuid);
     PaginationDTO findAll(String search, String city, String durationStr, Double minRating, @NonNull Pageable pageable);
     void delete(@NonNull UUID tourUuid);
