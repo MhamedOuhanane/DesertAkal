@@ -9,7 +9,6 @@ import com.desertakal.desertakal.service.interfaces.CityService;
 import com.desertakal.desertakal.service.interfaces.TourService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -162,6 +161,29 @@ public class TourController {
                 .build();
 
         log.info("The tour image was successfully updated using: {} [Status: 200 OK]", tourUuid);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<Void>> delete(
+            @PathVariable UUID uuid,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to DELETE Tour with UUID: {} [Requested by Path: {}]",
+                uuid, request.getServletPath());
+
+        service.delete(uuid);
+
+        var response = StandardResponseDTO.<Void>builder()
+                .timestamp(LocalDateTime.now())
+                .status(200)
+                .message("Tour has been successfully deleted")
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Successfully deleted Tour with UUID: {} [Status: 200 OK]", uuid);
 
         return ResponseEntity.ok(response);
     }
