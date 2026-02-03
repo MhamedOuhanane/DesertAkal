@@ -18,7 +18,4 @@ public class CityTourCreateDTO {
 
     @NotNull(message = "City UUID is required")
     private UUID cityUuid;
-
-    @NotNull(message = "Tour UUID is required")
-    private UUID tourUuid;
 }
