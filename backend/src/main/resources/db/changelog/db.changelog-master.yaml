@@ -59,3 +59,7 @@ databaseChangeLog:
       file: db/changelog/029_update_premary_key_table_city_tours.xml
   - include:
       file: db/changelog/030_add_column_days_count_table_city_tours.xml
+  - include:
+      file: db/changelog/031_add_column_days_count_table_city_tours_and_drop_column_cities.xml
+  - include:
+      file: db/changelog/032_update_column_duration_days_table_tours.xml

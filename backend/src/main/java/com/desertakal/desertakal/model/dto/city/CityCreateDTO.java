@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class CityCreateDTO {
     @NotBlank(message = "City name is required")
-    @Size(min = 4, max = 100, message = "City name must be between 4 and 100 characters")
+    @Size(min = 2, max = 100, message = "City name must be between 4 and 100 characters")
     private String name;
 
     @NotNull(message = "Latitude is required")

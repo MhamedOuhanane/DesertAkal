@@ -43,7 +43,7 @@ public class SecurityConfig {
                                 "/favicon.ico"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/cities/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/cities/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/tours/**").permitAll()
                         .requestMatchers("/api/admins/**").hasRole("ADMIN")
                         .requestMatchers("/api/guides/**").hasAnyRole("ADMIN", "GUIDE")
                         .requestMatchers("/api/tourists/**").hasAnyRole("ADMIN", "TOURIST")

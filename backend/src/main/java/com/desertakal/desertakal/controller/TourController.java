@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.controller;
 
+import com.desertakal.desertakal.model.dto.city.CityDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.dto.tour.TourCreateDTO;
@@ -184,6 +185,29 @@ public class TourController {
                 .build();
 
         log.info("Successfully deleted Tour with UUID: {} [Status: 200 OK]", uuid);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("{uuid}/cities")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull List<CityDTO>>> getCities(
+            @PathVariable UUID uuid,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to find all cities associated with Tour UUID: {} [Path: {}]", uuid, request.getServletPath());
+
+        var result = cityService.findByTour(uuid);
+
+        var response = StandardResponseDTO.<List<CityDTO>>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Successfully retrieved all cities associated with Tour {" + uuid + "} retrieved successfully")
+                .status(200)
+                .path(request.getServletPath())
+                .data(result)
+                .build();
+
+        log.info("Successfully retrieved all cities associated with Tour UUID: {}", uuid);
 
         return ResponseEntity.ok(response);
     }

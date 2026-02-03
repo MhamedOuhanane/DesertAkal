@@ -106,18 +106,26 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public List<CityDTO> findByTour(@NonNull UUID tourUuid) {
+        log.info("Request to find all cities associated with Tour UUID: {}", tourUuid);
 
         Tour tour = tourRepository.findByUuid(tourUuid)
                 .orElseThrow(() -> {
-                    log.warn("Found failed: Tour {} not found", tourUuid);
+                    log.error("Data fetch failed: Tour with UUID {} does not exist", tourUuid);
                     return new ResourceNotFoundException("Tour", "identifier", tourUuid.toString());
                 });
 
-        var cites = repository.findByCityToursTour(tour);
+        log.debug("Tour found: '{}'. Proceeding to fetch cities via CityTours junction.", tour.getTitle());
 
-        log.info("Success: Retrieved {} cities", cites.size());
+        List<City> cities = repository.findByCityToursTour(tour);
 
-        return mapper.toDtos(cites);
+        if (cities.isEmpty()) {
+            log.warn("Search completed: No cities are currently linked to Tour '{}' ({})",
+                    tour.getTitle(), tourUuid);
+        } else {
+            log.info("Success: Retrieved {} cities for Tour '{}'", cities.size(), tour.getTitle());
+        }
+
+        return mapper.toDtos(cities);
     }
 
     @Override
