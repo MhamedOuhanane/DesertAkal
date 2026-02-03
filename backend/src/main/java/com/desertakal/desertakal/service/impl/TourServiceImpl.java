@@ -42,27 +42,28 @@ public class TourServiceImpl implements TourService {
     @Override
     @Transactional
     public TourFindDTO create(@NonNull TourCreateDTO dto, @NonNull MultipartFile image) {
-        log.info("Request to create new Tour with title: '{}'", dto.getTitle());
+        log.info("Starting creation of Tour: '{}'", dto.getTitle());
 
         if (repository.existsByTitle(dto.getTitle())) {
-            log.warn("Create failed: Tour title '{}' already exists", dto.getTitle());
+            log.error("Validation failed: Tour title '{}' is a duplicate", dto.getTitle());
             throw new DuplicateResourceException("Tour", "title", dto.getTitle());
         }
 
         Tour tour = mapper.toEntity(dto);
-
         List<CityTour> cityTours = mapCityTours(dto.getCityTours(), tour);
         tour.setCityTours(cityTours);
 
         int totalDays = cityTours.stream().mapToInt(CityTour::getDaysCount).sum();
         tour.setDurationDays(totalDays);
+        log.debug("Calculated total duration: {} days across {} cities", totalDays, cityTours.size());
 
         String imagePath = fileStorageService.uploadDocument(image, "tours");
         tour.setImage(imagePath);
+        log.info("Cover image uploaded to path: {}", imagePath);
 
         Tour newTour = repository.save(tour);
 
-        log.info("Tour successfully created. Assigned UUID: {} [Name: '{}']",
+        log.info("Tour successfully created. Assigned UUID: {} [Title: '{}']",
                 newTour.getUuid(), newTour.getTitle());
 
         return mapper.toFindDto(newTour);
@@ -80,7 +81,17 @@ public class TourServiceImpl implements TourService {
 
     @Override
     public TourFindDTO find(@NonNull UUID tourUuid) {
-        return null;
+        log.info("Attempting to find Tour with UUID: {}", tourUuid);
+
+        Tour tour = repository.findByUuid(tourUuid)
+                .orElseThrow(() -> {
+                    log.warn("Found failed: Tour {} not found", tourUuid);
+                    return new ResourceNotFoundException("Tour", "identifier", tourUuid.toString());
+                });
+
+        log.debug("Tour successfully retrieved: {} (UUID: {})", tour.getTitle(), tourUuid);
+
+        return mapper.toFindDto(tour);
     }
 
     @Override
@@ -109,15 +120,22 @@ public class TourServiceImpl implements TourService {
     }
 
     private List<CityTour> mapCityTours(@NonNull List<CityTourCreateDTO> DTOs, Tour tour) {
+        log.debug("Mapping {} CityTourDTOs for tour: '{}'", DTOs.size(), tour.getTitle());
+
         return DTOs.stream()
                 .map(ctDto -> {
                     City city = cityRepository.findByUuid(ctDto.getCityUuid())
-                            .orElseThrow(() -> new ResourceNotFoundException("City", "uuid", ctDto.getCityUuid().toString()));
+                            .orElseThrow(() -> {
+                                log.error("City mapping failed: UUID {} not found", ctDto.getCityUuid());
+                                return new ResourceNotFoundException("City", "uuid", ctDto.getCityUuid().toString());
+                            });
 
                     CityTour cityTour = cityTourMapper.toEntity(ctDto);
-
                     cityTour.setCity(city);
                     cityTour.setTour(tour);
+
+                    log.debug("Mapped city: '{}' with order: {} and days: {}",
+                            city.getName(), cityTour.getOrderIndex(), cityTour.getDaysCount());
 
                     return cityTour;
                 }).toList();
