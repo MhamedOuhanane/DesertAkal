@@ -4,6 +4,7 @@ import com.desertakal.desertakal.model.dto.city.CityDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.dto.tour.TourCreateDTO;
+import com.desertakal.desertakal.model.dto.tour.TourDTO;
 import com.desertakal.desertakal.model.dto.tour.TourFindDTO;
 import com.desertakal.desertakal.model.dto.tour.TourUpdateDTO;
 import com.desertakal.desertakal.service.interfaces.CityService;
@@ -208,6 +209,26 @@ public class TourController {
                 .build();
 
         log.info("Successfully retrieved all cities associated with Tour UUID: {}", uuid);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/top5")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<@NonNull StandardResponseDTO<List<@NonNull TourDTO>>> getTop5Tours(
+            HttpServletRequest request
+    ) {
+        log.info("REST request to get top 5 rated tours [Path: {}]", request.getServletPath());
+
+        List<TourDTO> result = service.findTop5();
+
+        var response = StandardResponseDTO.<List<TourDTO>>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Top 5 highest rated tours retrieved successfully")
+                .status(200)
+                .path(request.getServletPath())
+                .data(result)
+                .build();
 
         return ResponseEntity.ok(response);
     }
