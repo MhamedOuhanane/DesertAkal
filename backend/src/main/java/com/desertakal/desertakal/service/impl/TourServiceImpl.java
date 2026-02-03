@@ -77,7 +77,35 @@ public class TourServiceImpl implements TourService {
 
     @Override
     public TourFindDTO update(@NonNull UUID tourUuid, @NonNull TourUpdateDTO dto) {
-        return null;
+        log.info("Starting update process for Tour with UUID: {}", tourUuid);
+
+        Tour tour = repository.findByUuid(tourUuid)
+                .orElseThrow(() -> {
+                    log.warn("Update failed: Tour with UUID {} not found", tourUuid);
+                    return new ResourceNotFoundException("Tour", "identifier", tourUuid.toString());
+                });
+
+        log.debug("Mapping UpdateDTO to Tour entity for UUID: {}", tourUuid);
+
+        mapper.updateEntityFromDto(dto, tour);
+
+        if (dto.getCityTours() != null && !dto.getCityTours().isEmpty()) {
+                log.info("Updating CityTours list for Tour: {}. New count: {}", tourUuid, dto.getCityTours().size());
+
+                tour.getCityTours().clear();
+
+                List<CityTour> newCityTours = mapCityTours(dto.getCityTours(), tour);
+                tour.getCityTours().addAll(newCityTours);
+
+                int totalDays = newCityTours.stream().mapToInt(CityTour::getDaysCount).sum();
+                tour.setDurationDays(totalDays);
+                log.debug("New duration calculated: {} days", totalDays);
+            }
+
+        Tour updatedTour = repository.save(tour);
+        log.info("Tour [UUID: {}] successfully persisted in database", tourUuid);
+
+        return mapper.toFindDto(updatedTour);
     }
 
     @Override
