@@ -11,7 +11,6 @@ import com.desertakal.desertakal.service.interfaces.CityService;
 import com.desertakal.desertakal.service.interfaces.TourService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -92,7 +91,7 @@ public class TourController {
             @RequestParam(defaultValue = "0") BigDecimal minRating,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "asc") String order,
             HttpServletRequest request
     ) {

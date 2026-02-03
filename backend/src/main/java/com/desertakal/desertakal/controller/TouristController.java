@@ -1,17 +1,22 @@
 package com.desertakal.desertakal.controller;
 
 import com.desertakal.desertakal.exception.custom.FileUploadException;
+import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.dto.tourist.TouristDTO;
 import com.desertakal.desertakal.model.dto.tourist.TouristUpdateDTO;
 import com.desertakal.desertakal.model.dto.user.UserFindDTO;
 import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
+import com.desertakal.desertakal.service.interfaces.TourService;
 import com.desertakal.desertakal.service.interfaces.TouristService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +31,7 @@ import java.util.UUID;
 @Slf4j
 public class TouristController {
     private final TouristService service;
+    private final TourService tourService;
 
     @GetMapping("/{uuid}")
     @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true)")
@@ -105,6 +111,41 @@ public class TouristController {
                 .build();
 
         log.info("Tourist with UUID: {} has been successfully patched via {}", uuid, request.getServletPath());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{uuid}")
+    @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true)")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> getTours(
+            @NonNull @PathVariable UUID uuid,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String order,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to get all booked tours for Tourist UUID: {} [Page: {}, Size: {}, SortBy: {}]",
+                uuid, page, size, sortBy);
+
+        Sort sort = Sort.by(Sort.Direction.fromString(order), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        var result = tourService.findAllByTourist(uuid, pageable);
+
+        String message = String.format("Successfully retrieved %d tour(s) for the requested tourist profile.",
+                result.getTotalElements());
+
+        var response = StandardResponseDTO.<PaginationDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message(message)
+                .status(200)
+                .path(request.getServletPath())
+                .data(result)
+                .build();
+
+        log.info("Successfully returned {} tours for Tourist UUID: {} [Status: 200]",
+                result.getTotalElements(), uuid);
 
         return ResponseEntity.ok(response);
     }
