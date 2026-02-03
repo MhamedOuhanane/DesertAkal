@@ -78,6 +78,7 @@ public class TourServiceImpl implements TourService {
     }
 
     @Override
+    @Transactional
     public TourFindDTO update(@NonNull UUID tourUuid, @NonNull TourUpdateDTO dto) {
         log.info("Starting update process for Tour with UUID: {}", tourUuid);
 
@@ -95,6 +96,7 @@ public class TourServiceImpl implements TourService {
                 log.info("Updating CityTours list for Tour: {}. New count: {}", tourUuid, dto.getCityTours().size());
 
                 tour.getCityTours().clear();
+                repository.saveAndFlush(tour);
 
                 List<CityTour> newCityTours = mapCityTours(dto.getCityTours(), tour);
                 tour.getCityTours().addAll(newCityTours);
@@ -111,6 +113,7 @@ public class TourServiceImpl implements TourService {
     }
 
     @Override
+    @Transactional
     public TourFindDTO updateImage(@NonNull UUID tourUuid, @NonNull MultipartFile image) {
         log.info("Request to update image for Tour UUID: {}", tourUuid);
 
@@ -182,6 +185,7 @@ public class TourServiceImpl implements TourService {
     }
 
     @Override
+    @Transactional
     public void delete(@NonNull UUID tourUuid) {
         log.info("Starting deletion process for tour with UUID: {}", tourUuid);
 
@@ -218,7 +222,15 @@ public class TourServiceImpl implements TourService {
 
     @Override
     public List<TourDTO> findTop5() {
-        return List.of();
+        log.debug("Fetching Top 5 highest rated tours");
+
+        List<Tour> toursTop5 = repository.findTop5ByOrderByRatingDesc();
+
+        if (toursTop5.isEmpty()) {
+            log.warn("No tours found for Top 5 list");
+        }
+
+        return mapper.toDtos(toursTop5);
     }
 
     @Override
@@ -273,17 +285,23 @@ public class TourServiceImpl implements TourService {
             }
 
             if (durationStr != null && !durationStr.isBlank()) {
+                String cleanDuration = durationStr.trim(); // تنظيف السلسلة
                 try {
-                    if (durationStr.startsWith("+")) {
-                        predicates.add(cb.greaterThanOrEqualTo(root.get("durationDays"), Integer.parseInt(durationStr.substring(1))));
-                    } else if (durationStr.startsWith("-")) {
-                        predicates.add(cb.lessThanOrEqualTo(root.get("durationDays"), Integer.parseInt(durationStr.substring(1))));
+                    if (cleanDuration.startsWith("+")) {
+                        int val = Integer.parseInt(cleanDuration.substring(1).trim());
+                        predicates.add(cb.greaterThanOrEqualTo(root.get("durationDays"), val));
+                        log.debug("Filter applied: durationDays >= {}", val);
+                    } else if (cleanDuration.startsWith("-")) {
+                        int val = Integer.parseInt(cleanDuration.substring(1).trim());
+                        predicates.add(cb.lessThanOrEqualTo(root.get("durationDays"), val));
+                        log.debug("Filter applied: durationDays <= {}", val);
                     } else {
-                        predicates.add(cb.equal(root.get("durationDays"), Integer.parseInt(durationStr)));
+                        int val = Integer.parseInt(cleanDuration);
+                        predicates.add(cb.equal(root.get("durationDays"), val));
+                        log.debug("Filter applied: durationDays == {}", val);
                     }
-                    log.debug("Filter added: durationDays {}", durationStr);
                 } catch (NumberFormatException e) {
-                    log.warn("Skipping duration filter: '{}' is not a valid integer", durationStr);
+                    log.warn("Invalid duration format received: '{}'", durationStr);
                 }
             }
 

@@ -88,7 +88,7 @@ public class TourController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String durationStr,
-            @RequestParam(defaultValue = "0") @Positive BigDecimal minRating,
+            @RequestParam(defaultValue = "0") BigDecimal minRating,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "title") String sortBy,
