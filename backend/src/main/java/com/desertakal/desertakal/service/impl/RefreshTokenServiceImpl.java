@@ -48,7 +48,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
         User user = userRepository.findByUuid(dto.getUserUuid())
                 .orElseThrow(() -> {
-                    log.warn("User not found for UUID: {}", dto.getUserUuid());
+                    log.warn("Create failed: User not found for UUID: {}", dto.getUserUuid());
                     return new ResourceNotFoundException("User", "identifier", dto.getUserUuid().toString());
                 });
 
@@ -156,7 +156,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
         User user = userRepository.findByUuid(userUuid)
                 .orElseThrow(() -> {
-                    log.warn("User not found for UUID: {}", userUuid);
+                    log.warn("Get Session failed: User not found for UUID: {}", userUuid);
                     return new ResourceNotFoundException("User", "identifier", userUuid.toString());
                 });
 
@@ -189,7 +189,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public RefreshTokenFullDTO find(@NonNull String token) {
         RefreshToken refreshToken = repository.findByToken(token).orElseThrow(() -> {
-            log.warn("Refresh attempt failed: Token not found in database.");
+            log.warn("Find failed: Token not found in database.");
             return new ResourceNotFoundException("Refresh token", "token", token);
         });
 
@@ -230,7 +230,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public void logout(@NonNull String token) {
         RefreshToken refreshToken = repository.findByToken(token).orElseThrow(() -> {
-            log.warn("Refresh attempt failed: Token not found in database.");
+            log.warn("Logout failed: Token not found in database.");
             return new ResourceNotFoundException("Refresh token", "token", token);
         });
 

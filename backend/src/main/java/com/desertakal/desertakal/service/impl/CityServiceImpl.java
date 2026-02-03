@@ -79,7 +79,7 @@ public class CityServiceImpl implements CityService {
                 search != null ? search : "NONE", pageable.getPageNumber());
 
         Specification<@NonNull City> spec = (root, query, cb) -> {
-            if (search != null && !search.isEmpty()) {
+            if (search != null && !search.isBlank()) {
                 String pattern = "%" + search.toLowerCase() + "%";
                 return cb.like(cb.lower(root.get("name")), pattern);
             }

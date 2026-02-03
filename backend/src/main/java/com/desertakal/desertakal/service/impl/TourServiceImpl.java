@@ -17,14 +17,20 @@ import com.desertakal.desertakal.repository.CityRepository;
 import com.desertakal.desertakal.repository.TourRepository;
 import com.desertakal.desertakal.service.interfaces.FileStorageService;
 import com.desertakal.desertakal.service.interfaces.TourService;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -95,8 +101,26 @@ public class TourServiceImpl implements TourService {
     }
 
     @Override
-    public PaginationDTO findAll(String search, String city, String durationStr, Double minRating, @NonNull Pageable pageable) {
-        return null;
+    public PaginationDTO findAll(String search, String city, String durationStr, BigDecimal minRating, @NonNull Pageable pageable) {
+        log.info("Fetching tours with filters - Search: '{}', City: '{}', Duration: '{}', MinRating: {}",
+                search, city, durationStr, minRating);
+
+        Specification<@NonNull Tour> spec = getToursSpecification(search, city, durationStr, minRating);
+
+        var tourPage = repository.findAll(spec, pageable);
+
+        log.info("Search completed: Found {} items on page {} of {}",
+                tourPage.getNumberOfElements(), tourPage.getNumber(), tourPage.getTotalPages());
+
+        return PaginationDTO.builder()
+                .content(mapper.toDtos(tourPage.getContent()))
+                .page(tourPage.getNumber())
+                .size(tourPage.getSize())
+                .totalElements(tourPage.getTotalElements())
+                .totalPages(tourPage.getTotalPages())
+                .isFirst(tourPage.isFirst())
+                .isLast(tourPage.isLast())
+                .build();
     }
 
     @Override
@@ -139,5 +163,48 @@ public class TourServiceImpl implements TourService {
 
                     return cityTour;
                 }).toList();
+    }
+
+    private Specification<@NonNull Tour> getToursSpecification(String search, String city, String durationStr, BigDecimal minRating) {
+        return  (root, query, cb) -> {
+            query.distinct(true);
+
+            log.debug("Building Specification predicates for Tour search...");
+
+            List<Predicate> predicates = new ArrayList<>();
+            Join<Object, Object> cityJoin = root.join("cityTours", JoinType.LEFT).join("city", JoinType.LEFT);
+
+            if (search != null && !search.isBlank()) {
+                predicates.add(cb.like(cb.lower(root.get("title")), "%" + search.toLowerCase() + "%"));
+                log.debug("Filter added: title LIKE '%{}%'", search);
+            }
+
+            if (city != null && !city.isBlank()) {
+                predicates.add(cb.like(cb.lower(cityJoin.get("name")), "%" + city.toLowerCase() + "%"));
+                log.debug("Filter added: city.name LIKE '%{}%'", city);
+            }
+
+            if (durationStr != null && !durationStr.isBlank()) {
+                try {
+                    if (durationStr.startsWith("+")) {
+                        predicates.add(cb.greaterThanOrEqualTo(root.get("durationDays"), Integer.parseInt(durationStr.substring(1))));
+                    } else if (durationStr.startsWith("-")) {
+                        predicates.add(cb.lessThanOrEqualTo(root.get("durationDays"), Integer.parseInt(durationStr.substring(1))));
+                    } else {
+                        predicates.add(cb.equal(root.get("durationDays"), Integer.parseInt(durationStr)));
+                    }
+                    log.debug("Filter added: durationDays {}", durationStr);
+                } catch (NumberFormatException e) {
+                    log.warn("Skipping duration filter: '{}' is not a valid integer", durationStr);
+                }
+            }
+
+            if (minRating != null && minRating.compareTo(BigDecimal.ZERO) >= 0) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("rating"), minRating));
+                log.debug("Filter added: rating >= {}", minRating);
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
     }
 }

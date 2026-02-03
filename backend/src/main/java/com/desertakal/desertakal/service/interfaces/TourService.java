@@ -9,6 +9,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ public interface TourService {
     TourFindDTO update(@NonNull UUID tourUuid, @NonNull TourUpdateDTO dto);
     TourFindDTO updateImage(@NonNull UUID tourUuid, @NonNull MultipartFile image);
     TourFindDTO find(@NonNull UUID tourUuid);
-    PaginationDTO findAll(String search, String city, String durationStr, Double minRating, @NonNull Pageable pageable);
+    PaginationDTO findAll(String search, String city, String durationStr, BigDecimal minRating, @NonNull Pageable pageable);
     void delete(@NonNull UUID tourUuid);
     List<TourDTO> findTop5();
     PaginationDTO findAllByTourist(@NonNull UUID touristUuid, @NonNull Pageable pageable);

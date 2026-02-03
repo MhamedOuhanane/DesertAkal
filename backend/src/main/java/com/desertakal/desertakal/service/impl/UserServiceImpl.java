@@ -150,12 +150,12 @@ public class UserServiceImpl implements UserService {
                 predicates.add(cb.equal(root.get("status"), status));
             }
 
-            if (roleName != null && !roleName.isEmpty()) {
+            if (roleName != null && !roleName.isBlank()) {
                 Join<User, Role> roleJoin = root.join("role");
                 predicates.add(cb.equal(roleJoin.get("name"), roleName));
             }
 
-            if (search != null && !search.isEmpty()) {
+            if (search != null && !search.isBlank()) {
                 Expression<String> fullName = cb.concat(cb.concat(root.get("firstName"), " "), root.get("lastName"));
                 predicates.add(cb.like(cb.lower(fullName), "%" + search.toLowerCase() + "%"));
             }

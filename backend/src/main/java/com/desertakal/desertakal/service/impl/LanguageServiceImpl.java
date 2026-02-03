@@ -58,7 +58,7 @@ public class LanguageServiceImpl implements LanguageService {
                 search != null ? search : "NONE", pageable.getPageNumber());
 
         Specification<@NonNull Language> spec = (root, query, cb) -> {
-            if (search != null && !search.isEmpty()) {
+            if (search != null && !search.isBlank()) {
                 String pattern = "%" + search.toLowerCase() + "%";
                 return cb.like(cb.lower(root.get("name")), pattern);
             }

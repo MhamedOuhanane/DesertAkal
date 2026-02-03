@@ -35,7 +35,7 @@ public class RoleServiceImpl implements RoleService {
         log.info("Fetching roles with search: {}", search);
 
         Specification<@NonNull Role> spec = (root, query, cb) -> {
-            if (search == null || search.isEmpty()) {
+            if (search == null || search.isBlank()) {
                 return cb.conjunction();
             }
 
