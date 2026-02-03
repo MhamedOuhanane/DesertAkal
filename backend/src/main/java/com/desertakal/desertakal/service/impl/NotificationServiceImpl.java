@@ -3,6 +3,7 @@ package com.desertakal.desertakal.service.impl;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.notif.NotificationDTO;
 import com.desertakal.desertakal.model.dto.notif.NotificationFindDTO;
+import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.entity.Notification;
 import com.desertakal.desertakal.model.entity.User;
 import com.desertakal.desertakal.model.mapper.NotificationMapper;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,7 +63,34 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public List<NotificationDTO> findByUser(@NonNull UUID userUuid, @NonNull Pageable pageable) {
-        return List.of();
+    public PaginationDTO findByUser(@NonNull UUID userUuid, @NonNull Pageable pageable) {
+        log.info("Fetching notifications for user: {} [Page: {}, Size: {}]",
+                userUuid, pageable.getPageNumber(), pageable.getPageSize());
+
+        User user = userRepository.findByUuid(userUuid)
+                .orElseThrow(() -> {
+                    log.error("Failed to fetch notifications: User {} not found", userUuid);
+                    return new ResourceNotFoundException("User", "identifier", userUuid.toString());
+                });
+
+        Specification<@NonNull Notification> spec = (root, query, cb) -> {
+            log.debug("Building query specification for user: {}", user.getEmail());
+            return cb.equal(root.get("user"), user);
+        };
+
+        var notifPage = repository.findAll(spec, pageable);
+
+        log.info("Successfully retrieved {} notifications for user: {} (Total elements: {})",
+                notifPage.getNumberOfElements(), userUuid, notifPage.getTotalElements());
+
+        return PaginationDTO.builder()
+                .content(mapper.toDtos(notifPage.getContent()))
+                .page(notifPage.getNumber())
+                .size(notifPage.getSize())
+                .totalElements(notifPage.getTotalElements())
+                .totalPages(notifPage.getTotalPages())
+                .isFirst(notifPage.isFirst())
+                .isLast(notifPage.isLast())
+                .build();
     }
 }
