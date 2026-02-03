@@ -82,7 +82,35 @@ public class TourServiceImpl implements TourService {
 
     @Override
     public TourFindDTO updateImage(@NonNull UUID tourUuid, @NonNull MultipartFile image) {
-        return null;
+        log.info("Request to update image for Tour UUID: {}", tourUuid);
+
+        Tour tour = repository.findByUuid(tourUuid)
+                .orElseThrow(() -> {
+                    log.error("Update Image abort: Tour with UUID {} not found", tourUuid);
+                    return new ResourceNotFoundException("Tour", "identifier", tourUuid.toString());
+                });
+
+        if (image.isEmpty()) {
+            log.warn("Update Image skipped: The provided multipart file is empty for Tour {}", tourUuid);
+            return mapper.toFindDto(tour);
+        }
+
+        log.debug("Processing new image: Name={}, Size={} bytes", image.getOriginalFilename(), image.getSize());
+
+        String newImagePath = fileStorageService.uploadDocument(image, "tours");
+        log.info("New image uploaded successfully to: {}", newImagePath);
+
+        String oldImagePath = tour.getImage();
+        if (oldImagePath != null && !oldImagePath.isBlank() && !oldImagePath.contains("defaults/")) {
+            fileStorageService.deleteFile(oldImagePath);
+        }
+
+        tour.setImage(newImagePath);
+        Tour updatedTour = repository.save(tour);
+
+        log.info("Tour image path updated in database for UUID: {}", tourUuid);
+
+        return mapper.toFindDto(updatedTour);
     }
 
     @Override

@@ -260,14 +260,14 @@ public class UserServiceImpl implements UserService {
         if (photo.getSize() > 0 && !photo.isEmpty()) {
             String newPhotoPath = fileStorageService.uploadDocument(photo, "users/profiles");
 
-            if (user.getPhoto() != null && !user.getPhoto().isEmpty() && !user.getPhoto().contains("defaults/")) {
+            if (user.getPhoto() != null && !user.getPhoto().isBlank() && !user.getPhoto().contains("defaults/")) {
                 fileStorageService.deleteFile(user.getPhoto());
             }
 
             user.setPhoto(newPhotoPath);
         }
 
-        log.info("User {} updated successfully", userUuid);
+        log.info("User profile picture {} was successfully updated", userUuid);
         return mapper.toFindDto(user);
     }
 
