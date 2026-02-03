@@ -58,8 +58,26 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    @Transactional
     public NotificationFindDTO find(@NonNull UUID notifUuid) {
-        return null;
+        log.info("Request to fetch and mark as seen Notification UUID: {}", notifUuid);
+
+        Notification notification = repository.findByUuid(notifUuid)
+                .orElseThrow(() -> {
+                    log.error("Fetch failed: Notification with UUID {} not found", notifUuid);
+                    return new ResourceNotFoundException("Notification", "identifier", notifUuid.toString());
+                });
+
+        if (Boolean.FALSE.equals(notification.getSeen())) {
+            log.debug("Updating status for notification {}: seen = true", notifUuid);
+            notification.setSeen(true);
+        } else {
+            log.debug("Notification {} is already marked as seen", notifUuid);
+        }
+
+        log.info("Successfully retrieved and updated Notification: {}", notifUuid);
+
+        return mapper.toFindDto(notification);
     }
 
     @Override
