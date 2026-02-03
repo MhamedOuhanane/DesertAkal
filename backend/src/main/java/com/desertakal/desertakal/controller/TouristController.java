@@ -115,7 +115,7 @@ public class TouristController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping("/{uuid}/tours")
     @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true)")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> getTours(
             @NonNull @PathVariable UUID uuid,

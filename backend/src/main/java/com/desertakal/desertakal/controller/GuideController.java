@@ -6,6 +6,7 @@ import com.desertakal.desertakal.model.dto.guide.GuideUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.service.interfaces.GuideService;
+import com.desertakal.desertakal.service.interfaces.TourService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import java.util.UUID;
 @Slf4j
 public class GuideController {
     private final GuideService service;
+    private final TourService tourService;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -128,6 +130,41 @@ public class GuideController {
                 .build();
 
         log.info("Guide with UUID: {} has been successfully patched via {}", uuid, request.getServletPath());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{uuid}/tours")
+    @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true)")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> getTours(
+            @NonNull @PathVariable UUID uuid,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String order,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("REST request to get all tours assigned for Guide UUID: {} [Page: {}, Size: {}, SortBy: {}]",
+                uuid, page, size, sortBy);
+
+        Sort sort = Sort.by(Sort.Direction.fromString(order), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        var result = tourService.findAllByGuide(uuid, pageable);
+
+        String message = String.format("Successfully retrieved %d tour(s) for the requested guide profile.",
+                result.getTotalElements());
+
+        var response = StandardResponseDTO.<PaginationDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message(message)
+                .status(200)
+                .path(request.getServletPath())
+                .data(result)
+                .build();
+
+        log.info("Successfully returned {} tours for Guide UUID: {} [Status: 200]",
+                result.getTotalElements(), uuid);
 
         return ResponseEntity.ok(response);
     }
