@@ -267,7 +267,32 @@ public class TourServiceImpl implements TourService {
 
     @Override
     public PaginationDTO findAllByGuide(@NonNull UUID guideUuid, @NonNull Pageable pageable) {
-        return null;
+        log.info("Starting process to fetch tours for Guide UUID: {} [Page: {}, Size: {}]",
+                guideUuid, pageable.getPageNumber(), pageable.getPageSize());
+
+        Guide guide = guideRepository.findByUuid(guideUuid)
+                .orElseThrow(() -> {
+                    log.error("Fetch Tours failed: Guide with UUID {} not found", guideUuid);
+                    return new ResourceNotFoundException("Guide", "identifier", guideUuid.toString());
+                });
+
+        log.debug("Guide found: {} {}. Executing join query for tours.",
+                guide.getFirstName(), guide.getLastName());
+
+        Page<@NonNull Tour> tourPage = repository.findAllByGuide(guide, pageable);
+
+        log.info("Search completed: Found {} tours for guide {} on page {} of {}",
+                tourPage.getTotalElements(), guideUuid, tourPage.getNumber(), tourPage.getTotalPages());
+
+        return PaginationDTO.builder()
+                .content(mapper.toDtos(tourPage.getContent()))
+                .page(tourPage.getNumber())
+                .size(tourPage.getSize())
+                .totalElements(tourPage.getTotalElements())
+                .totalPages(tourPage.getTotalPages())
+                .isFirst(tourPage.isFirst())
+                .isLast(tourPage.isLast())
+                .build();
     }
 
     private List<CityTour> mapCityTours(@NonNull List<CityTourCreateDTO> DTOs, Tour tour) {
