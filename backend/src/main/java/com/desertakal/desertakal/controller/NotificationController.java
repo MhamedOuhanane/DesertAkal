@@ -26,7 +26,7 @@ import java.util.UUID;
 public class NotificationController {
     private final NotificationService service;
 
-    @GetMapping("/{userUuid}")
+    @GetMapping("/user/{userUuid}")
     @PreAuthorize("@ownerSecurityService.isOwner(#userUuid, authentication, false )")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> shows(
             @PathVariable UUID userUuid,
@@ -81,6 +81,30 @@ public class NotificationController {
                 .build();
 
         log.info("Successfully retrieved Notification details for UUID: {}", uuid);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{uuid}/ user/{userUuid}")
+    @PreAuthorize("@ownerSecurityService.isOwner(#userUuid, authentication, false )")
+    public ResponseEntity<@NonNull StandardResponseDTO<Void>> delete(
+            @PathVariable UUID uuid,
+            @PathVariable UUID userUuid,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to DELETE Notification with UUID: {} [Requested by Path: {}]",
+                uuid, request.getServletPath());
+
+        service.delete(uuid);
+
+        var response = StandardResponseDTO.<Void>builder()
+                .timestamp(LocalDateTime.now())
+                .status(200)
+                .message("Notification has been successfully deleted")
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Successfully deleted Notification with UUID: {} [Status: 200 OK]", uuid);
 
         return ResponseEntity.ok(response);
     }

@@ -1,7 +1,7 @@
 package com.desertakal.desertakal.service.impl;
 
+import com.desertakal.desertakal.exception.custom.BusinessRuleException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
-import com.desertakal.desertakal.model.dto.notif.NotificationDTO;
 import com.desertakal.desertakal.model.dto.notif.NotificationFindDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.entity.Notification;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -110,5 +109,20 @@ public class NotificationServiceImpl implements NotificationService {
                 .isFirst(notifPage.isFirst())
                 .isLast(notifPage.isLast())
                 .build();
+    }
+
+    @Override
+    public void delete(@NonNull UUID notifUuid) {
+        log.info("Request to delete Notification with UUID: {}", notifUuid);
+
+        Notification notification = repository.findByUuid(notifUuid)
+                .orElseThrow(() -> {
+                    log.warn("Delete failed: Notification not found for UUID: {}", notifUuid);
+                    return new ResourceNotFoundException("Notification", "identifier", notifUuid.toString());
+                });
+
+        repository.delete(notification);
+
+        log.info("Successfully deleted Notification UUID: {}", notifUuid);
     }
 }
