@@ -1,6 +1,5 @@
 package com.desertakal.desertakal.controller;
 
-import com.desertakal.desertakal.model.dto.notif.NotificationDTO;
 import com.desertakal.desertakal.model.dto.notif.NotificationFindDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
@@ -85,7 +84,7 @@ public class NotificationController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{uuid}/ user/{userUuid}")
+    @DeleteMapping("/{uuid}/user/{userUuid}")
     @PreAuthorize("@ownerSecurityService.isOwner(#userUuid, authentication, false )")
     public ResponseEntity<@NonNull StandardResponseDTO<Void>> delete(
             @PathVariable UUID uuid,

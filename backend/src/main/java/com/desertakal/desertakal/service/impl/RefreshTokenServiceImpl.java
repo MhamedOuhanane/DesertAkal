@@ -188,6 +188,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public RefreshTokenFullDTO find(@NonNull String token) {
+        log.info("Request received to found refresh token : {}", token);
         RefreshToken refreshToken = repository.findByToken(token).orElseThrow(() -> {
             log.warn("Find failed: Token not found in database.");
             return new ResourceNotFoundException("Refresh token", "token", token);
