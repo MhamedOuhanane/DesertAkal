@@ -59,7 +59,7 @@ public class Tour implements Reviewable {
     private LocalDateTime updatedAt;
 
     @Builder.Default
-    @OneToMany(mappedBy = "tour")
+    @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CityTour> cityTours = new ArrayList<>();
 
     @Builder.Default

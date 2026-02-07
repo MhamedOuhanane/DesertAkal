@@ -13,12 +13,13 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CityTourCreateDTO {
     @NotNull(message = "Order index is required")
-    @Min(value = 0, message = "Order index must be greater or equal to 0")
+    @Min(value = 1, message = "Order index must be greater or equal to 0")
     private Integer orderIndex;
+
+    @NotNull(message = "Days count for this city is required")
+    @Min(value = 1, message = "Duration in each city must be at least 1 day")
+    private Integer daysCount;
 
     @NotNull(message = "City UUID is required")
     private UUID cityUuid;
-
-    @NotNull(message = "Tour UUID is required")
-    private UUID tourUuid;
 }

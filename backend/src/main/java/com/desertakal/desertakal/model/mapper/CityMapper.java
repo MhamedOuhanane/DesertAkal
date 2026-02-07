@@ -2,7 +2,7 @@ package com.desertakal.desertakal.model.mapper;
 
 import com.desertakal.desertakal.model.dto.city.CityCreateDTO;
 import com.desertakal.desertakal.model.dto.city.CityDTO;
-import com.desertakal.desertakal.model.dto.city.CityFIndDTO;
+import com.desertakal.desertakal.model.dto.city.CityFindDTO;
 import com.desertakal.desertakal.model.dto.city.CityUpdateDTO;
 import com.desertakal.desertakal.model.entity.City;
 import org.mapstruct.*;
@@ -14,7 +14,7 @@ public interface CityMapper {
 
     @Named("toDto")
     CityDTO toDto(City city);
-    CityFIndDTO toFindDto(City city);
+    CityFindDTO toFindDto(City city);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uuid", ignore = true)
@@ -25,6 +25,8 @@ public interface CityMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @InheritConfiguration(name = "toEntity")
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     void updateEntityFromDto(CityUpdateDTO dto, @MappingTarget City city);
 
     @IterableMapping(qualifiedByName = "toDto")

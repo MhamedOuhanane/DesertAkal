@@ -14,5 +14,4 @@ public interface GuideService {
     PaginationDTO findAll(String search, String language, @NonNull Pageable pageable);
     GuideFindDTO find(@NonNull UUID guideUuid);
     GuideFindDTO update(@NonNull UUID guideUuid, @NonNull GuideUpdateDTO dto);
-    void delete(@NonNull UUID guideUuid);
 }

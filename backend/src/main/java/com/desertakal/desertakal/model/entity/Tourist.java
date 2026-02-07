@@ -24,10 +24,10 @@ public class Tourist extends User {
     private String language;
 
     @Builder.Default
-    @OneToMany(mappedBy = "tourist", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "tourist", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "tourist", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "tourist", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 }

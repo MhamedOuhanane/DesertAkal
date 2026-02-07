@@ -10,6 +10,7 @@ import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.user.UserFindDTO;
 import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
+import com.desertakal.desertakal.model.entity.Guide;
 import com.desertakal.desertakal.model.entity.Role;
 import com.desertakal.desertakal.model.entity.Tourist;
 import com.desertakal.desertakal.model.entity.User;
@@ -150,12 +151,12 @@ public class UserServiceImpl implements UserService {
                 predicates.add(cb.equal(root.get("status"), status));
             }
 
-            if (roleName != null && !roleName.isEmpty()) {
+            if (roleName != null && !roleName.isBlank()) {
                 Join<User, Role> roleJoin = root.join("role");
                 predicates.add(cb.equal(roleJoin.get("name"), roleName));
             }
 
-            if (search != null && !search.isEmpty()) {
+            if (search != null && !search.isBlank()) {
                 Expression<String> fullName = cb.concat(cb.concat(root.get("firstName"), " "), root.get("lastName"));
                 predicates.add(cb.like(cb.lower(fullName), "%" + search.toLowerCase() + "%"));
             }
@@ -214,11 +215,6 @@ public class UserServiceImpl implements UserService {
             log.debug("Update: User OAuths detected, count: {}", user.getOAuths().size());
         }
 
-        if (dto.getEmail() != null && repository.existsByEmail(dto.getEmail())) {
-            log.warn("Update failed: User email '{}' already exists", dto.getEmail());
-            throw new DuplicateResourceException("User", "Email", dto.getEmail());
-        }
-
         log.debug("Mapping UpdateDTO to User entity for UUID: {}", userUuid);
 
         mapper.updateEntityFromDto(dto, user);
@@ -265,14 +261,14 @@ public class UserServiceImpl implements UserService {
         if (photo.getSize() > 0 && !photo.isEmpty()) {
             String newPhotoPath = fileStorageService.uploadDocument(photo, "users/profiles");
 
-            if (user.getPhoto() != null && !user.getPhoto().isEmpty() && !user.getPhoto().contains("defaults/")) {
+            if (user.getPhoto() != null && !user.getPhoto().isBlank() && !user.getPhoto().contains("defaults/")) {
                 fileStorageService.deleteFile(user.getPhoto());
             }
 
             user.setPhoto(newPhotoPath);
         }
 
-        log.info("User {} updated successfully", userUuid);
+        log.info("User profile picture {} was successfully updated", userUuid);
         return mapper.toFindDto(user);
     }
 
@@ -286,12 +282,28 @@ public class UserServiceImpl implements UserService {
                     return new ResourceNotFoundException("User", "identifier", userUuid.toString());
                 });
 
-        log.warn("User identified for deletion - Email: {}, Role: {}, Registered at: {}",
-                user.getEmail(), user.getRole().getName(), user.getCreatedAt());
+        int reservationCount = 0;
+
+        if (user instanceof Guide guide) {
+            reservationCount = guide.getReservations().size();
+            log.debug("User is a Guide. Found {} associated reservations", reservationCount);
+        } else if (user instanceof Tourist tourist) {
+            reservationCount = tourist.getReservations().size();
+            log.debug("User is a Tourist. Found {} associated reservations", reservationCount);
+        }
+
+        if (reservationCount > 0) {
+            log.warn("Delete blocked: User '{}' (Email: {}) has {} active reservation(s)",
+                    user.getUuid(), user.getEmail(), reservationCount);
+
+            throw new BusinessRuleException(
+                    String.format("Action impossible : L'utilisateur '%s' ne peut pas être supprimé car il est lié à %d réservation(s). " +
+                                    "Veuillez traiter ces réservations avant la suppression.",
+                            user.getEmail(), reservationCount)
+            );
+        }
 
         repository.delete(user);
-
-        log.info("User with UUID: {} and Email: {} successfully deleted from system",
-                userUuid, user.getEmail());
+        log.info("User {} [Role: {}] successfully removed from the system", user.getEmail(), user.getRole().getName());
     }
 }

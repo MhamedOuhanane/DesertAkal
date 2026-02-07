@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class CityCreateDTO {
     @NotBlank(message = "City name is required")
-    @Size(min = 4, max = 100, message = "City name must be between 4 and 100 characters")
+    @Size(min = 2, max = 100, message = "City name must be between 4 and 100 characters")
     private String name;
 
     @NotNull(message = "Latitude is required")
@@ -26,7 +26,4 @@ public class CityCreateDTO {
     @NotNull(message = "Description is required")
     @Size(max = 5000, message = "Description must be at most 5000 characters")
     private String description;
-
-    @Size(max = 255, message = "Cover file name must be at most 255 characters")
-    private String coverFileName;
 }

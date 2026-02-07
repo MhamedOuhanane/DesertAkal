@@ -20,8 +20,12 @@ public class CityTour {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "order_index", nullable = false)
     private Integer orderIndex;
+
+    @Builder.Default
+    @Column(name = "days_count", nullable = false)
+    private Integer daysCount = 1;
 
     @ManyToOne
     @JoinColumn(name = "city_id")

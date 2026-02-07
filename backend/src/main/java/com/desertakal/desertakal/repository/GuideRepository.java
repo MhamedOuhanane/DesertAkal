@@ -15,4 +15,5 @@ public interface GuideRepository extends JpaRepository<@NonNull Guide, @NonNull 
     boolean existsByEmail(String email);
 
     boolean existsByUsername(String username);
+    List<@NonNull Guide> findTop5ByOrderByRatingDesc();
 }

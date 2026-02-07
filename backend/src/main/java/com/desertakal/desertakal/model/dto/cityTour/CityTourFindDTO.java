@@ -1,7 +1,6 @@
 package com.desertakal.desertakal.model.dto.cityTour;
 
-import com.desertakal.desertakal.model.dto.city.CityFIndDTO;
-import com.desertakal.desertakal.model.entity.City;
+import com.desertakal.desertakal.model.dto.city.CityFindDTO;
 import lombok.*;
 
 import java.util.UUID;
@@ -13,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CityTourFindDTO {
     private Integer orderIndex;
-    private CityFIndDTO city;
+    private Integer daysCount;
+    private CityFindDTO city;
     private UUID tourUuid;
 }

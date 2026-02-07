@@ -10,9 +10,12 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NotificationDTO {
+public class NotificationFindDTO {
     private UUID uuid;
     private String title;
-    private LocalDateTime date;
+    private String message;
     private Boolean seen;
+    private LocalDateTime date;
+    private UUID userUuid;
+    private String userName;
 }
