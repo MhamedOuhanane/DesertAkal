@@ -1,0 +1,8 @@
+@import 'tailwindcss';
+
+@source "./**/*.html";
+@source "./**/*.ts";
+
+@theme {
+    --color-desert-gold: #ffbb2e;
+}
