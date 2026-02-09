@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+
+@theme {
+    --color-main-bg: var(--bg-color);
+    --color-surface: var(--surface-color);
+    --color-surface-elevated: var(--surface-elevated-color);
+    --color-border: var(--border-color);
+    --color-divider: var(--divider-color);
+
+    --color-text-primary: var(--text-primary-color);
+    --color-text-secondary: var(--text-secondary-color);
+    --color-text-tertiary: var(--text-tertiary-color);
+    --color-text-disabled: var(--text-disabled-color);
+
+    --color-primary: var(--primary-color);
+    --color-primary-hover: var(--primary-hover-color);
+    --color-primary-active: var(--primary-active-color);
+
+    --color-secondary: var(--secondary-color);
+    --color-secondary-hover: var(--secondary-hover-color);
+
+    --color-success: var(--success-color);
+    --color-success-bg: var(--success-bg-color);
+
+    --color-error: var(--error-color);
+    --color-error-bg: var(--error-bg-color);
+
+    --color-warning: var(--warning-color);
+    --color-warning-bg: var(--warning-bg-color);
+
+    --color-info: var(--info-color);
+    --color-info-bg: var(--info-bg-color);
+
+    --shadow-color: var(--shadow-base-color);
+}
