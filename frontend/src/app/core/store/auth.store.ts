@@ -6,7 +6,7 @@ import {
     withMethods,
     withState,
 } from '@ngrx/signals';
-import { UserAuth } from '../models/user.models';
+import { UserAuth } from '../models/user.model';
 import { computed, inject } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../environments/environment.development';
