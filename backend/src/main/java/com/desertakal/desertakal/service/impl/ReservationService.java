@@ -1,0 +1,23 @@
+package com.desertakal.desertakal.service.impl;
+
+import com.desertakal.desertakal.model.dto.reservation.ReservationCreateDTO;
+import com.desertakal.desertakal.model.dto.reservation.ReservationFindDTO;
+import com.desertakal.desertakal.model.dto.reservation.ReservationUpdateDTO;
+import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
+import com.desertakal.desertakal.model.enums.ReservationStatus;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+public interface ReservationService {
+    ReservationFindDTO create(@NonNull ReservationCreateDTO dto);
+    ReservationFindDTO create(@NonNull UUID reservationUuid, @NonNull ReservationUpdateDTO dto);
+    void cancel(@NonNull UUID reservationUuid);
+    ReservationFindDTO get(@NonNull UUID reservationUuid);
+    PaginationDTO getAll(String tour, String guide, String tourist, ReservationStatus status, LocalDateTime date, @NonNull Pageable pageable);
+    PaginationDTO getByTourist(@NonNull UUID touristUuid, String tour, String guide, ReservationStatus status, LocalDateTime date, @NonNull Pageable pageable);
+    PaginationDTO getByGuide(@NonNull UUID guideUuid, String tour, String tourist, ReservationStatus status, LocalDateTime date, @NonNull Pageable pageable);
+    void delete(@NonNull UUID reservationUuid);
+}
