@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -145,6 +144,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 .username(user.getEmail())
                 .fullName(user.getFullName())
                 .role(user.getRole().getName())
+                .photo(user.getPhoto())
                 .refreshToken(newRefreshToken)
                 .accessToken(newAccessToken)
                 .build();
