@@ -1,5 +1,12 @@
-import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals';
-import { UserAuth } from "../models/user.models";
+import {
+    patchState,
+    signalStore,
+    withComputed,
+    withHooks,
+    withMethods,
+    withState,
+} from '@ngrx/signals';
+import { UserAuth } from '../models/user.models';
 import { computed, inject } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../environments/environment.development';
@@ -14,20 +21,20 @@ const initialState: AuthState = {
     user: null,
     token: null,
     loading: false,
-}
+};
 
-export const AuthState = signalStore(
+export const AuthStore = signalStore(
     { providedIn: 'root' },
 
     withState(initialState),
 
-    withComputed(({token, user}) => ({
-        isAuthenticated: computed(() => !token()),
+    withComputed(({ token, user }) => ({
+        isAuthenticated: computed(() => !!token()),
         userRole: computed(() => user()?.role || 'VISITOR'),
         userPhoto: computed(() => user()?.photo || 'assets/defaults/default-profile.png'),
     })),
 
-    withMethods((store, cookieService =inject(CookieService)) => ({
+    withMethods((store, cookieService = inject(CookieService)) => ({
         setLogin(token: string, user: UserAuth) {
             patchState(store, { loading: true });
 
@@ -35,15 +42,39 @@ export const AuthState = signalStore(
             expires.setMinutes(expires.getMinutes() + 15);
 
             const isSecure = environment.secureCookie;
-            
-            cookieService.set('auth_token', token, expires, '/', '', isSecure, 'Lax');
-            cookieService.set('user_data', JSON.stringify(user), 30, '/', '', isSecure, 'Lax');
+
+            cookieService.set('auth_token', token, expires, '/', '', isSecure, 'Strict');
+            cookieService.set('user_data', JSON.stringify(user), 30, '/', '', isSecure, 'Strict');
 
             patchState(store, {
-                token, 
-                user, 
+                token,
+                user,
                 loading: false,
-            })
+            });
+        },
+
+        setRefreshToken(newToken: string) {
+            const isSecure = environment.secureCookie;
+
+            const expires = new Date();
+            expires.setMinutes(expires.getMinutes() + 15);
+
+            cookieService.set('auth_token', newToken, expires, '/', '', isSecure, 'Strict');
+
+            const currentUser = store.user();
+            if (currentUser) {
+                cookieService.set(
+                    'user_data',
+                    JSON.stringify(currentUser),
+                    30,
+                    '/',
+                    '',
+                    isSecure,
+                    'Strict',
+                );
+            }
+
+            patchState(store, { token: newToken });
         },
 
         logout() {
@@ -54,7 +85,7 @@ export const AuthState = signalStore(
 
         setLoading(value: boolean) {
             patchState(store, { loading: value });
-        }
+        },
     })),
 
     withHooks({
@@ -62,15 +93,15 @@ export const AuthState = signalStore(
             const savedToken = cookieService.get('auth_token');
             const savedUserJson = cookieService.get('user_data');
 
-            if(savedToken && savedUserJson) {
+            if (savedToken && savedUserJson) {
                 try {
-                    const user = JSON.parse(savedToken) as UserAuth;
+                    const user = JSON.parse(savedUserJson) as UserAuth;
 
-                    patchState(store, { token: savedToken, user});
+                    patchState(store, { token: savedToken, user });
                 } catch (error) {
                     store.logout();
                 }
             }
-        }
-    })
+        },
+    }),
 );
