@@ -2,10 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { DeviceService } from './device-service';
 import { environment } from '../../../environments/environment.development';
-import { ActiveSession, LoginRequest, Register } from '../models/auth.model';
+import { ActiveSession, LoginRequest, Register } from '../auth/auth.models';
 import { Observable } from 'rxjs';
-import { UserAuth } from '../models/user.model';
-import { ApiResponse } from '../models/response.model';
+import { UserAuth } from '../models/user.models';
+import { ApiResponse } from '../models/response.models';
 
 @Injectable({
     providedIn: 'root',

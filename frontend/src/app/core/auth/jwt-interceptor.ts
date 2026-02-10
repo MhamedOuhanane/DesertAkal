@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { AuthStore } from '../store/auth.store';
+import { AuthStore } from './auth.store';
 import { DeviceService } from '../services/device-service';
 import { catchError, throwError } from 'rxjs';
 import { toast } from 'ngx-sonner';

@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthStore } from '../store/auth.store';
+import { AuthStore } from '../auth/auth.store';
 import { toast } from 'ngx-sonner';
 
 export const roleGuard: CanActivateFn = (route, state) => {
