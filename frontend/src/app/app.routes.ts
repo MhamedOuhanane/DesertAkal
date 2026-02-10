@@ -3,15 +3,15 @@ import { MainLayout } from './layout/main-layout/main-layout/main-layout';
 
 export const routes: Routes = [
     {
-    path: '',
-    component: MainLayout,
-    children: [
-      {
         path: '',
-      },
-      {
-        path: 'tours'
-      }
-    ]
-  },
+        component: MainLayout,
+        children: [
+            {
+                path: '',
+            },
+            {
+                path: 'tours',
+            },
+        ],
+    },
 ];
