@@ -14,6 +14,7 @@ public class LoginDTO {
     private UUID uuid;
     private String username;
     private String fullName;
+    private String photo;
     private String role;
     private String accessToken;
     private String refreshToken;

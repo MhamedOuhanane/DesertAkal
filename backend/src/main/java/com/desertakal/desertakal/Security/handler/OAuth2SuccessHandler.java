@@ -3,7 +3,6 @@ package com.desertakal.desertakal.Security.handler;
 import com.desertakal.desertakal.Security.jwt.JwtService;
 import com.desertakal.desertakal.config.CookieConfig;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
-import com.desertakal.desertakal.model.dto.auth.LoginDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
 import com.desertakal.desertakal.model.entity.*;
