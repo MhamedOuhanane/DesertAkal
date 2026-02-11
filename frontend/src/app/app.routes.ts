@@ -5,7 +5,7 @@ import { roleGuard } from './core/guards/role-guard';
 export const routes: Routes = [
     {
         path: '',
-        loadComponent: () => import('./layout/main-layout/main-layout').then((m) => m.MainLayout),
+        loadComponent: () => import('./layouts/main-layout/main-layout').then((m) => m.MainLayout),
         canActivate: [roleGuard],
         data: { roles: ['VISITOR', 'TOURIST'] },
         children: [

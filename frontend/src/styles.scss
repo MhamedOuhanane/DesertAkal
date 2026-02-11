@@ -45,7 +45,10 @@
 
     --shadow-base-color: rgba(0, 0, 0, 0.08);
     --shadow-elevated-color: rgba(244, 157, 37, 0.15);
-    --shadow-primary: rgba(244, 157, 37, 0.3);
+    --shadow-primary: rgba(244, 158, 37, 0.158);
+
+    --logo-blue: #1e40af;
+    --logo-gold: #f59e0b;
 }
 
 /* ====================================
@@ -180,11 +183,11 @@ body {
     color: #ffeed6;
     font-weight: 700;
     padding: 12px 24px;
-    border-radius: 12px;
+    border-radius: 10px;
     border: none;
     cursor: pointer;
     transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 14px var(--shadow-primary);
+    box-shadow: 0 4px 12px var(--shadow-primary);
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -205,7 +208,7 @@ body {
     color: var(--primary-color);
     font-weight: 700;
     padding: 12px 24px;
-    border-radius: 12px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -225,7 +228,7 @@ body {
     color: var(--primary-color);
     font-weight: 700;
     padding: 12px 24px;
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid rgba(244, 157, 37, 0.2);
     cursor: pointer;
     transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -334,7 +337,7 @@ body {
 
 .alert {
     padding: 16px;
-    border-radius: 12px;
+    border-radius: 10px;
     border-left: 4px solid;
 }
 
@@ -371,7 +374,7 @@ body {
     border: 2px solid var(--border-color);
     color: var(--text-primary-color);
     padding: 12px 16px;
-    border-radius: 12px;
+    border-radius: 10px;
     outline: none;
     transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -408,8 +411,12 @@ body {
    ==================================== */
 
 @keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes slide-up {
@@ -463,4 +470,8 @@ body {
 
 .shadow-elevated {
     box-shadow: 0 10px 25px var(--shadow-elevated-color);
+}
+
+.text-logo-blue {
+    color: #5677e6 !important;
 }
