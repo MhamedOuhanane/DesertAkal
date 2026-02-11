@@ -3,45 +3,34 @@
    Design System Complet
    ==================================== */
 
-// Import Material Theme
 @use './material-theme.scss';
 
-// Import Google Fonts
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 /* ====================================
-   TAILWIND CONFIGURATION
-   ==================================== */
-
-/* ====================================
    🌅 LIGHT MODE
-   Colors from Design System Image
    ==================================== */
 
 :root {
-    /* 📐 Backgrounds & Surfaces */
-    --bg-color: #f8f7f5; /* Desert Mist - Background Light */
-    --surface-color: #ffffff; /* Surface Light */
-    --surface-elevated-color: #ffffff; /* Elevated surfaces */
-    --border-color: #e5e0d8; /* Light borders */
-    --divider-color: #d6d3d1; /* Dividers */
+    --bg-color: #f8f7f5;
+    --surface-color: #ffffff;
+    --surface-elevated-color: #ffffff;
+    --border-color: #e5e0d8;
+    --divider-color: #d6d3d1;
 
-    /* 📝 Text Colors */
-    --text-primary-color: #1c160d; /* Deep Earth - Text Light */
-    --text-secondary-color: #6b6456; /* Secondary text */
-    --text-tertiary-color: #9c7a49; /* Tertiary text */
-    --text-disabled-color: #a8a29e; /* Disabled text */
+    --text-primary-color: #1c160d;
+    --text-secondary-color: #6b6456;
+    --text-tertiary-color: #9c7a49;
+    --text-disabled-color: #a8a29e;
 
-    /* 🎨 Brand Colors - Light Mode */
-    --primary-color: #f49d25; /* Golden Sand */
-    --primary-hover-color: #e08d15; /* Darker golden */
-    --primary-active-color: #d97706; /* Burnt Sienna (active) */
+    --primary-color: #f49d25;
+    --primary-hover-color: #e08d15;
+    --primary-active-color: #d97706;
 
-    --secondary-color: #e07a5f; /* Terracotta */
-    --secondary-hover-color: #d66b4f; /* Darker terracotta */
+    --secondary-color: #e07a5f;
+    --secondary-hover-color: #d66b4f;
 
-    /* ✅ Semantic Colors */
     --success-color: #10b981;
     --success-bg-color: #d1fae5;
 
@@ -54,7 +43,6 @@
     --info-color: #3b82f6;
     --info-bg-color: #dbeafe;
 
-    /* 🌓 Shadows */
     --shadow-base-color: rgba(0, 0, 0, 0.08);
     --shadow-elevated-color: rgba(244, 157, 37, 0.15);
     --shadow-primary: rgba(244, 157, 37, 0.3);
@@ -62,33 +50,28 @@
 
 /* ====================================
    🌙 DARK MODE
-   Colors from Design System Image
    ==================================== */
 
 .dark,
 .dark-mode {
-    /* 📐 Backgrounds & Surfaces */
-    --bg-color: #221a10; /* Midnight Obsidian - Background Dark */
-    --surface-color: #2d241b; /* Deep Dune - Surface Dark */
-    --surface-elevated-color: #3a3028; /* Elevated surfaces dark */
-    --border-color: rgba(255, 255, 255, 0.1); /* Dark borders */
-    --divider-color: rgba(255, 255, 255, 0.05); /* Dark dividers */
+    --bg-color: #221a10;
+    --surface-color: #2d241b;
+    --surface-elevated-color: #3a3028;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --divider-color: rgba(255, 255, 255, 0.05);
 
-    /* 📝 Text Colors */
-    --text-primary-color: #f3eadd; /* Text Dark - Light cream */
-    --text-secondary-color: #bdb5a8; /* Secondary text dark */
-    --text-tertiary-color: #8c8478; /* Tertiary text dark */
-    --text-disabled-color: #6b6456; /* Disabled text dark */
+    --text-primary-color: #f3eadd;
+    --text-secondary-color: #bdb5a8;
+    --text-tertiary-color: #8c8478;
+    --text-disabled-color: #6b6456;
 
-    /* 🎨 Brand Colors - Dark Mode */
-    --primary-color: #fcd34d; /* Sahara Gold (brighter for dark) */
-    --primary-hover-color: #fde68a; /* Lighter golden */
-    --primary-active-color: #f59e0b; /* Active state */
+    --primary-color: #f49d25;
+    --primary-hover-color: #e08d15;
+    --primary-active-color: #f59e0b;
 
-    --secondary-color: #d97706; /* Burnt Sienna */
-    --secondary-hover-color: #ea8c1a; /* Lighter burnt sienna */
+    --secondary-color: #d97706;
+    --secondary-hover-color: #ea8c1a;
 
-    /* ✅ Semantic Colors (adapted for dark) */
     --success-color: #10b981;
     --success-bg-color: rgba(16, 185, 129, 0.15);
 
@@ -101,7 +84,6 @@
     --info-color: #3b82f6;
     --info-bg-color: rgba(59, 130, 246, 0.15);
 
-    /* 🌓 Shadows */
     --shadow-base-color: rgba(0, 0, 0, 0.5);
     --shadow-elevated-color: rgba(252, 211, 77, 0.2);
     --shadow-primary: rgba(252, 211, 77, 0.3);
@@ -110,14 +92,6 @@
 /* ====================================
    GLOBAL STYLES
    ==================================== */
-
-*,
-*::before,
-*::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 
 html,
 body {
@@ -136,7 +110,7 @@ body {
 }
 
 /* ====================================
-   SCROLLBAR CUSTOM
+   SCROLLBAR
    ==================================== */
 
 ::-webkit-scrollbar {
@@ -203,7 +177,7 @@ body {
 
 .btn-primary {
     background-color: var(--primary-color);
-    color: white;
+    color: #ffeed6;
     font-weight: 700;
     padding: 12px 24px;
     border-radius: 12px;
@@ -218,8 +192,6 @@ body {
 
 .btn-primary:hover {
     background-color: var(--primary-hover-color);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px var(--shadow-primary);
 }
 
 .btn-primary:active {
@@ -423,28 +395,6 @@ body {
 }
 
 /* ====================================
-   TRANSITIONS
-   ==================================== */
-
-* {
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-button,
-a {
-    transition-duration: 200ms;
-}
-
-.surface,
-.card {
-    transition-duration: 300ms;
-}
-
-body {
-    transition-duration: 400ms;
-}
-
-/* ====================================
    SELECTION
    ==================================== */
 
@@ -453,31 +403,13 @@ body {
     color: white;
 }
 
-::-moz-selection {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-/* ====================================
-   FOCUS STATES
-   ==================================== */
-
-*:focus-visible {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
-}
-
 /* ====================================
    ANIMATIONS
    ==================================== */
 
 @keyframes fade-in {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 @keyframes slide-up {
@@ -532,7 +464,3 @@ body {
 .shadow-elevated {
     box-shadow: 0 10px 25px var(--shadow-elevated-color);
 }
-
-/* ====================================
-   FIN DU FICHIER
-   ==================================== */

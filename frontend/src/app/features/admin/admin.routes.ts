@@ -1,5 +1,5 @@
-import { Routes } from "@angular/router";
-import { DashboardLayout } from "../../layout/dashboard-layout/dashboard-layout";
+import { Routes } from '@angular/router';
+import { DashboardLayout } from '../../layout/dashboard-layout/dashboard-layout';
 
 export const ADMIN_ROUTES: Routes = [
     {
@@ -8,12 +8,13 @@ export const ADMIN_ROUTES: Routes = [
         children: [
             {
                 path: 'dashboard',
-                loadComponent: () => import('./dashboard/dashboard').then(m => m.Dashboard)
+                loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
             },
             {
                 path: 'tours',
-                loadComponent: () => import('./tours-management/tours-management').then(m => m.ToursManagement)
-            }
-        ]
-    }
-]
+                loadComponent: () =>
+                    import('./tours-management/tours-management').then((m) => m.ToursManagement),
+            },
+        ],
+    },
+];

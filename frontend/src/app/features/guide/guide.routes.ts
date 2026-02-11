@@ -1,5 +1,5 @@
-import { Routes } from "@angular/router";
-import { DashboardLayout } from "../../layout/dashboard-layout/dashboard-layout";
+import { Routes } from '@angular/router';
+import { DashboardLayout } from '../../layout/dashboard-layout/dashboard-layout';
 
 export const GUIDE_ROUTES: Routes = [
     {
@@ -8,8 +8,8 @@ export const GUIDE_ROUTES: Routes = [
         children: [
             {
                 path: '',
-                loadComponent: () => import('./profile/profile-guide').then(m => m.ProfileGuide)
-            }
-        ]
-    }
-]
+                loadComponent: () => import('./profile/profile-guide').then((m) => m.ProfileGuide),
+            },
+        ],
+    },
+];
