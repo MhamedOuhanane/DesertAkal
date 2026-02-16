@@ -5,6 +5,7 @@ export interface MenuItem {
     icon: string;
     path: string;
     roles: UserRole[];
+    exact?: boolean;
 }
 
 export interface MenuGroup {
@@ -19,4 +20,5 @@ export interface PublicNavLink {
     icon: string;
     roles: UserRole[];
     requiresAuth: boolean;
+    exact?: boolean;
 }
