@@ -28,6 +28,9 @@
     --primary-hover-color: #e08d15;
     --primary-active-color: #d97706;
 
+    --btn-grad-start: #f49d25;
+    --btn-grad-end: #f49d25;
+
     --secondary-color: #e07a5f;
     --secondary-hover-color: #d66b4f;
 
@@ -71,6 +74,9 @@
     --primary-color: #f49d25;
     --primary-hover-color: #e08d15;
     --primary-active-color: #f59e0b;
+
+    --btn-grad-start: #ff6b35;
+    --btn-grad-end: #f7931e;
 
     --secondary-color: #d97706;
     --secondary-hover-color: #ea8c1a;
@@ -179,7 +185,7 @@ body {
    ==================================== */
 
 .btn-primary {
-    background-color: var(--primary-color);
+    background: linear-gradient(100deg, var(--btn-grad-start), var(--btn-grad-end));
     color: #ffeed6;
     font-weight: 700;
     padding: 12px 24px;
@@ -194,7 +200,7 @@ body {
 }
 
 .btn-primary:hover {
-    background-color: var(--primary-hover-color);
+    background: linear-gradient(100deg, var(--primary-hover-color), var(--primary-hover-color));;
 }
 
 .btn-primary:active {
@@ -473,5 +479,5 @@ body {
 }
 
 .text-logo-blue {
-    color: #5677e6 !important;
+    color: #5e7ee6 !important;
 }

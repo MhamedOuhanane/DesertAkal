@@ -8,7 +8,7 @@ import { RouterOutlet } from '@angular/router';
         class: 'block',
     },
     template: `
-        <div class="flex h-screen overflow-hidden bg-main-bg text-text-primary">
+        <div class="flex h-screen overflow-hidden bg-main-bg text-primary">
             <aside
                 [class.w-64]="isSidebarOpen()"
                 [class.w-20]="!isSidebarOpen()"
@@ -23,9 +23,9 @@ import { RouterOutlet } from '@angular/router';
                 >
                     <button
                         (click)="toggleSidebar()"
-                        class="p-2 hover:bg-primary/10 rounded-lg transition-colors"
+                        class="p-2 cursor-pointer hover:bg-primary/10 rounded-lg transition-colors"
                     >
-                        <span class="material-icons">menu</span>
+                        <span class="material-icons">{{ isSidebarOpen() ? 'close' : 'menu'}}</span>
                     </button>
                     <!-- <app-header [minimal]="true" />  -->
                 </header>

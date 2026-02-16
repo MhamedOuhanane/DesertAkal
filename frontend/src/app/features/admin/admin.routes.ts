@@ -7,7 +7,7 @@ export const ADMIN_ROUTES: Routes = [
         component: DashboardLayout,
         children: [
             {
-                path: 'dashboard',
+                path: '',
                 loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
             },
             {
