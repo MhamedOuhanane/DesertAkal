@@ -10,12 +10,12 @@ import { MatInputModule } from '@angular/material/input';
     selector: 'app-footer',
     standalone: true,
     imports: [
-        RouterLink, 
-        MatButtonModule, 
-        MatIconModule, 
-        MatDividerModule, 
-        MatFormFieldModule, 
-        MatInputModule
+        RouterLink,
+        MatButtonModule,
+        MatIconModule,
+        MatDividerModule,
+        MatFormFieldModule,
+        MatInputModule,
     ],
     templateUrl: './footer.html',
     styleUrl: './footer.scss',

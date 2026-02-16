@@ -1,15 +1,15 @@
-import { userRole } from "./user.models";
+import { UserRole } from './user.models';
 
-export interface MenuItem  {
+export interface MenuItem {
     label: string;
     icon: string;
     path: string;
-    roles: userRole[];
+    roles: UserRole[];
 }
 
 export interface MenuGroup {
     title: string;
-    roles: userRole[];
+    roles: UserRole[];
     items: MenuItem[];
 }
 
@@ -17,6 +17,6 @@ export interface PublicNavLink {
     label: string;
     path: string;
     icon: string;
-    roles: userRole[];
+    roles: UserRole[];
     requiresAuth: boolean;
 }

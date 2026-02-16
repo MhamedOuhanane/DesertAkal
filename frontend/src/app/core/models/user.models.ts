@@ -1,10 +1,10 @@
-export type userRole = 'ADMIN' | 'GUIDE' | 'TOURIST' | 'VISITOR';
+export type UserRole = 'ADMIN' | 'GUIDE' | 'TOURIST' | 'VISITOR';
 export interface UserAuth {
     uuid: string;
     username: string;
     fullName: string;
     photo: string;
-    role: userRole;
+    role: UserRole;
 }
 
 export interface User {
@@ -14,7 +14,7 @@ export interface User {
     photo: string;
     username: string;
     email: string;
-    role: userRole;
+    role: UserRole;
 }
 
 export interface UserDetails extends User {

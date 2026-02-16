@@ -25,7 +25,7 @@ import { RouterOutlet } from '@angular/router';
                         (click)="toggleSidebar()"
                         class="p-2 cursor-pointer hover:bg-primary/10 rounded-lg transition-colors"
                     >
-                        <span class="material-icons">{{ isSidebarOpen() ? 'close' : 'menu'}}</span>
+                        <span class="material-icons">{{ isSidebarOpen() ? 'close' : 'menu' }}</span>
                     </button>
                     <!-- <app-header [minimal]="true" />  -->
                 </header>
