@@ -26,20 +26,19 @@
             <div *appIsAuthenticated="false" class="items-center gap-2 hidden md:flex">
                 <div class="hidden h-6 w-px bg-border sm:block"></div>
 
-            <a
-                
-                routerLink="/auth/login"
-                class="hidden rounded-lg px-4 py-2 text-sm font-semibold text-text-secondary transition-all duration-200 hover:text-primary sm:block"
-            >
-                Sign In
-            </a>
+                <a
+                    routerLink="/auth/login"
+                    class="hidden rounded-lg px-4 py-2 text-sm font-semibold text-text-secondary transition-all duration-200 hover:text-primary sm:block"
+                >
+                    Sign In
+                </a>
 
-            <a
-                routerLink="/auth/register"
-                class="btn-primary rounded-xl px-5 py-2.5 text-sm font-bold shadow-lg shadow-primary/20"
-            >
-                Sign Up
-            </a>
+                <a
+                    routerLink="/auth/register"
+                    class="btn-primary rounded-xl px-5 py-2.5 text-sm font-bold shadow-lg shadow-primary/20"
+                >
+                    Sign Up
+                </a>
             </div>
 
             <button

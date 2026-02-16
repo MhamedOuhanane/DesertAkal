@@ -5,6 +5,7 @@ export const ADMIN_ROUTES: Routes = [
     {
         path: '',
         component: DashboardLayout,
+        data: { breadcrumb: 'Dashboard' },
         children: [
             {
                 path: '',
@@ -14,6 +15,7 @@ export const ADMIN_ROUTES: Routes = [
                 path: 'tours',
                 loadComponent: () =>
                     import('./tours-management/tours-management').then((m) => m.ToursManagement),
+                data: { breadcrumb: 'Tours Management' },
             },
         ],
     },

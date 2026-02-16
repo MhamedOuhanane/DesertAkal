@@ -1,10 +1,11 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Sidebar } from '../../shared/components/sidebar/sidebar';
+import { Breadcrumb } from '../../shared/components/breadcrumb/breadcrumb';
 
 @Component({
     selector: 'app-dashboard-layout',
-    imports: [RouterOutlet, Sidebar],
+    imports: [RouterOutlet, Sidebar, Breadcrumb],
     host: {
         class: 'block',
     },
@@ -21,16 +22,16 @@ import { Sidebar } from '../../shared/components/sidebar/sidebar';
             <!-- Main Area -->
             <div
                 class="flex flex-1 flex-col overflow-hidden transition-all
-               duration-300"
+                duration-300"
             >
                 <!-- Header -->
                 <!-- <app-dashboard-header
-          (sidebarToggle)="toggleMobileSidebar()"
+            (sidebarToggle)="toggleMobileSidebar()"
         /> -->
 
                 <!-- Content -->
                 <main class="flex-1 overflow-y-auto p-4 sm:p-6">
-                    <!-- <app-breadcrumb /> -->
+                    <app-breadcrumb />
                     <router-outlet />
                 </main>
             </div>
