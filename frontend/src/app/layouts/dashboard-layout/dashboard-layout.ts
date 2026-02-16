@@ -1,36 +1,36 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Sidebar } from '../../shared/components/sidebar/sidebar';
 
 @Component({
     selector: 'app-dashboard-layout',
-    imports: [RouterOutlet],
+    imports: [RouterOutlet, Sidebar],
     host: {
         class: 'block',
     },
     template: `
-        <div class="flex h-screen overflow-hidden bg-main-bg text-primary">
-            <aside
-                [class.w-64]="isSidebarOpen()"
-                [class.w-20]="!isSidebarOpen()"
-                class="transition-all duration-300 border-r border-border bg-surface overflow-y-auto hidden md:block"
+        <div class="flex min-h-screen bg-main-bg">
+            <!-- Sidebar -->
+            <app-sidebar
+                [collapsed]="sidebarCollapsed()"
+                [mobileOpen]="sidebarMobileOpen()"
+                (toggleCollapse)="toggleCollapse()"
+                (closeMobile)="sidebarMobileOpen.set(false)"
+            />
+
+            <!-- Main Area -->
+            <div
+                class="flex flex-1 flex-col overflow-hidden transition-all
+               duration-300"
             >
-                <!-- <app-sidebar [collapsed]="!isSidebarOpen()" /> -->
-            </aside>
+                <!-- Header -->
+                <!-- <app-dashboard-header
+          (sidebarToggle)="toggleMobileSidebar()"
+        /> -->
 
-            <div class="flex flex-col flex-1 overflow-hidden">
-                <header
-                    class="h-16 border-b border-border bg-surface flex items-center px-6 justify-between shadow-sm"
-                >
-                    <button
-                        (click)="toggleSidebar()"
-                        class="p-2 cursor-pointer hover:bg-primary/10 rounded-lg transition-colors"
-                    >
-                        <span class="material-icons">{{ isSidebarOpen() ? 'close' : 'menu' }}</span>
-                    </button>
-                    <!-- <app-header [minimal]="true" />  -->
-                </header>
-
-                <main class="flex-1 overflow-y-auto p-6 animate-fade-in bg-main-bg">
+                <!-- Content -->
+                <main class="flex-1 overflow-y-auto p-4 sm:p-6">
+                    <!-- <app-breadcrumb /> -->
                     <router-outlet />
                 </main>
             </div>
@@ -39,9 +39,10 @@ import { RouterOutlet } from '@angular/router';
     styles: ``,
 })
 export class DashboardLayout {
-    isSidebarOpen = signal(true);
+    sidebarCollapsed = signal(false);
+    sidebarMobileOpen = signal(false);
 
-    toggleSidebar() {
-        this.isSidebarOpen.update((v) => !v);
+    toggleCollapse(): void {
+        this.sidebarCollapsed.update((v) => !v);
     }
 }

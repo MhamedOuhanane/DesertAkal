@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { ThemeToggle } from "../theme-toggle/theme-toggle";
+import { ThemeToggle } from '../theme-toggle/theme-toggle';
 import { NavigationService } from '../../../core/services/navigation-service';
 
 @Component({
