@@ -23,9 +23,11 @@
         <div class="flex items-center gap-2">
             <app-theme-toggle />
 
-            <div class="hidden h-6 w-px bg-border sm:block"></div>
+            <div *appIsAuthenticated="false" class="items-center gap-2 hidden md:flex">
+                <div class="hidden h-6 w-px bg-border sm:block"></div>
 
             <a
+                
                 routerLink="/auth/login"
                 class="hidden rounded-lg px-4 py-2 text-sm font-semibold text-text-secondary transition-all duration-200 hover:text-primary sm:block"
             >
@@ -38,6 +40,7 @@
             >
                 Sign Up
             </a>
+            </div>
 
             <button
                 (click)="toggleMobileMenu()"
@@ -94,6 +97,7 @@
                 }
                 <div class="my-3 h-px bg-border"></div>
                 <a
+                    *appIsAuthenticated="false"
                     routerLink="/auth/login"
                     (click)="closeMobileMenu()"
                     class="rounded-lg px-4 py-3 text-sm font-medium text-text-secondary"
