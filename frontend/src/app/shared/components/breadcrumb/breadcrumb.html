@@ -1,0 +1,32 @@
+@if (breadcrumbs().length > 0) {
+    <nav class="mb-6 flex items-center gap-1 overflow-x-auto text-sm" aria-label="Breadcrumb">
+        @for (crumb of breadcrumbs(); track crumb.path; let last = $last) {
+            <mat-icon class="shrink-0 text-[16px] text-text-disabled/50"> chevron_right </mat-icon>
+
+            @if (last) {
+                <span
+                    class="flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 font-semibold text-text-primary"
+                >
+                    @if (crumb.icon) {
+                        <mat-icon class="text-[16px] text-primary">
+                            {{ crumb.icon }}
+                        </mat-icon>
+                    }
+                    {{ crumb.label }}
+                </span>
+            } @else {
+                <a
+                    [routerLink]="crumb.path"
+                    class="flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-text-secondary transition-colors hover:bg-primary/5 hover:text-primary"
+                >
+                    @if (crumb.icon) {
+                        <mat-icon class="text-[16px]">
+                            {{ crumb.icon }}
+                        </mat-icon>
+                    }
+                    {{ crumb.label }}
+                </a>
+            }
+        }
+    </nav>
+}

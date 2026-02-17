@@ -32,4 +32,16 @@
     --color-info-bg: var(--info-bg-color);
 
     --shadow-color: var(--shadow-base-color);
+
+    --color-primary-dark: var(--primary-active-color);
+    --color-primary-light: var(--primary-hover-color);
+    --color-background-light: var(--bg-color);
+    --color-background-dark: #221a10;
+    --color-surface-light: var(--surface-color);
+    --color-surface-dark: #2d241b;
+    --color-text-light: var(--text-primary-color);
+    --color-text-dark: #f3eadd;
+
+    --font-display: 'Plus Jakarta Sans', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
 }

@@ -7,9 +7,13 @@ import {
     withState,
 } from '@ngrx/signals';
 import { UserAuth } from '../models/user.models';
-import { computed, inject } from '@angular/core';
+import { computed, inject, signal } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../environments/environment.development';
+import { toast } from 'ngx-sonner';
+import { firstValueFrom } from 'rxjs';
+import { AuthService } from './auth-service';
+import { Router } from '@angular/router';
 
 export interface AuthState {
     user: UserAuth | null;
@@ -29,64 +33,87 @@ export const AuthStore = signalStore(
     withState(initialState),
 
     withComputed(({ token, user }) => ({
-        isAuthenticated: computed(() => !!token()),
-        userRole: computed(() => user()?.role || 'VISITOR'),
+        isAuthenticated: signal(true),
+        userRole: computed(() => user()?.role || 'TOURIST'),
         userPhoto: computed(() => user()?.photo || 'assets/defaults/default-profile.png'),
     })),
 
-    withMethods((store, cookieService = inject(CookieService)) => ({
-        setLogin(token: string, user: UserAuth) {
-            patchState(store, { loading: true });
+    withMethods(
+        (
+            store,
+            cookieService = inject(CookieService),
+            authService = inject(AuthService),
+            router = inject(Router),
+        ) => ({
+            setLogin(token: string, user: UserAuth) {
+                patchState(store, { loading: true });
 
-            const expires = new Date();
-            expires.setMinutes(expires.getMinutes() + 15);
+                const expires = new Date();
+                expires.setMinutes(expires.getMinutes() + 15);
 
-            const isSecure = environment.secureCookie;
+                const isSecure = environment.secureCookie;
 
-            cookieService.set('auth_token', token, expires, '/', '', isSecure, 'Strict');
-            cookieService.set('user_data', JSON.stringify(user), 30, '/', '', isSecure, 'Strict');
-
-            patchState(store, {
-                token,
-                user,
-                loading: false,
-            });
-        },
-
-        setRefreshToken(newToken: string) {
-            const isSecure = environment.secureCookie;
-
-            const expires = new Date();
-            expires.setMinutes(expires.getMinutes() + 15);
-
-            cookieService.set('auth_token', newToken, expires, '/', '', isSecure, 'Strict');
-
-            const currentUser = store.user();
-            if (currentUser) {
+                cookieService.set('auth_token', token, expires, '/', '', isSecure, 'Strict');
                 cookieService.set(
                     'user_data',
-                    JSON.stringify(currentUser),
+                    JSON.stringify(user),
                     30,
                     '/',
                     '',
                     isSecure,
                     'Strict',
                 );
-            }
 
-            patchState(store, { token: newToken });
-        },
+                patchState(store, {
+                    token,
+                    user,
+                    loading: false,
+                });
+            },
 
-        logout() {
-            cookieService.delete('auth_token', '/');
-            cookieService.delete('user_data', '/');
-            patchState(store, initialState);
-        },
+            setRefreshToken(newToken: string) {
+                const isSecure = environment.secureCookie;
 
-        setLoading(value: boolean) {
-            patchState(store, { loading: value });
-        },
-    })),
+                const expires = new Date();
+                expires.setMinutes(expires.getMinutes() + 15);
+
+                cookieService.set('auth_token', newToken, expires, '/', '', isSecure, 'Strict');
+
+                const currentUser = store.user();
+                if (currentUser) {
+                    cookieService.set(
+                        'user_data',
+                        JSON.stringify(currentUser),
+                        30,
+                        '/',
+                        '',
+                        isSecure,
+                        'Strict',
+                    );
+                }
+
+                patchState(store, { token: newToken });
+            },
+
+            async logout() {
+                this.setLoading(true);
+                try {
+                    await firstValueFrom(authService.logout());
+                } catch (error) {
+                    toast.error('Server logout failed, cleaning local storage anyway.');
+                } finally {
+                    cookieService.delete('auth_token', '/');
+                    cookieService.delete('user_data', '/');
+                    patchState(store, initialState);
+                    router.navigate(['/login']);
+                }
+            },
+
+            setLoading(value: boolean) {
+                patchState(store, { loading: value });
+            },
+        }),
+    ),
 
     withHooks({
         onInit(store, cookieService = inject(CookieService)) {

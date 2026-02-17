@@ -1,0 +1,150 @@
+@if (mobileOpen()) {
+    <div
+        class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
+        (click)="closeMobile.emit()"
+    ></div>
+}
+
+<aside
+    class="fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-border bg-surface transition-all duration-300 lg:relative lg:z-auto"
+    [class.w-64]="isExpanded()"
+    [class.w-[72px]]="!isExpanded()"
+    [class.-translate-x-full]="!mobileOpen()"
+    [class.translate-x-0]="mobileOpen()"
+    [class.lg:translate-x-0]="true"
+>
+    <div
+        class="flex h-16 shrink-0 items-center px-4 border-b border-border"
+        [class.justify-center]="!isExpanded()"
+    >
+        <app-brand-logo [link]="pathHome()" [isExpanded]="isExpanded()" />
+    </div>
+
+    @if (isExpanded()) {
+        <div class="relative border-b border-border px-3 py-3">
+            <div class="relative">
+                <mat-icon
+                    class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[18px] text-text-disabled"
+                >
+                    search
+                </mat-icon>
+
+                <input
+                    type="text"
+                    placeholder="Search menu..."
+                    [value]="searchQuery()"
+                    (input)="onSearch($event)"
+                    class="w-full rounded-lg border border-border bg-main-bg py-2 pl-9 pr-8 text-sm text-text-primary placeholder:text-text-disabled focus:border-primary/50 focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all duration-200"
+                />
+
+                @if (searchQuery()) {
+                    <button
+                        (click)="clearSearch()"
+                        class="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-text-disabled hover:bg-primary/10 hover:text-primary transition-colors duration-150"
+                    >
+                        <mat-icon class="text-[14px]">close</mat-icon>
+                    </button>
+                }
+            </div>
+
+            @if (searchQuery() && searchResults().length > 0) {
+                <div
+                    class="absolute left-3 right-3 top-full z-10 mt-1 max-h-52 overflow-y-auto rounded-xl border border-border bg-surface shadow-elevated [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-text-disabled/30"
+                >
+                    <p
+                        class="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-text-disabled"
+                    >
+                        {{ searchResults().length }} result{{
+                            searchResults().length > 1 ? 's' : ''
+                        }}
+                    </p>
+
+                    @for (item of searchResults(); track item.path) {
+                        <a
+                            [routerLink]="item.path"
+                            (click)="onSearchNavigate()"
+                            class="flex items-center gap-3 px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-primary/5 hover:text-primary"
+                        >
+                            <mat-icon class="text-[18px] opacity-60">
+                                {{ item.icon }}
+                            </mat-icon>
+                            <span class="flex-1 truncate">{{ item.label }}</span>
+                        </a>
+                    }
+                </div>
+            }
+
+            @if (searchQuery() && searchResults().length === 0) {
+                <div
+                    class="absolute left-3 right-3 top-full z-10 mt-1 rounded-xl border border-border bg-surface px-4 py-6 text-center shadow-elevated"
+                >
+                    <mat-icon class="text-[32px] text-text-disabled"> search_off </mat-icon>
+                    <p class="mt-1 text-xs text-text-disabled">
+                        No results for "{{ searchQuery() }}"
+                    </p>
+                </div>
+            }
+        </div>
+    } @else {
+        <div class="flex justify-center border-b border-border py-3">
+            <button
+                (click)="toggleCollapse.emit()"
+                [matTooltip]="'Search menu'"
+                matTooltipPosition="right"
+                class="flex h-9 w-9 items-center justify-center rounded-lg text-text-disabled transition-colors hover:bg-primary/5 hover:text-primary"
+            >
+                <mat-icon class="text-[20px]">search</mat-icon>
+            </button>
+        </div>
+    }
+
+    <nav class="flex-1 overflow-y-auto {{ isExpanded() ? 'px-3' : 'px-1' }} py-6 custom-scrollbar">
+        @for (group of menuGroups(); track group.title; let first = $first) {
+            @if (isExpanded()) {
+                <p
+                    class="mb-2 px-4 text-[11px] font-bold uppercase tracking-[2px] text-text-disabled"
+                    [class.mt-6]="!first"
+                >
+                    {{ group.title }}
+                </p>
+            } @else if (!first) {
+                <div class="my-4 h-px bg-border mx-2"></div>
+            }
+
+            @for (item of group.items; track item.path) {
+                <a
+                    [routerLink]="item.path"
+                    routerLinkActive="!bg-primary/10 !text-primary !font-semibold [&>mat-icon]:!text-primary"
+                    [routerLinkActiveOptions]="{ exact: item.exact || false }"
+                    (click)="onNavigate()"
+                    matRipple
+                    [matTooltip]="isExpanded() ? '' : item.label"
+                    matTooltipPosition="right"
+                    class="group mb-1 flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-text-secondary transition-all hover:bg-primary/5 hover:text-primary"
+                    [class.justify-center]="!isExpanded()"
+                >
+                    <mat-icon class="text-[22px]">{{ item.icon }}</mat-icon>
+
+                    @if (isExpanded()) {
+                        <span class="truncate">{{ item.label }}</span>
+                    }
+                </a>
+            }
+        }
+    </nav>
+
+    <div class="p-3 border-t border-border">
+        <button
+            (click)="toggleCollapse.emit()"
+            class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-text-secondary hover:bg-primary/5 hover:text-primary transition-all"
+            [class.justify-center]="!isExpanded()"
+        >
+            <mat-icon class="transition-transform duration-300" [class.rotate-180]="collapsed()">
+                chevron_left
+            </mat-icon>
+            @if (isExpanded()) {
+                <span class="whitespace-nowrap overflow-hidden"> Collapse Menu </span>
+            }
+        </button>
+    </div>
+</aside>

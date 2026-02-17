@@ -1,0 +1,38 @@
+<header class="sticky top-0 z-40 w-full border-b border-border bg-surface/80 backdrop-blur-md">
+    <div class="flex h-16 items-center justify-between px-4 sm:px-6">
+        <div class="flex items-center gap-3">
+            <button
+                (click)="sidebarToggle.emit()"
+                matRipple
+                [matRippleColor]="'rgba(244, 157, 37, 0.08)'"
+                class="flex lg:hidden h-10 w-10 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-primary/5 hover:text-primary"
+                aria-label="Toggle sidebar"
+            >
+                <mat-icon class="text-[22px]">menu</mat-icon>
+            </button>
+            <app-brand-logo class="flex lg:hidden" [link]="navService.dashboardHome()" />
+        </div>
+
+        <div class="flex items-center gap-1 sm:gap-2">
+            <button
+                (click)="themeService.toggleTheme()"
+                matRipple
+                [matRippleColor]="'rgba(244, 157, 37, 0.08)'"
+                class="flex h-10 w-10 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-primary/5 hover:text-primary"
+                aria-label="Toggle theme"
+            >
+                <mat-icon class="text-[20px]">
+                    {{ themeService.isDark() ? 'light_mode' : 'dark_mode' }}
+                </mat-icon>
+            </button>
+
+            <div class="mx-1 hidden h-6 w-px bg-border sm:block"></div>
+
+            <app-user-dropdown [userMenuLinks]="userMenuLinks()" />
+        </div>
+    </div>
+</header>
+
+@if (showUserMenu()) {
+    <div class="fixed inset-0 z-30" (click)="closeAll()"></div>
+}
