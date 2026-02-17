@@ -2,10 +2,12 @@ import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Sidebar } from '../../shared/components/sidebar/sidebar';
 import { Breadcrumb } from '../../shared/components/breadcrumb/breadcrumb';
+import { MatIcon } from '@angular/material/icon';
+import { DashboardHeader } from '../../shared/components/dashboard-header/dashboard-header';
 
 @Component({
     selector: 'app-dashboard-layout',
-    imports: [RouterOutlet, Sidebar, Breadcrumb],
+    imports: [RouterOutlet, Sidebar, Breadcrumb, MatIcon, DashboardHeader],
     host: {
         class: 'block',
     },
@@ -19,17 +21,12 @@ import { Breadcrumb } from '../../shared/components/breadcrumb/breadcrumb';
                 (closeMobile)="sidebarMobileOpen.set(false)"
             />
 
-            <!-- Main Area -->
             <div
                 class="flex flex-1 flex-col overflow-hidden transition-all
                 duration-300"
             >
-                <!-- Header -->
-                <!-- <app-dashboard-header
-            (sidebarToggle)="toggleMobileSidebar()"
-        /> -->
+                <app-dashboard-header (sidebarToggle)="toggleMobileSidebar()" />
 
-                <!-- Content -->
                 <main class="flex-1 overflow-y-auto p-4 sm:p-6">
                     <app-breadcrumb />
                     <router-outlet />
@@ -45,5 +42,13 @@ export class DashboardLayout {
 
     toggleCollapse(): void {
         this.sidebarCollapsed.update((v) => !v);
+        if (this.sidebarMobileOpen()) {
+            this.sidebarCollapsed.set(false);
+            this.sidebarMobileOpen.set(false);
+        }
+    }
+
+    toggleMobileSidebar(): void {
+        this.sidebarMobileOpen.update((v) => !v);
     }
 }

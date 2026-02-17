@@ -86,4 +86,30 @@ export class NavigationService {
 
         return item.roles.includes(this.currentRole());
     }
+
+    readonly roleTextClass = computed(() => {
+        switch (this.currentRole()) {
+            case 'ADMIN':
+                return 'text-error';
+            case 'GUIDE':
+                return 'text-info';
+            case 'TOURIST':
+                return 'text-success';
+            default:
+                return 'text-primary';
+        }
+    });
+
+    readonly roleBadgeClass = computed(() => {
+        switch (this.currentRole()) {
+            case 'ADMIN':
+                return 'bg-error/10 text-error';
+            case 'GUIDE':
+                return 'bg-info/10 text-info';
+            case 'TOURIST':
+                return 'bg-success/10 text-success';
+            default:
+                return 'bg-primary/10 text-primary';
+        }
+    });
 }

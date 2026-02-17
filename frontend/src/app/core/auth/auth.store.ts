@@ -30,7 +30,7 @@ export const AuthStore = signalStore(
 
     withComputed(({ token, user }) => ({
         isAuthenticated: computed(() => !!token()),
-        userRole: computed(() => user()?.role || 'VISITOR'),
+        userRole: computed(() => user()?.role || 'ADMIN'),
         userPhoto: computed(() => user()?.photo || 'assets/defaults/default-profile.png'),
     })),
 

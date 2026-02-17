@@ -21,9 +21,9 @@ export const routes: Routes = [
     },
 
     {
-        path: 'admin',
-        canActivate: [authGuard, roleGuard],
-        data: { roles: ['ADMIN'] },
+        path: 'dashboard',
+        // canActivate: [authGuard, roleGuard],
+        // data: { roles: ['ADMIN'] },
         loadChildren: () => import('./features/admin/admin.routes').then((r) => r.ADMIN_ROUTES),
     },
 

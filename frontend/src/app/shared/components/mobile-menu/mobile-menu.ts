@@ -46,18 +46,7 @@ export class MobileMenu {
         return !!photo && !photo.includes('default-profile');
     });
 
-    readonly roleBadgeClass = computed(() => {
-        switch (this.navService.currentRole()) {
-            case 'ADMIN':
-                return 'bg-error/10 text-error';
-            case 'GUIDE':
-                return 'bg-info/10 text-info';
-            case 'TOURIST':
-                return 'bg-success/10 text-success';
-            default:
-                return 'bg-primary/10 text-primary';
-        }
-    });
+    readonly roleBadgeClass = this.navService.roleBadgeClass;
 
     onNavigate(): void {
         this.close.emit();
