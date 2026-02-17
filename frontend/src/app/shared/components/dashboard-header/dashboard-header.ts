@@ -5,13 +5,13 @@ import { AuthStore } from '../../../core/auth/auth.store';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { MatRipple } from '@angular/material/core';
-import { HasRole } from '../../directives';
 import { UserDropdown } from '../user-dropdown/user-dropdown';
 import { MenuItem } from '../../../core/models/navigation.models';
+import { BrandLogo } from '../brand-logo/brand-logo';
 
 @Component({
     selector: 'app-dashboard-header',
-    imports: [MatIcon, RouterLink, MatRipple, HasRole, UserDropdown],
+    imports: [MatIcon, MatRipple, UserDropdown, BrandLogo],
     templateUrl: './dashboard-header.html',
     styles: ``,
 })

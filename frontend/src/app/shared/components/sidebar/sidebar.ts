@@ -5,10 +5,11 @@ import { MatIcon } from '@angular/material/icon';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatRippleModule } from '@angular/material/core';
+import { BrandLogo } from '../brand-logo/brand-logo';
 
 @Component({
     selector: 'app-sidebar',
-    imports: [MatIcon, RouterLink, RouterLinkActive, MatTooltipModule, MatRippleModule],
+    imports: [MatIcon, RouterLink, RouterLinkActive, MatTooltipModule, MatRippleModule, BrandLogo],
     host: {
         class: 'block',
     },

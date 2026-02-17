@@ -6,14 +6,19 @@ import { MatIcon } from '@angular/material/icon';
 import { HasRole } from '../../directives';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatRipple } from '@angular/material/core';
+import { SignOutButton } from '../sign-out-button/sign-out-button';
 
 @Component({
     selector: 'app-user-dropdown',
-    imports: [MatIcon, HasRole, RouterLink, MatRipple, RouterLinkActive],
+    imports: [MatIcon, HasRole, RouterLink, MatRipple, RouterLinkActive, SignOutButton],
     templateUrl: './user-dropdown.html',
     styles: `
         .ring-active {
-            @apply ring-primary/30 !important;
+            --ring-color: color-mix(in srgb, var(--primary-color) 30%, transparent);
+            box-shadow:
+                0 0 0 2px var(--surface-color),
+                0 0 0 4px var(--ring-color),
+                0 0 10px color-mix(in srgb, var(--primary-color) 20%, transparent);
         }
     `,
 })

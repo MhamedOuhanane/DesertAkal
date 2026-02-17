@@ -87,10 +87,10 @@
 
                     @for (item of userMenuLinks(); track item.path) {
                         <a
-                            routerLink="/"
+                            [routerLink]="item.path"
                             (click)="close()"
                             routerLinkActive="!bg-primary/10 !text-primary"
-                            [routerLinkActiveOptions]="{ exact: true }"
+                            [routerLinkActiveOptions]="{ exact: false }"
                             class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary transition-all duration-200 hover:bg-primary/5 hover:text-primary active:scale-[0.98]"
                         >
                             <div
@@ -144,17 +144,7 @@
             </div>
 
             <div class="border-t border-border p-2">
-                <button
-                    (click)="logout()"
-                    class="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-error transition-all duration-200 hover:bg-error/5 active:scale-[0.98]"
-                >
-                    <div
-                        class="flex h-8 w-8 items-center justify-center rounded-lg bg-error/10 transition-colors group-hover:bg-error/15"
-                    >
-                        <mat-icon class="text-[18px] text-error"> logout </mat-icon>
-                    </div>
-                    <span>Sign Out</span>
-                </button>
+                <app-sign-out-button (onSignOut)="logout()" />
             </div>
         </div>
     }

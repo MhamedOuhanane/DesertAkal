@@ -5,10 +5,19 @@ import { NavigationService } from '../../../core/services/navigation-service';
 import { IsAuthenticated } from '../../directives';
 import { MobileMenu } from '../mobile-menu/mobile-menu';
 import { UserDropdown } from '../user-dropdown/user-dropdown';
+import { BrandLogo } from '../brand-logo/brand-logo';
 
 @Component({
     selector: 'app-public-header',
-    imports: [RouterLink, RouterLinkActive, ThemeToggle, IsAuthenticated, MobileMenu, UserDropdown],
+    imports: [
+        RouterLink,
+        RouterLinkActive,
+        ThemeToggle,
+        IsAuthenticated,
+        MobileMenu,
+        UserDropdown,
+        BrandLogo,
+    ],
     templateUrl: './public-header.html',
     styleUrl: './public-header.scss',
 })

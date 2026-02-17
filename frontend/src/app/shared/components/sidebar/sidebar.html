@@ -17,14 +17,7 @@
         class="flex h-16 shrink-0 items-center px-4 border-b border-border"
         [class.justify-center]="!isExpanded()"
     >
-        <a [routerLink]="pathHome()" class="flex items-center gap-2">
-            <mat-icon class="text-primary text-[32px] w-auto h-auto">terrain</mat-icon>
-            @if (isExpanded()) {
-                <span class="text-lg font-bold tracking-tight text-text-primary">
-                    Desert<span class="text-primary">Akal</span>
-                </span>
-            }
-        </a>
+        <app-brand-logo [link]="pathHome()" [isExpanded]="isExpanded()" />
     </div>
 
     @if (isExpanded()) {

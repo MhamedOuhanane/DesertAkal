@@ -96,7 +96,7 @@ export const NAV_CONFIG = {
                 {
                     label: 'Admin Dashboard',
                     icon: 'dashboard',
-                    path: '/dashboard/admin',
+                    path: '/dashboard',
                     roles: ['ADMIN'],
                     exact: true,
                 },
@@ -123,27 +123,27 @@ export const NAV_CONFIG = {
                 {
                     label: 'All Users',
                     icon: 'group',
-                    path: '/dashboard/admin/users',
+                    path: '/dashboard/users',
                     roles: ['ADMIN'],
                     badge: '24',
                 },
                 {
                     label: 'Tours Management',
                     icon: 'explore',
-                    path: '/dashboard/admin/tours',
+                    path: '/dashboard/tours',
                     roles: ['ADMIN'],
                 },
                 {
                     label: 'Bookings Overview',
                     icon: 'book_online',
-                    path: '/dashboard/admin/bookings',
+                    path: '/dashboard/bookings',
                     roles: ['ADMIN'],
                     badge: 'New',
                 },
                 {
                     label: 'Article Validation',
                     icon: 'fact_check',
-                    path: '/dashboard/admin/articles',
+                    path: '/dashboard/articles',
                     roles: ['ADMIN'],
                 },
             ],
@@ -197,7 +197,7 @@ export const NAV_CONFIG = {
                 {
                     label: 'System Payments',
                     icon: 'payments',
-                    path: '/dashboard/admin/payments',
+                    path: '/dashboard/payments',
                     roles: ['ADMIN'],
                 },
                 {

@@ -10,24 +10,7 @@
             >
                 <mat-icon class="text-[22px]">menu</mat-icon>
             </button>
-            <a [routerLink]="navService.dashboardHome()" class="flex items-center gap-2 lg:hidden">
-                <svg class="h-8 w-8 text-primary" viewBox="0 0 48 48" fill="none">
-                    <path
-                        d="M4 36c4-8 8-16 16-16s8 8 12 8 8-4 12-4v12H4V36z"
-                        fill="currentColor"
-                        opacity="0.2"
-                    />
-                    <circle cx="34" cy="14" r="6" fill="currentColor" />
-                    <path
-                        d="M2 40c6-12 10-20 18-20s10 10 14 10 8-6 12-6v16H2z"
-                        fill="currentColor"
-                        opacity="0.6"
-                    />
-                </svg>
-                <span class="text-lg font-bold text-text-primary">
-                    Desert<span class="text-primary">Akal</span>
-                </span>
-            </a>
+            <app-brand-logo class="flex lg:hidden" [link]="navService.dashboardHome()" />
         </div>
 
         <div class="flex items-center gap-1 sm:gap-2">
