@@ -5,10 +5,13 @@ import { AuthStore } from '../../../core/auth/auth.store';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { MatRipple } from '@angular/material/core';
+import { HasRole } from '../../directives';
+import { UserDropdown } from '../user-dropdown/user-dropdown';
+import { MenuItem } from '../../../core/models/navigation.models';
 
 @Component({
     selector: 'app-dashboard-header',
-    imports: [MatIcon, RouterLink, MatRipple],
+    imports: [MatIcon, RouterLink, MatRipple, HasRole, UserDropdown],
     templateUrl: './dashboard-header.html',
     styles: ``,
 })
@@ -21,12 +24,22 @@ export class DashboardHeader {
 
     readonly showUserMenu = signal(false);
 
+    readonly userMenuLinks = signal<MenuItem[]>([
+        {
+            label: 'My Profile',
+            path: this.navService.dashboardHome() + '/profile',
+            icon: 'person',
+            roles: ['ADMIN', 'GUIDE', 'TOURIST'],
+        },
+        {
+            label: 'Settings',
+            path: this.navService.dashboardHome() + '/settings',
+            icon: 'settings',
+            roles: ['ADMIN', 'GUIDE', 'TOURIST'],
+        },
+    ]);
+
     closeAll(): void {
         this.showUserMenu.set(false);
-    }
-
-    logout(): void {
-        this.closeAll();
-        this.authStore.logout();
     }
 }

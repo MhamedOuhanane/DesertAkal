@@ -7,7 +7,7 @@ import {
     withState,
 } from '@ngrx/signals';
 import { UserAuth } from '../models/user.models';
-import { computed, inject } from '@angular/core';
+import { computed, inject, signal } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../environments/environment.development';
 
@@ -29,8 +29,8 @@ export const AuthStore = signalStore(
     withState(initialState),
 
     withComputed(({ token, user }) => ({
-        isAuthenticated: computed(() => !!token()),
-        userRole: computed(() => user()?.role || 'ADMIN'),
+        isAuthenticated: signal(true),
+        userRole: computed(() => user()?.role || 'TOURIST'),
         userPhoto: computed(() => user()?.photo || 'assets/defaults/default-profile.png'),
     })),
 

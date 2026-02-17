@@ -2,12 +2,11 @@ import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Sidebar } from '../../shared/components/sidebar/sidebar';
 import { Breadcrumb } from '../../shared/components/breadcrumb/breadcrumb';
-import { MatIcon } from '@angular/material/icon';
 import { DashboardHeader } from '../../shared/components/dashboard-header/dashboard-header';
 
 @Component({
     selector: 'app-dashboard-layout',
-    imports: [RouterOutlet, Sidebar, Breadcrumb, MatIcon, DashboardHeader],
+    imports: [RouterOutlet, Sidebar, Breadcrumb, DashboardHeader],
     host: {
         class: 'block',
     },

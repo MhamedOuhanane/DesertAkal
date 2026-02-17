@@ -1,0 +1,165 @@
+<div class="relative">
+    <button
+        (click)="toggle()"
+        matRipple
+        [matRippleColor]="'rgba(244, 157, 37, 0.08)'"
+        class="flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-primary/5"
+    >
+        <div
+            class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full text-sm font-bold ring-2 ring-transparent transition-all"
+            [class]="roleBadgeClass()"
+            [class.ring-active]="isOpen()"
+        >
+            @if (hasCustomPhoto()) {
+                <img
+                    [src]="authStore.userPhoto()"
+                    alt="avatar"
+                    class="h-full w-full object-cover"
+                />
+            } @else {
+                {{ userInitials() }}
+            }
+        </div>
+
+        <div class="hidden text-left sm:block">
+            <p class="text-sm font-semibold text-text-primary">
+                {{ userName() }}
+            </p>
+            <p class="text-[10px] font-bold uppercase tracking-wide" [class]="roleTextClass()">
+                {{ navService.currentRole() }}
+            </p>
+        </div>
+
+        <mat-icon
+            class="hidden text-[18px] text-text-disabled transition-transform duration-200 sm:block"
+            [class.rotate-180]="isOpen()"
+        >
+            expand_more
+        </mat-icon>
+    </button>
+
+    @if (isOpen()) {
+        <div
+            class="absolute right-0 top-14 w-64 animate-scale-in rounded-2xl border border-border bg-surface shadow-elevated"
+        >
+            <div class="border-b border-border p-4">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full text-sm font-bold"
+                        [class]="roleBadgeClass()"
+                    >
+                        @if (hasCustomPhoto()) {
+                            <img
+                                [src]="authStore.userPhoto()"
+                                alt="avatar"
+                                class="h-full w-full object-cover"
+                            />
+                        } @else {
+                            {{ userInitials() }}
+                        }
+                    </div>
+
+                    <div class="min-w-0 flex-1">
+                        <p class="truncate text-sm font-bold text-text-primary">
+                            {{ userName() }}
+                        </p>
+                        <p class="truncate text-xs text-text-disabled">
+                            {{ authStore.user()?.username }}
+                        </p>
+                    </div>
+
+                    <span
+                        class="shrink-0 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide"
+                        [class]="roleBadgeClass()"
+                    >
+                        {{ navService.currentRole() }}
+                    </span>
+                </div>
+            </div>
+
+            @if (userMenuLinks().length > 0) {
+                <div class="p-2">
+                    <p
+                        class="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest text-text-disabled"
+                    >
+                        Account
+                    </p>
+
+                    @for (item of userMenuLinks(); track item.path) {
+                        <a
+                            routerLink="/"
+                            (click)="close()"
+                            routerLinkActive="!bg-primary/10 !text-primary"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary transition-all duration-200 hover:bg-primary/5 hover:text-primary active:scale-[0.98]"
+                        >
+                            <div
+                                class="flex h-8 w-8 items-center justify-center rounded-lg bg-main-bg transition-colors group-hover:bg-primary/10"
+                            >
+                                <mat-icon class="text-[18px]">
+                                    {{ item.icon }}
+                                </mat-icon>
+                            </div>
+                            <span>{{ item.label }}</span>
+                        </a>
+                    }
+                </div>
+            }
+
+            <div class="border-t border-border p-2">
+                <a
+                    [routerLink]="navService.dashboardHome()"
+                    (click)="close()"
+                    class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary transition-all duration-200 hover:bg-primary/5 hover:text-primary active:scale-[0.98]"
+                >
+                    <div
+                        class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/15"
+                    >
+                        <mat-icon class="text-[18px] text-primary"> dashboard </mat-icon>
+                    </div>
+                    <span>Dashboard</span>
+                    <mat-icon
+                        class="ml-auto text-[16px] text-text-disabled transition-transform group-hover:translate-x-0.5"
+                    >
+                        arrow_forward
+                    </mat-icon>
+                </a>
+            </div>
+
+            <div *appHasRole="['GUIDE', 'TOURIST']" class="border-t border-border p-2">
+                <a
+                    routerLink="/"
+                    (click)="close()"
+                    routerLinkActive="!bg-primary/10 !text-primary"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary transition-all duration-200 hover:bg-primary/5 hover:text-primary active:scale-[0.98]"
+                >
+                    <div
+                        class="flex h-8 w-8 items-center justify-center rounded-lg bg-main-bg transition-colors group-hover:bg-primary/10"
+                    >
+                        <mat-icon class="text-[18px]">open_in_new</mat-icon>
+                    </div>
+                    <span>Back to Site</span>
+                </a>
+            </div>
+
+            <div class="border-t border-border p-2">
+                <button
+                    (click)="logout()"
+                    class="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-error transition-all duration-200 hover:bg-error/5 active:scale-[0.98]"
+                >
+                    <div
+                        class="flex h-8 w-8 items-center justify-center rounded-lg bg-error/10 transition-colors group-hover:bg-error/15"
+                    >
+                        <mat-icon class="text-[18px] text-error"> logout </mat-icon>
+                    </div>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@if (isOpen()) {
+    <div class="fixed inset-0 z-[-1]" (click)="close()"></div>
+}
