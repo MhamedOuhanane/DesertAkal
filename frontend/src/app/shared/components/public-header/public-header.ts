@@ -1,12 +1,13 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ThemeToggle } from '../theme-toggle/theme-toggle';
 import { NavigationService } from '../../../core/services/navigation-service';
 import { IsAuthenticated } from '../../directives';
+import { MobileMenu } from '../mobile-menu/mobile-menu';
 
 @Component({
     selector: 'app-public-header',
-    imports: [RouterLink, RouterLinkActive, ThemeToggle, IsAuthenticated],
+    imports: [RouterLink, RouterLinkActive, ThemeToggle, IsAuthenticated, MobileMenu],
     templateUrl: './public-header.html',
     styleUrl: './public-header.scss',
 })
@@ -15,7 +16,18 @@ export class PublicHeader {
 
     mobileMenuOpen = signal(false);
 
-    readonly navLinks = this.navService.filteredPublicLinks;
+    readonly navLinks = this.navService.filteredPublicLinks();
+
+    constructor() {
+        effect(() => {
+            if (this.mobileMenuOpen()) {
+                document.body.style.overflow = 'hidden';
+                document.body.style.paddingRight = '0px';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        });
+    }
 
     toggleMobileMenu(): void {
         this.mobileMenuOpen.update((v) => !v);

@@ -35,7 +35,16 @@ export class Breadcrumb {
     ): BreadcrumbItem[] {
         const children = route.children;
 
+        console.log(route);
+
+        if (!route.children || route.children.length === 0) {
+            return crumbs;
+        }
+
         for (const child of children) {
+            if (!child?.snapshot) {
+                continue;
+            }
             const segments = child.snapshot.url.map((s) => s.path);
 
             if (segments.length > 0) {
@@ -43,16 +52,22 @@ export class Breadcrumb {
             }
 
             const data = child.snapshot.data;
-            if (data['breadcrumb']) {
-                crumbs.push({
-                    label: data['breadcrumb'],
-                    path: url === '' ? '/dashboard' : url,
-                    icon: data['breadcrumbIcon'] ?? undefined,
-                });
+            if (data && data['breadcrumb']) {
+                const crumbPath = url || '/dashboard';
+
+                const alreadyExists = crumbs.some((c) => c.path === crumbPath);
+                if (!alreadyExists) {
+                    crumbs.push({
+                        label: data['breadcrumb'],
+                        path: url,
+                        icon: data['breadcrumbIcon'] ?? undefined,
+                    });
+                }
             }
 
             return this.buildBreadcrumbs(child, url, crumbs);
         }
+        console.log(crumbs);
 
         return crumbs;
     }
