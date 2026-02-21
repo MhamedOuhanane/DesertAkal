@@ -1,4 +1,4 @@
-package com.desertakal.desertakal.service.impl;
+package com.desertakal.desertakal.service.interfaces;
 
 import com.desertakal.desertakal.model.dto.reservation.ReservationCreateDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationFindDTO;
@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public interface ReservationService {
-    ReservationFindDTO create(@NonNull ReservationCreateDTO dto);
-    ReservationFindDTO create(@NonNull UUID reservationUuid, @NonNull ReservationUpdateDTO dto);
+    ReservationFindDTO create(@NonNull ReservationCreateDTO dto, @NonNull UUID touristUuid);
+    ReservationFindDTO update(@NonNull UUID reservationUuid, @NonNull ReservationUpdateDTO dto);
     void cancel(@NonNull UUID reservationUuid);
     ReservationFindDTO get(@NonNull UUID reservationUuid);
     PaginationDTO getAll(String tour, String guide, String tourist, ReservationStatus status, LocalDateTime date, @NonNull Pageable pageable);
