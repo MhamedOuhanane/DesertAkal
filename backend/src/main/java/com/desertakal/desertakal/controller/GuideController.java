@@ -54,7 +54,7 @@ public class GuideController {
     }
 
     @GetMapping("/{uuid}")
-    @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true)")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull GuideFindDTO>> show(
             @NonNull @PathVariable UUID uuid,
             @NonNull HttpServletRequest request
@@ -77,7 +77,7 @@ public class GuideController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> shows(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String language,

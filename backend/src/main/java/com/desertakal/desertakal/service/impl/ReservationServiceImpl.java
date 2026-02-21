@@ -38,6 +38,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final TourRepository tourRepository;
 
     @Override
+    @Transactional
     public ReservationFindDTO create(@NonNull ReservationCreateDTO dto, @NonNull UUID touristUuid) {
         log.info("Starting reservation creation process for Tourist: {} on Tour: {}", touristUuid, dto.getTourUuid());
 
@@ -65,9 +66,11 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setTourist(tourist);
         reservation.setTour(tour);
         reservation.setGuide(guide);
+        reservation.setPdfUrl("jijijinjhhhhhhhhhhhhhhhhhhhhhhhhhh");
+        reservation.setQrCode("jijijinjhhhhhhhhhhhhhhhhhhhhhhhhhh");
 
         try {
-            Reservation newReservation = repository.save(reservation);
+            Reservation newReservation = repository.saveAndFlush(reservation);
             log.info("Reservation successfully created with UUID: {} for Tourist: {}", newReservation.getUuid(), touristUuid);
             return mapper.toFindDto(newReservation);
         } catch (Exception e) {
