@@ -1,6 +1,6 @@
 package com.desertakal.desertakal.service.impl;
 
-import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
+import com.desertakal.desertakal.exception.custom.*;
 import com.desertakal.desertakal.model.dto.reservation.ReservationCreateDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationFindDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationUpdateDTO;
@@ -45,6 +45,15 @@ public class ReservationServiceImpl implements ReservationService {
     public ReservationFindDTO create(@NonNull ReservationCreateDTO dto, @NonNull UUID touristUuid) {
         log.info("Starting reservation creation process for Tourist: {} on Tour: {}", touristUuid, dto.getTourUuid());
 
+        LocalDateTime minimumAllowedDate = LocalDateTime.now().plusWeeks(1);
+
+        if (dto.getStartDate().isBefore(minimumAllowedDate)) {
+            log.warn("Creation rejected: Start date {} is too close. Minimum 7 days lead time required.", dto.getStartDate());
+            throw new BadRequestException(
+                    "Reservations must be made at least one week in advance to allow for preparation."
+            );
+        }
+
         Tourist tourist = touristRepository.findByUuid(touristUuid)
                 .orElseThrow(() -> {
                     log.error("Creation failed: Tourist with UUID {} not found", touristUuid);
@@ -58,7 +67,9 @@ public class ReservationServiceImpl implements ReservationService {
 
         if (hasActiveReservation) {
             log.warn("Creation rejected: Tourist {} already has a pending or confirmed reservation", touristUuid);
-            throw new IllegalStateException("You already have an active reservation. You cannot create a new one until the current one is completed or cancelled.");
+            throw new BusinessRuleException(
+                    "You already have an active reservation (Pending or Confirmed). You cannot create a new one until the current one is completed or cancelled."
+            );
         }
 
         Guide guide = guideRepository.findByUuid(dto.getGuideUuid())
@@ -81,7 +92,9 @@ public class ReservationServiceImpl implements ReservationService {
 
         if (!isGuideAvailable) {
             log.warn("Assignment failed: Guide {} is busy during requested dates", dto.getGuideUuid());
-            throw new IllegalStateException("The selected guide is already assigned to another tour or has a pending request during this period.");
+            throw new GuideNotAvailableException(
+                    String.format("Guide %s is already assigned to another tour or has a pending request during this period", guide.getFullName())
+            );
         }
 
 
@@ -106,8 +119,69 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional
     public ReservationFindDTO update(@NonNull UUID reservationUuid, @NonNull ReservationUpdateDTO dto) {
-        return null;
+        log.info("Starting update for Reservation UUID: {}", reservationUuid);
+
+        Reservation reservation = repository.findByUuid(reservationUuid)
+                .orElseThrow(() -> {
+                    log.error("Update failed: Reservation {} not found", reservationUuid);
+                    return new ResourceNotFoundException("Reservation", "identifier", reservationUuid.toString());
+                });
+
+        if (!reservation.getStatus().equals(ReservationStatus.PENDING)) {
+            log.warn("Update rejected: Reservation {} is in status {}", reservationUuid, reservation.getStatus());
+            throw new ReservationStatusException("update", reservation.getStatus());
+        }
+
+        if (reservation.getStartDate().isBefore(LocalDateTime.now().plusDays(3))) {
+            log.warn("Update rejected: Current start date {} is within 3-day limit", reservation.getStartDate());
+            throw new BusinessRuleException("Cannot update reservation: The tour starts in less than 3 days.");
+        }
+
+        if (dto.getStartDate() != null && dto.getStartDate().isBefore(LocalDateTime.now().plusDays(3))) {
+            log.warn("Update rejected: New start date {} is too close to current date", dto.getStartDate());
+            throw new BadRequestException("The new start date must be at least 3 days from today.");
+        }
+
+        Guide guide = reservation.getGuide();
+        boolean isNewGuide = dto.getGuideUuid() != null && !dto.getGuideUuid().equals(guide.getUuid());
+        boolean isNewStartDate = dto.getStartDate() != null && !dto.getStartDate().equals(reservation.getStartDate());
+
+        if (isNewGuide || isNewStartDate) {
+            if (isNewGuide) {
+                log.debug("Switching guide from {} to {}", guide.getUuid(), dto.getGuideUuid());
+                guide = guideRepository.findByUuid(dto.getGuideUuid())
+                        .orElseThrow(() -> new ResourceNotFoundException("Guide", "identifier", dto.getGuideUuid().toString()));
+            }
+
+            LocalDateTime targetStartDate = isNewStartDate ? dto.getStartDate() : reservation.getStartDate();
+
+            boolean isGuideAvailable = guideRepository.isGuideAvailable(
+                    guide,
+                    targetStartDate,
+                    targetStartDate.plusDays(reservation.getTour().getDurationDays())
+            );
+
+            if (!isGuideAvailable) {
+                log.error("Update failed: Guide {} not available for period {} to {}",
+                        guide.getUuid(), targetStartDate, targetStartDate.plusDays(reservation.getTour().getDurationDays()));
+                throw new GuideNotAvailableException(
+                        String.format("Guide %s is already assigned or has a pending request during this period", guide.getFullName())
+                );
+            }
+        }
+
+        mapper.updateEntityFromDto(dto, reservation);
+        reservation.setGuide(guide);
+
+        if (isNewStartDate) {
+            reservation.setEndDate(dto.getStartDate().plusDays(reservation.getTour().getDurationDays()));
+        }
+
+        log.info("Reservation {} successfully updated and saved", reservationUuid);
+
+        return mapper.toFindDto(reservation);
     }
 
     @Override

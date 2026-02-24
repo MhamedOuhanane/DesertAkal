@@ -40,7 +40,7 @@ public interface GuideRepository extends JpaRepository<@NonNull Guide, @NonNull 
 
     @Query("""
         select COUNT(r) = 0 from Reservation r
-            where r.guide.uuid = :guide
+            where r.guide = :guide
                 and r.status in (
                         com.desertakal.desertakal.model.enums.ReservationStatus.CONFIRMED,
                         com.desertakal.desertakal.model.enums.ReservationStatus.PENDING
