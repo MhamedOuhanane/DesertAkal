@@ -37,4 +37,20 @@ public interface GuideRepository extends JpaRepository<@NonNull Guide, @NonNull 
             @Param("endDate") LocalDateTime endDate,
             @Param("language") String language
     );
+
+    @Query("""
+        select COUNT(r) = 0 from Reservation r
+            where r.guide.uuid = :guide
+                and r.status in (
+                        com.desertakal.desertakal.model.enums.ReservationStatus.CONFIRMED,
+                        com.desertakal.desertakal.model.enums.ReservationStatus.PENDING
+                    )
+                        and r.startDate < :endDate
+                            and r.endDate > :startDate
+    """)
+    boolean isGuideAvailable(
+            @Param("guide") Guide guide,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 }
