@@ -120,7 +120,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional
-    public ReservationFindDTO update(@NonNull UUID reservationUuid, @NonNull ReservationUpdateDTO dto) {
+    public ReservationFindDTO update(@NonNull UUID reservationUuid, @NonNull ReservationUpdateDTO dto, @NonNull UUID currentUserUuid) {
         log.info("Starting update for Reservation UUID: {}", reservationUuid);
 
         Reservation reservation = repository.findByUuid(reservationUuid)
@@ -128,6 +128,12 @@ public class ReservationServiceImpl implements ReservationService {
                     log.error("Update failed: Reservation {} not found", reservationUuid);
                     return new ResourceNotFoundException("Reservation", "identifier", reservationUuid.toString());
                 });
+
+        if (!reservation.getTourist().getUuid().equals(currentUserUuid)) {
+            log.error("Security violation: User {} tried to update reservation belonging to user {}",
+                    currentUserUuid, reservation.getTourist().getUuid());
+            throw new UnauthorizedActionException("You are not the owner of this reservation.");
+        }
 
         if (!reservation.getStatus().equals(ReservationStatus.PENDING)) {
             log.warn("Update rejected: Reservation {} is in status {}", reservationUuid, reservation.getStatus());
@@ -144,42 +150,45 @@ public class ReservationServiceImpl implements ReservationService {
             throw new BadRequestException("The new start date must be at least 3 days from today.");
         }
 
-        Guide guide = reservation.getGuide();
-        boolean isNewGuide = dto.getGuideUuid() != null && !dto.getGuideUuid().equals(guide.getUuid());
+        Guide oldGuide = reservation.getGuide();
+        Guide currentGuide = oldGuide;
+        boolean isNewGuide = dto.getGuideUuid() != null && !dto.getGuideUuid().equals(oldGuide.getUuid());
         boolean isNewStartDate = dto.getStartDate() != null && !dto.getStartDate().equals(reservation.getStartDate());
 
         if (isNewGuide || isNewStartDate) {
             if (isNewGuide) {
-                log.debug("Switching guide from {} to {}", guide.getUuid(), dto.getGuideUuid());
-                guide = guideRepository.findByUuid(dto.getGuideUuid())
+                currentGuide = guideRepository.findByUuid(dto.getGuideUuid())
                         .orElseThrow(() -> new ResourceNotFoundException("Guide", "identifier", dto.getGuideUuid().toString()));
             }
 
             LocalDateTime targetStartDate = isNewStartDate ? dto.getStartDate() : reservation.getStartDate();
 
             boolean isGuideAvailable = guideRepository.isGuideAvailable(
-                    guide,
+                    currentGuide,
                     targetStartDate,
                     targetStartDate.plusDays(reservation.getTour().getDurationDays())
             );
 
             if (!isGuideAvailable) {
                 log.error("Update failed: Guide {} not available for period {} to {}",
-                        guide.getUuid(), targetStartDate, targetStartDate.plusDays(reservation.getTour().getDurationDays()));
+                        currentGuide.getUuid(), targetStartDate, targetStartDate.plusDays(reservation.getTour().getDurationDays()));
                 throw new GuideNotAvailableException(
-                        String.format("Guide %s is already assigned or has a pending request during this period", guide.getFullName())
+                        String.format("Guide %s is already assigned or has a pending request during this period", currentGuide.getFullName())
                 );
             }
         }
 
         mapper.updateEntityFromDto(dto, reservation);
-        reservation.setGuide(guide);
+        reservation.setGuide(currentGuide);
 
         if (isNewStartDate) {
             reservation.setEndDate(dto.getStartDate().plusDays(reservation.getTour().getDurationDays()));
         }
 
-        log.info("Reservation {} successfully updated and saved", reservationUuid);
+        repository.save(reservation);
+        log.info("Reservation {} successfully updated", reservationUuid);
+
+        sendUpdateNotifications(reservation, oldGuide, currentGuide, isNewGuide, isNewStartDate);
 
         return mapper.toFindDto(reservation);
     }
@@ -223,5 +232,24 @@ public class ReservationServiceImpl implements ReservationService {
         String guideMessage = String.format("A new tour '%s' has been assigned to you by %s.",
                 tour.getTitle(), tourist.getFullName());
         notificationService.create("New Tour Assigned", guideMessage, guide.getUuid());
+    }
+
+    private void sendUpdateNotifications(Reservation res, Guide oldG, Guide newG, boolean isNewG, boolean isNewD) {
+        Tourist tourist = res.getTourist();
+        Tour tour = res.getTour();
+
+        String touristMsg = String.format("Your reservation for '%s' has been updated successfully.", tour.getTitle());
+        notificationService.create("Reservation Updated", touristMsg, tourist.getUuid());
+
+        if (isNewG) {
+            String oldGMsg = String.format("The tour '%s' (Date: %s) is no longer assigned to you.", tour.getTitle(), res.getStartDate());
+            notificationService.create("Assignment Cancelled", oldGMsg, oldG.getUuid());
+
+            String newGMsg = String.format("A new tour '%s' has been assigned to you for %s.", tour.getTitle(), res.getStartDate());
+            notificationService.create("New Tour Assigned", newGMsg, newG.getUuid());
+        } else if (isNewD) {
+            String dateMsg = String.format("The schedule for tour '%s' has been changed to %s.", tour.getTitle(), res.getStartDate());
+            notificationService.create("Schedule Changed", dateMsg, newG.getUuid());
+        }
     }
 }

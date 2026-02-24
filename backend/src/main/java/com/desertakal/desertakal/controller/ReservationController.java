@@ -3,6 +3,7 @@ package com.desertakal.desertakal.controller;
 import com.desertakal.desertakal.Security.user.CustomUserDetails;
 import com.desertakal.desertakal.model.dto.reservation.ReservationCreateDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationFindDTO;
+import com.desertakal.desertakal.model.dto.reservation.ReservationUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.service.interfaces.ReservationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,12 +15,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/reservations")
@@ -55,5 +54,31 @@ public class ReservationController {
                 currentUser.getUuid(), result.getUuid());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PatchMapping("/{uuid}")
+    @PreAuthorize("hasRole('TOURIST')")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull ReservationFindDTO>> update(
+            @PathVariable UUID uuid,
+            @Valid @RequestBody ReservationUpdateDTO dto,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to update Reservation: {} | Path: {}",
+                uuid, request.getServletPath());
+
+        ReservationFindDTO result = service.update(uuid, dto);
+
+        var response = StandardResponseDTO.<ReservationFindDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Reservation updated successfully")
+                .status(HttpStatus.CREATED.value())
+                .data(result)
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Reservation updated successfully for Tourist: {} | Reservation UUID: {}",
+                result.getTourUuid(), result.getUuid());
+
+        return ResponseEntity.status(200).body(response);
     }
 }

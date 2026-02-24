@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public interface ReservationService {
     ReservationFindDTO create(@NonNull ReservationCreateDTO dto, @NonNull UUID touristUuid);
-    ReservationFindDTO update(@NonNull UUID reservationUuid, @NonNull ReservationUpdateDTO dto);
+    ReservationFindDTO update(@NonNull UUID reservationUuid, @NonNull ReservationUpdateDTO dto, @NonNull UUID currentUserUuid);
     void cancel(@NonNull UUID reservationUuid);
     ReservationFindDTO get(@NonNull UUID reservationUuid);
     PaginationDTO getAll(String tour, String guide, String tourist, ReservationStatus status, LocalDateTime date, @NonNull Pageable pageable);
