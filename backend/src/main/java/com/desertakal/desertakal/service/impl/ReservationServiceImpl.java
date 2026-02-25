@@ -308,7 +308,19 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public PaginationDTO getByTourist(@NonNull UUID touristUuid, String tour, String guide, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, @NonNull Pageable pageable) {
-        return null;
+        Specification<@NonNull Reservation> spec = getToursSpecification(touristUuid, null, tour, guide, null, status, startDate, endDate);
+
+        Page<@NonNull Reservation> reservationPages = repository.findAll(spec, pageable);
+
+        return PaginationDTO.builder()
+                .content(mapper.toDtos(reservationPages.getContent()))
+                .page(reservationPages.getNumber())
+                .size(reservationPages.getSize())
+                .totalElements(reservationPages.getTotalElements())
+                .totalPages(reservationPages.getTotalPages())
+                .isFirst(reservationPages.isFirst())
+                .isLast(reservationPages.isLast())
+                .build();
     }
 
     @Override
