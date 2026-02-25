@@ -7,6 +7,8 @@ import com.desertakal.desertakal.model.dto.tourist.TouristDTO;
 import com.desertakal.desertakal.model.dto.tourist.TouristUpdateDTO;
 import com.desertakal.desertakal.model.dto.user.UserFindDTO;
 import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
+import com.desertakal.desertakal.model.enums.ReservationStatus;
+import com.desertakal.desertakal.service.interfaces.ReservationService;
 import com.desertakal.desertakal.service.interfaces.TourService;
 import com.desertakal.desertakal.service.interfaces.TouristService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,9 +16,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +37,7 @@ import java.util.UUID;
 public class TouristController {
     private final TouristService service;
     private final TourService tourService;
+    private final ReservationService reservationService;
 
     @GetMapping("/{uuid}")
     @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true)")
@@ -146,6 +152,35 @@ public class TouristController {
 
         log.info("Successfully returned {} tours for Tourist UUID: {} [Status: 200]",
                 result.getTotalElements(), uuid);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{uuid}/reservations")
+    @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, false)")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> getReservations(
+            @PathVariable UUID uuid,
+            @RequestParam(required = false) String tour,
+            @RequestParam(required = false) String guide,
+            @RequestParam(required = false) ReservationStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            @ParameterObject Pageable pageable,
+            @NonNull HttpServletRequest request
+    ) {
+        log.info("Fetching personal reservations for user: {} | Path: {}", uuid, request.getServletPath());
+
+        PaginationDTO result = reservationService.getByTourist(uuid, tour, guide, status, startDate, endDate, pageable);
+
+        var response = StandardResponseDTO.<PaginationDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Your reservations have been retrieved successfully")
+                .status(HttpStatus.OK.value())
+                .path(request.getServletPath())
+                .data(result)
+                .build();
+
+        log.info("Successfully dispatched {} reservations to owner: {}", result.getTotalElements(), uuid);
 
         return ResponseEntity.ok(response);
     }
