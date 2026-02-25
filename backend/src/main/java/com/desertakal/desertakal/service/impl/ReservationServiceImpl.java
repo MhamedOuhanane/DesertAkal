@@ -361,8 +361,26 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional
     public void delete(@NonNull UUID reservationUuid) {
+        log.info("Initiating deletion attempt for Reservation: {}", reservationUuid);
 
+        Reservation reservation = repository.findByUuid(reservationUuid)
+                .orElseThrow(() -> {
+                    log.error("Delete failed: Reservation {} not found", reservationUuid);
+                    return new ResourceNotFoundException("Reservation", "identifier", reservationUuid.toString());
+                });
+
+        ReservationStatus status = reservation.getStatus();
+
+        if (status.equals(ReservationStatus.CONFIRMED) || status.equals(ReservationStatus.COMPLETED)) {
+            log.warn("Forbidden Action: Attempted to delete a {} reservation: {}", status, reservationUuid);
+            throw new BusinessRuleException(String.format("Cannot delete a reservation that is already %s.", status.name().toLowerCase()));
+        }
+
+        repository.delete(reservation);
+
+        log.info("Reservation {} successfully deleted (Original Status: {})", reservationUuid, status);
     }
 
     private void sendReservationNotifications(Tour tour, Tourist tourist, Guide guide) {

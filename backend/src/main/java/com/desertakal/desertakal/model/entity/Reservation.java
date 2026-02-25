@@ -79,7 +79,7 @@ public class Reservation {
     private Tourist tourist;
 
     @Builder.Default
-    @OneToMany(mappedBy = "reservation", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "reservation", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Payment> payments = new ArrayList<>();
 
     @PrePersist
