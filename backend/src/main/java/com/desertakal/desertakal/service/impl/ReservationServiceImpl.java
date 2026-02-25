@@ -307,10 +307,20 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public PaginationDTO getByTourist(@NonNull UUID touristUuid, String tour, String guide, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, @NonNull Pageable pageable) {
+    public PaginationDTO getByTourist(@NonNull UUID touristUuid, String tour, String guide, ReservationStatus status,
+                                      LocalDateTime startDate, LocalDateTime endDate, @NonNull Pageable pageable) {
+        log.info("Fetching reservations for Tourist: {} | Filters -> Tour: {}, Guide: {}, Status: {}",
+                touristUuid, tour, guide, status);
+
         Specification<@NonNull Reservation> spec = getToursSpecification(touristUuid, null, tour, guide, null, status, startDate, endDate);
 
+        log.debug("Executing paginated query for Tourist reservations. Page: {}, Size: {}",
+                pageable.getPageNumber(), pageable.getPageSize());
+
         Page<@NonNull Reservation> reservationPages = repository.findAll(spec, pageable);
+
+        log.info("Successfully retrieved {} reservations for Tourist: {}",
+                reservationPages.getTotalElements(), touristUuid);
 
         return PaginationDTO.builder()
                 .content(mapper.toDtos(reservationPages.getContent()))
@@ -324,8 +334,30 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public PaginationDTO getByGuide(@NonNull UUID guideUuid, String tour, String tourist, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, @NonNull Pageable pageable) {
-        return null;
+    public PaginationDTO getByGuide(@NonNull UUID guideUuid, String tour, String tourist, ReservationStatus status,
+                                    LocalDateTime startDate, LocalDateTime endDate, @NonNull Pageable pageable) {
+        log.info("Fetching assigned tours for Guide: {} | Filters -> Tour: {}, Tourist: {}, Status: {}",
+                guideUuid, tour, tourist, status);
+
+        Specification<@NonNull Reservation> spec = getToursSpecification(null, guideUuid, tour, null, tourist, status, startDate, endDate);
+
+        log.debug("Executing paginated query for Guide assignments. Page: {}, Size: {}",
+                pageable.getPageNumber(), pageable.getPageSize());
+
+        Page<@NonNull Reservation> reservationPages = repository.findAll(spec, pageable);
+
+        log.info("Successfully retrieved {} assignments for Guide: {}",
+                reservationPages.getTotalElements(), guideUuid);
+
+        return PaginationDTO.builder()
+                .content(mapper.toDtos(reservationPages.getContent()))
+                .page(reservationPages.getNumber())
+                .size(reservationPages.getSize())
+                .totalElements(reservationPages.getTotalElements())
+                .totalPages(reservationPages.getTotalPages())
+                .isFirst(reservationPages.isFirst())
+                .isLast(reservationPages.isLast())
+                .build();
     }
 
     @Override
