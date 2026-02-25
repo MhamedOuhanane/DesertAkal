@@ -251,7 +251,18 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public ReservationFindDTO get(@NonNull UUID reservationUuid) {
-        return null;
+        log.info("Fetching details for Reservation UUID: {}", reservationUuid);
+
+        Reservation reservation = repository.findByUuid(reservationUuid)
+                .orElseThrow(() -> {
+                    log.error("Fetch failed: Reservation not found with UUID: {}", reservationUuid);
+                    return new ResourceNotFoundException("Reservation", "identifier", reservationUuid.toString());
+                });
+
+        log.debug("Reservation found: Status={}, Tourist={}",
+                reservation.getStatus(), reservation.getTourist().getUuid());
+
+        return mapper.toFindDto(reservation);
     }
 
     @Override
