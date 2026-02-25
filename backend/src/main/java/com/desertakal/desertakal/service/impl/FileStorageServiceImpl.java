@@ -56,7 +56,8 @@ public class FileStorageServiceImpl implements FileStorageService {
         }
     }
 
-    public String uploadBytes(byte[] data, String objectName, String contentType) {
+    @Override
+    public String uploadBytes(byte[] data, @NonNull String objectName, @NonNull String contentType) {
         try {
             ensureBucketExists();
             minioClient.putObject(
