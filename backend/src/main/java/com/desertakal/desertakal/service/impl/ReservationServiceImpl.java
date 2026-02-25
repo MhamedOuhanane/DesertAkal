@@ -11,15 +11,22 @@ import com.desertakal.desertakal.model.mapper.ReservationMapper;
 import com.desertakal.desertakal.repository.*;
 import com.desertakal.desertakal.service.interfaces.NotificationService;
 import com.desertakal.desertakal.service.interfaces.ReservationService;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -276,17 +283,36 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public PaginationDTO getAll(String tour, String guide, String tourist, ReservationStatus status, LocalDateTime date, @NonNull Pageable pageable) {
+    public PaginationDTO getAll(String tour, String guide, String tourist, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, @NonNull Pageable pageable) {
+        log.info("REST Request to fetch all Reservations with filters | Tour: {}, Status: {}, Period: [{} to {}] | Page: {}, Size: {}",
+                tour, status, startDate, endDate, pageable.getPageNumber(), pageable.getPageSize());
+
+        Specification<@NonNull Reservation> spec = getToursSpecification(null, null, tour, guide, tourist, status, startDate, endDate);
+
+        log.debug("Executing paginated database query for Reservations...");
+        Page<@NonNull Reservation> reservationPages = repository.findAll(spec, pageable);
+
+        log.info("Fetch completed: Found total of {} reservations | Returning page {} of {}",
+                reservationPages.getTotalElements(), reservationPages.getNumber(), reservationPages.getTotalPages());
+
+        return PaginationDTO.builder()
+                .content(mapper.toDtos(reservationPages.getContent()))
+                .page(reservationPages.getNumber())
+                .size(reservationPages.getSize())
+                .totalElements(reservationPages.getTotalElements())
+                .totalPages(reservationPages.getTotalPages())
+                .isFirst(reservationPages.isFirst())
+                .isLast(reservationPages.isLast())
+                .build();
+    }
+
+    @Override
+    public PaginationDTO getByTourist(@NonNull UUID touristUuid, String tour, String guide, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, @NonNull Pageable pageable) {
         return null;
     }
 
     @Override
-    public PaginationDTO getByTourist(@NonNull UUID touristUuid, String tour, String guide, ReservationStatus status, LocalDateTime date, @NonNull Pageable pageable) {
-        return null;
-    }
-
-    @Override
-    public PaginationDTO getByGuide(@NonNull UUID guideUuid, String tour, String tourist, ReservationStatus status, LocalDateTime date, @NonNull Pageable pageable) {
+    public PaginationDTO getByGuide(@NonNull UUID guideUuid, String tour, String tourist, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, @NonNull Pageable pageable) {
         return null;
     }
 
@@ -342,5 +368,78 @@ public class ReservationServiceImpl implements ReservationService {
         notificationService.create(guideSubject, guideMsg, guide.getUuid());
 
         log.debug("Cancellation notifications dispatched to Tourist: {} and Guide: {}", tourist.getUuid(), guide.getUuid());
+    }
+
+    private Specification<@NonNull Reservation> getToursSpecification(
+            UUID touristUuid, UUID guideUuid,
+            String tour, String guide, String tourist,
+            ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate) {
+        return  (root, query, cb) -> {
+            query.distinct(true);
+
+            log.debug("Building dynamic Specification for Reservation search with parameters: [tour: {}, guide: {}, tourist: {}, status: {}, startDate: {}, startDate: {}]",
+                    tour, guide, tourist, status, startDate, endDate);
+
+            List<Predicate> predicates = new ArrayList<>();
+
+            Join<Reservation, Tour> tourJoin = root.join("tour");
+            Join<Reservation, Guide> guideJoin = root.join("guide");
+            Join<Reservation, Tourist> touristJoin = root.join("tourist");
+
+            if (touristUuid != null) {
+                predicates.add(cb.equal(tourJoin.get("uuid"), touristUuid));
+                log.debug("Filter applied: tourist.uuid = '{}'", touristUuid);
+            }
+
+            if (guideUuid != null) {
+                predicates.add(cb.equal(guideJoin.get("uuid"), guideUuid));
+                log.debug("Filter applied: guide.uuid = '{}'", guideUuid);
+            }
+
+            if (tour != null && !tour.isBlank()) {
+                predicates.add(cb.like(cb.lower(tourJoin.get("title")), "%" + tour.toLowerCase() + "%"));
+                log.debug("Filter added: title LIKE '%{}%'", tour);
+            }
+
+            if (guide != null && !guide.isBlank()) {
+                String pattern = "%" + guide.toLowerCase() + "%";
+                Expression<String> guideFullName = cb.concat(cb.concat(cb.lower(guideJoin.get("firstName")), " "), cb.lower(guideJoin.get("lastName")));
+                predicates.add(cb.like(guideFullName, pattern));
+                log.debug("Filter applied: guide full name matching '{}'", guide);
+            }
+
+            if (tourist != null && !tourist.isBlank()) {
+                String pattern = "%" + tourist.toLowerCase() + "%";
+                Expression<String> guideFullName = cb.concat(cb.concat(cb.lower(touristJoin.get("firstName")), " "), cb.lower(touristJoin.get("lastName")));
+                predicates.add(cb.like(guideFullName, pattern));
+                log.debug("Filter applied: tourist full name matching '{}'", tourist);
+            }
+
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+                log.debug("Filter added: status equal '%{}%'", status);
+            }
+
+            if (startDate != null) {
+                LocalDateTime startOfDay = startDate.toLocalDate().atStartOfDay();
+                LocalDateTime endOfDay = startDate.toLocalDate().atTime(23, 59, 59);
+
+                predicates.add(cb.between(root.get("startDate"), startOfDay, endOfDay));
+
+                log.debug("Filter applied: startDate BETWEEN '{}' AND '{}'", startOfDay, endOfDay);
+            }
+
+            if (endDate != null) {
+                LocalDateTime startOfDay = endDate.toLocalDate().atStartOfDay();
+                LocalDateTime endOfDay = endDate.toLocalDate().atTime(23, 59, 59);
+
+                predicates.add(cb.between(root.get("endDate"), startOfDay, endOfDay));
+
+                log.debug("Filter applied: endDate BETWEEN '{}' AND '{}'", startOfDay, endOfDay);
+            }
+
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
     }
 }
