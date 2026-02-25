@@ -65,3 +65,5 @@ databaseChangeLog:
       file: db/changelog/032_update_column_duration_days_table_tours.xml
   - include:
       file: db/changelog/033_add_column_end_date_table_reservation.xml
+  - include:
+      file: db/changelog/034_update_column_update_at name_table_payments.xml

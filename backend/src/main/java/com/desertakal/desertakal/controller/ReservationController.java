@@ -174,4 +174,27 @@ public class ReservationController {
 
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@org.jspecify.annotations.NonNull StandardResponseDTO<Void>> delete(
+            @PathVariable UUID uuid,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to DELETE Reservation with UUID: {} [Requested by Path: {}]",
+                uuid, request.getServletPath());
+
+        service.delete(uuid);
+
+        var response = StandardResponseDTO.<Void>builder()
+                .timestamp(LocalDateTime.now())
+                .status(200)
+                .message("Reservation has been successfully deleted")
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Successfully deleted Reservation with UUID: {} [Status: 200 OK]", uuid);
+
+        return ResponseEntity.ok(response);
+    }
 }

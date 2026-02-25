@@ -444,12 +444,12 @@ public class ReservationServiceImpl implements ReservationService {
 
             List<Predicate> predicates = new ArrayList<>();
 
-            Join<Reservation, Tour> tourJoin = root.join("tour");
-            Join<Reservation, Guide> guideJoin = root.join("guide");
-            Join<Reservation, Tourist> touristJoin = root.join("tourist");
+            Join<Reservation, Tour> tourJoin = root.join("tour", JoinType.LEFT);
+            Join<Reservation, Guide> guideJoin = root.join("guide", JoinType.LEFT);
+            Join<Reservation, Tourist> touristJoin = root.join("tourist", JoinType.LEFT);
 
             if (touristUuid != null) {
-                predicates.add(cb.equal(tourJoin.get("uuid"), touristUuid));
+                predicates.add(cb.equal(touristJoin.get("uuid"), touristUuid));
                 log.debug("Filter applied: tourist.uuid = '{}'", touristUuid);
             }
 
