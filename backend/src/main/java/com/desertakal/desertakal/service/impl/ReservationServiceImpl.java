@@ -45,15 +45,6 @@ public class ReservationServiceImpl implements ReservationService {
     public ReservationFindDTO create(@NonNull ReservationCreateDTO dto, @NonNull UUID touristUuid) {
         log.info("Starting reservation creation process for Tourist: {} on Tour: {}", touristUuid, dto.getTourUuid());
 
-        LocalDateTime minimumAllowedDate = LocalDateTime.now().plusWeeks(1);
-
-        if (dto.getStartDate().isBefore(minimumAllowedDate)) {
-            log.warn("Creation rejected: Start date {} is too close. Minimum 7 days lead time required.", dto.getStartDate());
-            throw new BadRequestException(
-                    "Reservations must be made at least one week in advance to allow for preparation."
-            );
-        }
-
         Tourist tourist = touristRepository.findByUuid(touristUuid)
                 .orElseThrow(() -> {
                     log.error("Creation failed: Tourist with UUID {} not found", touristUuid);
@@ -69,6 +60,15 @@ public class ReservationServiceImpl implements ReservationService {
             log.warn("Creation rejected: Tourist {} already has a pending or confirmed reservation", touristUuid);
             throw new BusinessRuleException(
                     "You already have an active reservation (Pending or Confirmed). You cannot create a new one until the current one is completed or cancelled."
+            );
+        }
+
+        LocalDateTime minimumAllowedDate = LocalDateTime.now().plusWeeks(1);
+
+        if (dto.getStartDate().isBefore(minimumAllowedDate)) {
+            log.warn("Creation rejected: Start date {} is too close. Minimum 7 days lead time required.", dto.getStartDate());
+            throw new BadRequestException(
+                    "Reservations must be made at least one week in advance to allow for preparation."
             );
         }
 
@@ -140,20 +140,31 @@ public class ReservationServiceImpl implements ReservationService {
             throw new ReservationStatusException("update", reservation.getStatus());
         }
 
+        boolean isNewStartDate = dto.getStartDate() != null && !dto.getStartDate().equals(reservation.getStartDate());
+        boolean isNewGuide = dto.getGuideUuid() != null && !dto.getGuideUuid().equals(reservation.getGuide().getUuid());
+
+        if (isNewStartDate) {
+            if (dto.getStartDate().isBefore(reservation.getStartDate())) {
+                log.warn("Update rejected: New start date {} is before current start date {}",
+                        dto.getStartDate(), reservation.getStartDate());
+                throw new BusinessRuleException("You can only postpone your tour. The new start date must be after the original start date.");
+            }
+
+            if (dto.getStartDate().isBefore(LocalDateTime.now().plusDays(3))) {
+                log.warn("Update rejected: New start date {} is too close to current date", dto.getStartDate());
+                throw new BadRequestException("The new start date must be at least 3 days from today.");
+            }
+        }
+
+
         if (reservation.getStartDate().isBefore(LocalDateTime.now().plusDays(3))) {
             log.warn("Update rejected: Current start date {} is within 3-day limit", reservation.getStartDate());
             throw new BusinessRuleException("Cannot update reservation: The tour starts in less than 3 days.");
         }
 
-        if (dto.getStartDate() != null && dto.getStartDate().isBefore(LocalDateTime.now().plusDays(3))) {
-            log.warn("Update rejected: New start date {} is too close to current date", dto.getStartDate());
-            throw new BadRequestException("The new start date must be at least 3 days from today.");
-        }
 
         Guide oldGuide = reservation.getGuide();
         Guide currentGuide = oldGuide;
-        boolean isNewGuide = dto.getGuideUuid() != null && !dto.getGuideUuid().equals(oldGuide.getUuid());
-        boolean isNewStartDate = dto.getStartDate() != null && !dto.getStartDate().equals(reservation.getStartDate());
 
         if (isNewGuide || isNewStartDate) {
             if (isNewGuide) {

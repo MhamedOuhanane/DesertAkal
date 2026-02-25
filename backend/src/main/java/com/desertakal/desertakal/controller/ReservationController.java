@@ -61,12 +61,13 @@ public class ReservationController {
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull ReservationFindDTO>> update(
             @PathVariable UUID uuid,
             @Valid @RequestBody ReservationUpdateDTO dto,
+            @AuthenticationPrincipal CustomUserDetails currentUser,
             HttpServletRequest request
     ) {
-        log.info("REST request to update Reservation: {} | Path: {}",
-                uuid, request.getServletPath());
+        log.info("REST request to update Reservation: {} | User: {} | Path: {}",
+                uuid, currentUser.getUuid(), request.getServletPath());
 
-        ReservationFindDTO result = service.update(uuid, dto);
+        ReservationFindDTO result = service.update(uuid, dto, currentUser.getUuid());
 
         var response = StandardResponseDTO.<ReservationFindDTO>builder()
                 .timestamp(LocalDateTime.now())

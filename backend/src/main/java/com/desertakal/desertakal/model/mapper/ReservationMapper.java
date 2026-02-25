@@ -29,7 +29,14 @@ public abstract class ReservationMapper {
     @Mapping(source = "guide.photo", target = "guidePhoto", qualifiedByName = "toPhotoUrl")
     public abstract ReservationDTO toDto(Reservation reservation);
 
-    @InheritConfiguration(name = "toDto")
+    @Mapping(source = "tour.uuid", target = "tourUuid")
+    @Mapping(source = "tour.title", target = "tourTitle")
+    @Mapping(source = "guide.uuid", target = "guideUuid")
+    @Mapping(expression = "java(reservation.getGuide() != null ? reservation.getGuide().getFullName() : null)", target = "guideName")
+    @Mapping(source = "tourist.uuid", target = "touristUuid")
+    @Mapping(expression = "java(reservation.getTourist().getFullName())", target = "touristName")
+    @Mapping(source = "tourist.photo", target = "touristPhoto", qualifiedByName = "toPhotoUrl")
+    @Mapping(source = "guide.photo", target = "guidePhoto", qualifiedByName = "toPhotoUrl")
     public abstract ReservationFindDTO toFindDto(Reservation reservation);
 
     @Mapping(target = "id", ignore = true)
