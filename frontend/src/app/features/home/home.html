@@ -1,0 +1,50 @@
+<div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <!-- ====== Hero ====== -->
+    <div class="text-center">
+        <span class="badge badge-primary mb-4 inline-flex"> #1 Desert Experience in Morocco </span>
+        <h1 class="text-4xl font-bold tracking-tight text-text-primary sm:text-5xl lg:text-6xl">
+            Discover the Magic of the
+            <span class="text-gradient"> Sahara</span>
+        </h1>
+        <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-text-secondary">
+            From sunset camel treks to luxury camps under the stars, DesertAkal brings you authentic
+            experiences tailored to your adventurous spirit.
+        </p>
+        <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <button class="btn-primary rounded-xl px-8 py-3 text-base">Explore Tours</button>
+            <button class="btn-outline rounded-xl px-8 py-3 text-base">Learn More</button>
+        </div>
+    </div>
+
+    <!-- ====== Features Cards ====== -->
+    <div class="mt-24 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        @for (card of cards; track card.title) {
+            <div class="card hover-lift p-6">
+                <div
+                    class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-2xl"
+                >
+                    {{ card.icon }}
+                </div>
+                <h3 class="text-lg font-bold text-text-primary">
+                    {{ card.title }}
+                </h3>
+                <p class="mt-2 text-sm leading-relaxed text-text-secondary">
+                    {{ card.description }}
+                </p>
+                <div class="mt-4">
+                    <span class="badge badge-primary">{{ card.badge }}</span>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- ====== Stats ====== -->
+    <div class="mt-24 grid grid-cols-2 gap-6 rounded-2xl bg-surface p-8 shadow-sm lg:grid-cols-4">
+        @for (stat of stats; track stat.label) {
+            <div class="text-center">
+                <p class="text-3xl font-bold text-primary">{{ stat.value }}</p>
+                <p class="mt-1 text-sm text-text-secondary">{{ stat.label }}</p>
+            </div>
+        }
+    </div>
+</div>

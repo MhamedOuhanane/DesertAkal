@@ -18,7 +18,15 @@ export class ThemeService {
         effect(() => {
             const dark = this.isDark();
             if (isPlatformBrowser(this.platformId)) {
-                document.documentElement.classList.toggle('dark-mode', dark);
+                const root = document.documentElement;
+                if (dark) {
+                    root.classList.add('dark');
+                    root.classList.add('dark-mode');
+                } else {
+                    root.classList.remove('dark');
+                    root.classList.remove('dark-mode');
+                }
+
                 localStorage.setItem('is-dark', String(dark));
             }
         });

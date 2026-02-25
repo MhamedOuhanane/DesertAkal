@@ -1,19 +1,20 @@
+export type UserRole = 'ADMIN' | 'GUIDE' | 'TOURIST' | 'VISITOR';
 export interface UserAuth {
     uuid: string;
     username: string;
     fullName: string;
-    photo: string;
-    role: 'ADMIN' | 'GUIDE' | 'TOURIST' | 'VISITOR';
+    photo?: string;
+    role: UserRole;
 }
 
 export interface User {
     uuid: string;
     firstName: string;
     lastName: string;
-    photo: string;
+    photo?: string;
     username: string;
     email: string;
-    role: 'ADMIN' | 'GUIDE' | 'TOURIST' | 'VISITOR';
+    role: UserRole;
 }
 
 export interface UserDetails extends User {
