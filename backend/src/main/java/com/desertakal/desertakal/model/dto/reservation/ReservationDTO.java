@@ -16,6 +16,7 @@ public class ReservationDTO {
     private UUID uuid;
     private LocalDateTime date;
     private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private Integer numberPeople;
     private BigDecimal amount;
     private ReservationStatus status;
@@ -23,6 +24,7 @@ public class ReservationDTO {
     private String tourTitle;
     private UUID guideUuid;
     private String guideName;
+    private String guidePhoto;
     private UUID touristUuid;
     private String touristName;
     private String touristPhoto;

@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "reservations")
+@Table(name = "reservations", indexes = {
+        @Index(name = "idx_reservation_availability", columnList = "start_date, end_date, status")
+})
 @Getter
 @Setter
 @Builder
@@ -35,6 +37,9 @@ public class Reservation {
 
     @Column(name = "start_date", nullable = false)
     private LocalDateTime startDate;
+
+    @Column(name = "end_date", nullable = false)
+    private LocalDateTime endDate;
 
     @Column(name = "number_people", nullable = false)
     private Integer numberPeople;
@@ -74,12 +79,15 @@ public class Reservation {
     private Tourist tourist;
 
     @Builder.Default
-    @OneToMany(mappedBy = "reservation", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "reservation", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Payment> payments = new ArrayList<>();
 
     @PrePersist
     public void prePersist(){
         if (uuid == null)
             uuid = UUID.randomUUID();
+
+        if (startDate != null && tour != null && tour.getDurationDays() != null)
+            endDate = startDate.plusDays(tour.getDurationDays());
     }
 }

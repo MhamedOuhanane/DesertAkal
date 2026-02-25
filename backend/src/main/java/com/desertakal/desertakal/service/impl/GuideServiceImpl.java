@@ -4,12 +4,14 @@ import com.desertakal.desertakal.exception.custom.BadRequestException;
 import com.desertakal.desertakal.exception.custom.DuplicateResourceException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.guide.GuideCreateDTO;
+import com.desertakal.desertakal.model.dto.guide.GuideDTO;
 import com.desertakal.desertakal.model.dto.guide.GuideFindDTO;
 import com.desertakal.desertakal.model.dto.guide.GuideUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.entity.Guide;
 import com.desertakal.desertakal.model.entity.Language;
 import com.desertakal.desertakal.model.entity.Role;
+import com.desertakal.desertakal.model.entity.Tour;
 import com.desertakal.desertakal.model.mapper.GuideMapper;
 import com.desertakal.desertakal.repository.GuideRepository;
 import com.desertakal.desertakal.repository.LanguageRepository;
@@ -184,5 +186,18 @@ public class GuideServiceImpl implements GuideService {
         log.info("Guide with UUID: {} successfully updated", guideUuid);
 
         return mapper.toFindDto(guide);
+    }
+
+    @Override
+    public List<GuideDTO> findTop5() {
+        log.debug("Fetching Top 5 highest rated guides");
+
+        List<Guide> toursTop5 = repository.findTop5ByOrderByRatingDesc();
+
+        if (toursTop5.isEmpty()) {
+            log.warn("No guide found for Top 5 list");
+        }
+
+        return mapper.toDtos(toursTop5);
     }
 }

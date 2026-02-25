@@ -48,7 +48,7 @@ public class TourController {
 
         var response = StandardResponseDTO.<TourFindDTO>builder()
                 .timestamp(LocalDateTime.now())
-                .message("Tour account has been created successfully.")
+                .message("Tour has been created successfully.")
                 .status(201)
                 .data(result)
                 .path(request.getServletPath())

@@ -5,25 +5,39 @@ import com.desertakal.desertakal.model.dto.reservation.ReservationDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationFindDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationUpdateDTO;
 import com.desertakal.desertakal.model.entity.Reservation;
+import com.desertakal.desertakal.model.enums.FileType;
+import com.desertakal.desertakal.service.interfaces.FileStorageService;
 import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface ReservationMapper {
+public abstract class ReservationMapper {
+
+    @Autowired
+    protected FileStorageService fileStorageService;
 
     @Named("toDto")
     @Mapping(source = "tour.uuid", target = "tourUuid")
     @Mapping(source = "tour.title", target = "tourTitle")
     @Mapping(source = "guide.uuid", target = "guideUuid")
-    @Mapping(expression = "java(reservation.getGuide() != null ? reservation.getGuide().getFirstName() + \" \" + reservation.getGuide().getLastName() : null)", target = "guideName")
+    @Mapping(expression = "java(reservation.getGuide() != null ? reservation.getGuide().getFullName() : null)", target = "guideName")
     @Mapping(source = "tourist.uuid", target = "touristUuid")
-    @Mapping(expression = "java(reservation.getTourist().getFirstName() + \" \" + reservation.getTourist().getLastName())", target = "touristName")
-    @Mapping(source = "tourist.photo", target = "touristPhoto")
-    ReservationDTO toDto(Reservation reservation);
+    @Mapping(expression = "java(reservation.getTourist().getFullName())", target = "touristName")
+    @Mapping(source = "tourist.photo", target = "touristPhoto", qualifiedByName = "toPhotoUrl")
+    @Mapping(source = "guide.photo", target = "guidePhoto", qualifiedByName = "toPhotoUrl")
+    public abstract ReservationDTO toDto(Reservation reservation);
 
-    @InheritConfiguration(name = "toDto")
-    ReservationFindDTO toFindDto(Reservation reservation);
+    @Mapping(source = "tour.uuid", target = "tourUuid")
+    @Mapping(source = "tour.title", target = "tourTitle")
+    @Mapping(source = "guide.uuid", target = "guideUuid")
+    @Mapping(expression = "java(reservation.getGuide() != null ? reservation.getGuide().getFullName() : null)", target = "guideName")
+    @Mapping(source = "tourist.uuid", target = "touristUuid")
+    @Mapping(expression = "java(reservation.getTourist().getFullName())", target = "touristName")
+    @Mapping(source = "tourist.photo", target = "touristPhoto", qualifiedByName = "toPhotoUrl")
+    @Mapping(source = "guide.photo", target = "guidePhoto", qualifiedByName = "toPhotoUrl")
+    public abstract ReservationFindDTO toFindDto(Reservation reservation);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uuid", ignore = true)
@@ -37,12 +51,17 @@ public interface ReservationMapper {
     @Mapping(target = "guide", ignore = true)
     @Mapping(target = "tourist", ignore = true)
     @Mapping(target = "payments", ignore = true)
-    Reservation toEntity(ReservationCreateDTO dto);
+    public abstract Reservation toEntity(ReservationCreateDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @InheritConfiguration(name = "toEntity")
-    void updateEntityFromDto(ReservationUpdateDTO dto, @MappingTarget Reservation reservation);
+    public abstract void updateEntityFromDto(ReservationUpdateDTO dto, @MappingTarget Reservation reservation);
 
     @IterableMapping(qualifiedByName = "toDto")
-    List<ReservationDTO> toDtos(List<Reservation> reservations);
+    public abstract List<ReservationDTO> toDtos(List<Reservation> reservations);
+
+    @Named("toPhotoUrl")
+    protected String toPhotoUrl(String photo) {
+        return fileStorageService.getPublicUrl(photo, FileType.PROFILE);
+    }
 }
