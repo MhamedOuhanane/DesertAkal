@@ -202,7 +202,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional
-    public void cancel(@NonNull UUID reservationUuid, @NonNull UUID currentUserUuid) {
+    public void cancel(@NonNull UUID reservationUuid, @NonNull UUID currentUserUuid, boolean isAdmin) {
         log.info("Starting cancellation process for Reservation: {} by User: {}", reservationUuid, currentUserUuid);
 
         Reservation reservation = repository.findByUuid(reservationUuid)
@@ -211,13 +211,6 @@ public class ReservationServiceImpl implements ReservationService {
                     return new ResourceNotFoundException("Reservation", "identifier", reservationUuid.toString());
                 });
 
-        User user = touristRepository.findByUuid(currentUserUuid)
-                .orElseThrow(() -> {
-                    log.error("Cancellation failed: User not found with UUID: {}", currentUserUuid);
-                    return new ResourceNotFoundException("User", "identifier", currentUserUuid.toString());
-                });
-
-        boolean isAdmin = user.getRole().getName().equals("ADMIN");
         boolean isOwner = reservation.getTourist().getUuid().equals(currentUserUuid);
 
         if (!isOwner && !isAdmin) {
@@ -250,6 +243,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         reservation.setStatus(ReservationStatus.CANCELLED);
+        repository.save(reservation);
 
         log.info("Reservation {} successfully cancelled by {}", reservationUuid, isAdmin ? "ADMIN" : "OWNER");
         sendCancellationNotifications(reservation, isAdmin);

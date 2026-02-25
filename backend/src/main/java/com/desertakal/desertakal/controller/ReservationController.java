@@ -18,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -81,5 +82,32 @@ public class ReservationController {
                 result.getTourUuid(), result.getUuid());
 
         return ResponseEntity.status(200).body(response);
+    }
+
+    @PatchMapping("/{uuid}/cancel")
+    @PreAuthorize("hasAnyRole('TOURIST', 'ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<Void>> cancel(
+            @PathVariable UUID uuid,
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to cancel Reservation: {} | Requested by: {} | Path: {}",
+                uuid, currentUser.getUuid(), request.getServletPath());
+
+        boolean isAdmin = currentUser.getAuthorities().stream()
+                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN"));
+
+        service.cancel(uuid, currentUser.getUuid(), isAdmin);
+
+        var response = StandardResponseDTO.<Void>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Reservation has been cancelled successfully")
+                .status(HttpStatus.OK.value())
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Reservation {} cancelled successfully", uuid);
+
+        return ResponseEntity.ok(response);
     }
 }
