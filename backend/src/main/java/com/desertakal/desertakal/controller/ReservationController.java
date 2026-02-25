@@ -4,13 +4,18 @@ import com.desertakal.desertakal.Security.user.CustomUserDetails;
 import com.desertakal.desertakal.model.dto.reservation.ReservationCreateDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationFindDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationUpdateDTO;
+import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
+import com.desertakal.desertakal.model.enums.ReservationStatus;
 import com.desertakal.desertakal.service.interfaces.ReservationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -113,7 +118,7 @@ public class ReservationController {
 
     @GetMapping("/{uuid}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<@NonNull StandardResponseDTO<ReservationFindDTO>> shows(
+    public ResponseEntity<@NonNull StandardResponseDTO<ReservationFindDTO>> show(
             @PathVariable UUID uuid,
             @AuthenticationPrincipal CustomUserDetails currentUser,
             HttpServletRequest request
@@ -135,6 +140,37 @@ public class ReservationController {
                 .build();
 
         log.info("Successfully dispatched details for Reservation: {} to User: {}", uuid, currentUser.getUuid());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<PaginationDTO>> shows(
+            @RequestParam(required = false) String tour,
+            @RequestParam(required = false) String guide,
+            @RequestParam(required = false) String tourist,
+            @RequestParam(required = false) ReservationStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            @ParameterObject Pageable pageable,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to fetch all reservations | Filters -> Tour: {}, Guide: {}, Tourist: {}, Status: {} | Path: {}",
+                tour, guide, tourist, status, request.getServletPath());
+
+        PaginationDTO result = service.getAll(tour, guide, tourist, status, startDate, endDate, pageable);
+
+        var response = StandardResponseDTO.<PaginationDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Reservations retrieved successfully")
+                .status(HttpStatus.OK.value())
+                .data(result)
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Successfully returned {} reservations for page {}",
+                result.getTotalElements(), pageable.getPageNumber());
 
         return ResponseEntity.ok(response);
     }
