@@ -110,4 +110,32 @@ public class ReservationController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{uuid}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<@NonNull StandardResponseDTO<ReservationFindDTO>> shows(
+            @PathVariable UUID uuid,
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to fetch Reservation details: {} | Requested by: {} | Path: {}",
+                uuid, currentUser.getUuid(), request.getServletPath());
+
+        boolean isAdmin = currentUser.getAuthorities().stream()
+                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN"));
+
+        ReservationFindDTO result = service.get(uuid, currentUser.getUuid(), isAdmin);
+
+        var response = StandardResponseDTO.<ReservationFindDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Reservation details retrieved successfully")
+                .status(HttpStatus.OK.value())
+                .data(result)
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Successfully dispatched details for Reservation: {} to User: {}", uuid, currentUser.getUuid());
+
+        return ResponseEntity.ok(response);
+    }
 }

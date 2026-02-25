@@ -250,7 +250,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public ReservationFindDTO get(@NonNull UUID reservationUuid) {
+    public ReservationFindDTO get(@NonNull UUID reservationUuid, @NonNull UUID currentUserUuid, boolean isAdmin) {
         log.info("Fetching details for Reservation UUID: {}", reservationUuid);
 
         Reservation reservation = repository.findByUuid(reservationUuid)
@@ -258,6 +258,16 @@ public class ReservationServiceImpl implements ReservationService {
                     log.error("Fetch failed: Reservation not found with UUID: {}", reservationUuid);
                     return new ResourceNotFoundException("Reservation", "identifier", reservationUuid.toString());
                 });
+
+        boolean isOwner = reservation.getTourist().getUuid().equals(currentUserUuid);
+        boolean isAssignedGuide = reservation.getGuide() != null &&
+                reservation.getGuide().getUuid().equals(currentUserUuid);
+
+        if (!isOwner && !isAssignedGuide && !isAdmin) {
+            log.error("Security Violation: Unauthorized fetch attempt for Reservation {} by User {}",
+                    reservationUuid, currentUserUuid);
+            throw new UnauthorizedActionException("Access denied: You are not authorized to view this reservation.");
+        }
 
         log.debug("Reservation found: Status={}, Tourist={}",
                 reservation.getStatus(), reservation.getTourist().getUuid());
