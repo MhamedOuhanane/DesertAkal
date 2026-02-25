@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.UUID;
 
 @Service
@@ -73,6 +74,22 @@ public class FileStorageServiceImpl implements FileStorageService {
         } catch (Exception e) {
             log.error("Failed to upload generated document: {}", e.getMessage());
             throw new FileUploadException("Error saving generated file: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public byte[] downloadFile(@NonNull String filePath) {
+        log.info("Attempting to download file from MinIO: {}", filePath);
+        try (InputStream stream = minioClient.getObject(
+                GetObjectArgs.builder()
+                        .bucket(bucketName)
+                        .object(filePath)
+                        .build())) {
+
+            return stream.readAllBytes();
+        } catch (Exception e) {
+            log.error("Error downloading file from MinIO path {}: {}", filePath, e.getMessage());
+            return null;
         }
     }
 

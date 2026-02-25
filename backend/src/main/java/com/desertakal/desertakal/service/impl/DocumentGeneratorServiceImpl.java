@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.service.impl;
 
+import com.desertakal.desertakal.exception.custom.DocumentGenerationException;
 import com.desertakal.desertakal.model.dto.reservation.ReservationFindDTO;
 import com.desertakal.desertakal.repository.ReservationRepository;
 import com.desertakal.desertakal.service.interfaces.DocumentGeneratorService;
@@ -51,39 +52,67 @@ public class DocumentGeneratorServiceImpl implements DocumentGeneratorService {
 
     @Override
     public byte[] generateReservationPdf(@NonNull ReservationFindDTO dto, byte[] qrCodeImage) {
-        log.info("Generating PDF for Booking: {}", dto.getUuid());
+        log.info("Generating PDF Voucher for Reservation: {}", dto.getUuid());
+
         try (PDDocument document = new PDDocument();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             PDPage page = new PDPage(PDRectangle.A4);
             document.addPage(page);
 
+            byte[] logoBytes = fileStorageService.downloadFile("public/desert_akal_logo.png");
+
             try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
+
+                if (logoBytes != null) {
+                    PDImageXObject pdLogo = PDImageXObject.createFromByteArray(document, logoBytes, "logo");
+                    contentStream.drawImage(pdLogo, 50, 750, 100, 50);
+                }
+
                 contentStream.beginText();
-                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 20);
-                contentStream.newLineAtOffset(50, 750);
-                contentStream.showText("DesertAkal - Reservation Voucher");
+                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 22);
+                contentStream.newLineAtOffset(180, 765);
+                contentStream.showText("RESERVATION VOUCHER");
                 contentStream.endText();
+
+                contentStream.setLineWidth(1f);
+                contentStream.moveTo(50, 735);
+                contentStream.lineTo(550, 735);
+                contentStream.stroke();
 
                 contentStream.beginText();
                 contentStream.setFont(PDType1Font.HELVETICA, 12);
+                contentStream.setLeading(20f);
                 contentStream.newLineAtOffset(50, 700);
-                contentStream.showText("Tourist: " + dto.getTouristName());
-                contentStream.newLineAtOffset(0, -20);
-                contentStream.showText("Tour: " + dto.getTourTitle());
-                contentStream.newLineAtOffset(0, -20);
-                contentStream.showText("Date: " + dto.getStartDate());
+
+                contentStream.showText("Reservation ID: " + dto.getUuid());
+                contentStream.newLine();
+                contentStream.showText("Customer Name: " + dto.getTouristName());
+                contentStream.newLine();
+                contentStream.showText("Tour Title: " + dto.getTourTitle());
+                contentStream.newLine();
+                contentStream.showText("Start Date: " + dto.getStartDate());
+                contentStream.newLine();
+                contentStream.showText("Number of People: " + dto.getNumberPeople());
                 contentStream.endText();
 
-                PDImageXObject pdImage = PDImageXObject.createFromByteArray(document, qrCodeImage, "QR_CODE");
-                contentStream.drawImage(pdImage, 400, 650, 150, 150);
+                PDImageXObject pdQrCode = PDImageXObject.createFromByteArray(document, qrCodeImage, "QR_CODE");
+                contentStream.drawImage(pdQrCode, 400, 520, 130, 130);
+
+                contentStream.beginText();
+                contentStream.setFont(PDType1Font.HELVETICA_OBLIQUE, 9);
+                contentStream.newLineAtOffset(415, 505);
+                contentStream.showText("Scan to verify booking");
+                contentStream.endText();
             }
 
             document.save(out);
+            log.info("Successfully generated PDF voucher with logo for: {}", dto.getUuid());
             return out.toByteArray();
+
         } catch (IOException e) {
-            log.error("PDF Creation Error: {}", e.getMessage());
-            throw new RuntimeException("Failed to build PDF");
+            log.error("Failed to build PDF document for {}: {}", dto.getUuid(), e.getMessage());
+            throw new DocumentGenerationException("Technical error: Unable to generate PDF voucher.");
         }
     }
 
