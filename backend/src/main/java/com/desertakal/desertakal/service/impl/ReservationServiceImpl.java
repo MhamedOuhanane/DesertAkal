@@ -5,16 +5,10 @@ import com.desertakal.desertakal.model.dto.reservation.ReservationCreateDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationFindDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
-import com.desertakal.desertakal.model.entity.Guide;
-import com.desertakal.desertakal.model.entity.Reservation;
-import com.desertakal.desertakal.model.entity.Tour;
-import com.desertakal.desertakal.model.entity.Tourist;
+import com.desertakal.desertakal.model.entity.*;
 import com.desertakal.desertakal.model.enums.ReservationStatus;
 import com.desertakal.desertakal.model.mapper.ReservationMapper;
-import com.desertakal.desertakal.repository.GuideRepository;
-import com.desertakal.desertakal.repository.ReservationRepository;
-import com.desertakal.desertakal.repository.TourRepository;
-import com.desertakal.desertakal.repository.TouristRepository;
+import com.desertakal.desertakal.repository.*;
 import com.desertakal.desertakal.service.interfaces.NotificationService;
 import com.desertakal.desertakal.service.interfaces.ReservationService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -39,6 +34,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final GuideRepository guideRepository;
     private final TourRepository tourRepository;
     private final NotificationService notificationService;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
@@ -205,8 +201,58 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public void cancel(@NonNull UUID reservationUuid) {
+    @Transactional
+    public void cancel(@NonNull UUID reservationUuid, @NonNull UUID currentUserUuid) {
+        log.info("Starting cancellation process for Reservation: {} by User: {}", reservationUuid, currentUserUuid);
 
+        Reservation reservation = repository.findByUuid(reservationUuid)
+                .orElseThrow(() -> {
+                    log.error("Cancellation failed: Reservation not found with UUID: {}", reservationUuid);
+                    return new ResourceNotFoundException("Reservation", "identifier", reservationUuid.toString());
+                });
+
+        User user = touristRepository.findByUuid(currentUserUuid)
+                .orElseThrow(() -> {
+                    log.error("Cancellation failed: User not found with UUID: {}", currentUserUuid);
+                    return new ResourceNotFoundException("User", "identifier", currentUserUuid.toString());
+                });
+
+        boolean isAdmin = user.getRole().getName().equals("ADMIN");
+        boolean isOwner = reservation.getTourist().getUuid().equals(currentUserUuid);
+
+        if (!isOwner && !isAdmin) {
+            log.error("Unauthorized Access: User {} attempted to cancel reservation {} owned by {}",
+                    currentUserUuid, reservationUuid, reservation.getTourist().getUuid());
+            throw new UnauthorizedActionException("Access denied: You are not authorized to cancel this reservation.");
+        }
+
+        if (reservation.getStatus().equals(ReservationStatus.CANCELLED)) {
+            log.warn("Redundant Request: Reservation {} is already cancelled", reservationUuid);
+            throw new ReservationStatusException("cancel", reservation.getStatus());
+        }
+
+        if (reservation.getStatus().equals(ReservationStatus.COMPLETED)) {
+            log.error("Invalid Action: Cannot cancel a completed reservation: {}", reservationUuid);
+            throw new BusinessRuleException("Cannot cancel a tour that has already been completed.");
+        }
+
+        if (reservation.getStatus().equals(ReservationStatus.REJECTED)) {
+            log.warn("Invalid Action: User {} tried to cancel a rejected reservation {}", currentUserUuid, reservationUuid);
+            throw new BusinessRuleException("This reservation has already been rejected and cannot be cancelled.");
+        }
+
+        if (reservation.getStatus().equals(ReservationStatus.CONFIRMED)) {
+            BigDecimal refundFactor = isAdmin ? BigDecimal.ONE : BigDecimal.valueOf(0.9);
+            BigDecimal refundAmount = reservation.getAmount().multiply(refundFactor);
+
+            log.info("Processing Refund for confirmed reservation {}: Total Amount: {}, Refundable: {} (Factor: {})",
+                    reservationUuid, reservation.getAmount(), refundAmount, refundFactor);
+        }
+
+        reservation.setStatus(ReservationStatus.CANCELLED);
+
+        log.info("Reservation {} successfully cancelled by {}", reservationUuid, isAdmin ? "ADMIN" : "OWNER");
+        sendCancellationNotifications(reservation, isAdmin);
     }
 
     @Override
@@ -262,5 +308,24 @@ public class ReservationServiceImpl implements ReservationService {
             String dateMsg = String.format("The schedule for tour '%s' has been changed to %s.", tour.getTitle(), res.getStartDate());
             notificationService.create("Schedule Changed", dateMsg, newG.getUuid());
         }
+    }
+
+    private void sendCancellationNotifications(Reservation res, boolean isAdminAction) {
+        Tourist tourist = res.getTourist();
+        Guide guide = res.getGuide();
+        Tour tour = res.getTour();
+
+        String touristSubject = "Reservation Cancellation";
+        String touristMsg = isAdminAction
+                ? String.format("Your reservation for tour '%s' has been cancelled by the administration.", tour.getTitle())
+                : String.format("You have successfully cancelled your reservation for tour '%s'.", tour.getTitle());
+        notificationService.create(touristSubject, touristMsg, tourist.getUuid());
+
+        String guideSubject = "Tour Assignment Cancelled";
+        String guideMsg = String.format("Important: The tour '%s' scheduled for %s has been cancelled.",
+                tour.getTitle(), res.getStartDate());
+        notificationService.create(guideSubject, guideMsg, guide.getUuid());
+
+        log.debug("Cancellation notifications dispatched to Tourist: {} and Guide: {}", tourist.getUuid(), guide.getUuid());
     }
 }
