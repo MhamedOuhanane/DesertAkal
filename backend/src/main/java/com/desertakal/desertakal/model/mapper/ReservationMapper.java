@@ -32,6 +32,7 @@ public abstract class ReservationMapper {
     @Mapping(expression = "java(reservation.getTourist().getFullName())", target = "touristName")
     @Mapping(source = "tourist.photo", target = "touristPhoto", qualifiedByName = "toPhotoUrl")
     @Mapping(source = "guide.photo", target = "guidePhoto", qualifiedByName = "toPhotoUrl")
+    @Mapping(source = "reference", target = "reference")
     public abstract ReservationDTO toDto(Reservation reservation);
 
     @Mapping(source = "tour.uuid", target = "tourUuid")
@@ -45,6 +46,7 @@ public abstract class ReservationMapper {
     @Mapping(source = "qrCode", target = "qrCode", qualifiedByName = "toFile")
     @Mapping(source = "pdfUrl", target = "pdfUrl", qualifiedByName = "toFile")
     @Mapping(source = "payments", target = "payments")
+    @Mapping(source = "reference", target = "reference")
     public abstract ReservationFindDTO toFindDto(Reservation reservation);
 
     @Mapping(target = "id", ignore = true)

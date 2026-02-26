@@ -25,6 +25,8 @@ public class ReservationFindDTO {
     private BigDecimal amount;
     private ReservationStatus status;
 
+    private String reference;
+
     private String qrCode;
     private String pdfUrl;
 

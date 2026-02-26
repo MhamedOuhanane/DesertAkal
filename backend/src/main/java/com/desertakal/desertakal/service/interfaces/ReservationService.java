@@ -15,7 +15,8 @@ public interface ReservationService {
     ReservationFindDTO create(@NonNull ReservationCreateDTO dto, @NonNull UUID touristUuid);
     ReservationFindDTO update(@NonNull UUID reservationUuid, @NonNull ReservationUpdateDTO dto, @NonNull UUID currentUserUuid);
     void cancel(@NonNull UUID reservationUuid, @NonNull UUID currentUserUuid, boolean isAdmin);
-    ReservationFindDTO get(@NonNull UUID reservationUuid, @NonNull UUID touristUuid, boolean isAdmin);
+    ReservationFindDTO get(@NonNull UUID reservationUuid, @NonNull UUID currentUserUuid, boolean isAdmin);
+    ReservationFindDTO get(@NonNull String reference, @NonNull UUID currentUserUuid, boolean isAdmin);
     PaginationDTO getAll(String tour, String guide, String tourist, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, @NonNull Pageable pageable);
     PaginationDTO getByTourist(@NonNull UUID touristUuid, String tour, String guide, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, @NonNull Pageable pageable);
     PaginationDTO getByGuide(@NonNull UUID guideUuid, String tour, String tourist, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, @NonNull Pageable pageable);

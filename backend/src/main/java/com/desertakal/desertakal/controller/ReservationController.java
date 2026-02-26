@@ -146,6 +146,35 @@ public class ReservationController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/ref/{reference}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<@NonNull StandardResponseDTO<ReservationFindDTO>> show(
+            @PathVariable String reference,
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to fetch Reservation by Reference: {} | Requested by User: {} | Path: {}",
+                reference, currentUser.getUuid(), request.getServletPath());
+
+        boolean isAdmin = currentUser.getAuthorities().stream()
+                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN"));
+
+        ReservationFindDTO result = service.get(reference, currentUser.getUuid(), isAdmin);
+
+        var response = StandardResponseDTO.<ReservationFindDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Reservation details retrieved successfully via Reference")
+                .status(HttpStatus.OK.value())
+                .data(result)
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Successfully dispatched details for Reference: {} to User: {}",
+                reference, currentUser.getUuid());
+
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<@NonNull StandardResponseDTO<PaginationDTO>> shows(

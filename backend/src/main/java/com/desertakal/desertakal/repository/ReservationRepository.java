@@ -16,6 +16,5 @@ import java.util.UUID;
 public interface ReservationRepository extends JpaRepository<@NonNull Reservation, @NonNull UUID>, JpaSpecificationExecutor<@NonNull Reservation> {
     Optional<@NonNull Reservation> findByUuid(@NonNull UUID uuid);
 
-    Page<@NonNull Reservation> findAllByTourist(Tourist tourist, Specification<@NonNull Reservation> spec, Pageable pageable);
-    Page<@NonNull Reservation> findAllByGuide(Guide guide, Specification<@NonNull Reservation> spec, Pageable pageable);
+    Optional<Reservation> findByReference(String reference);
 }

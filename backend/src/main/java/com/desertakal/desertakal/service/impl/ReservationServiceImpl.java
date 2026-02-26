@@ -291,6 +291,32 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    public ReservationFindDTO get(@NonNull String reference, @NonNull UUID currentUserUuid, boolean isAdmin) {
+        log.info("Fetching details for Reservation reference: {}", reference);
+
+        Reservation reservation = repository.findByReference(reference)
+                .orElseThrow(() -> {
+                    log.error("Fetch failed: Reservation not found with reference: {}", reference);
+                    return new ResourceNotFoundException("Reservation", "reference", reference);
+                });
+
+        boolean isOwner = reservation.getTourist().getUuid().equals(currentUserUuid);
+        boolean isAssignedGuide = reservation.getGuide() != null &&
+                reservation.getGuide().getUuid().equals(currentUserUuid);
+
+        if (!isOwner && !isAssignedGuide && !isAdmin) {
+            log.error("Security Violation: Unauthorized fetch attempt for Reservation reference {} by User {}",
+                    reference, currentUserUuid);
+            throw new UnauthorizedActionException("Access denied: You are not authorized to view this reservation.");
+        }
+
+        log.debug("Reservation found by reference {}: Status={}, Tourist={}",
+                reference, reservation.getStatus(), reservation.getTourist().getUuid());
+
+        return mapper.toFindDto(reservation);
+    }
+
+    @Override
     public PaginationDTO getAll(String tour, String guide, String tourist, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, @NonNull Pageable pageable) {
         log.info("REST Request to fetch all Reservations with filters | Tour: {}, Status: {}, Period: [{} to {}] | Page: {}, Size: {}",
                 tour, status, startDate, endDate, pageable.getPageNumber(), pageable.getPageSize());
