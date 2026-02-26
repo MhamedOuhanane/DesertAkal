@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
         }
         if (repository.existsByUsername(dto.getUsername())) {
             log.warn("Registration failed: Username {} is already taken", dto.getUsername());
-            throw new DuplicateResourceException("User", "Username", dto.getEmail());
+            throw new DuplicateResourceException("User", "Username", dto.getUsername());
         }
 
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {

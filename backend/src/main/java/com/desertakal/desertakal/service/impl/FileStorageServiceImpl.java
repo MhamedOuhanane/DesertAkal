@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.UUID;
 
 @Service
@@ -56,6 +58,42 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
+    public String uploadBytes(byte[] data, @NonNull String objectName, @NonNull String contentType) {
+        try {
+            ensureBucketExists();
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(objectName)
+                            .stream(new ByteArrayInputStream(data), data.length, -1)
+                            .contentType(contentType)
+                            .build()
+            );
+            log.info("Document successfully uploaded to MinIO: {}", objectName);
+            return objectName;
+        } catch (Exception e) {
+            log.error("Failed to upload generated document: {}", e.getMessage());
+            throw new FileUploadException("Error saving generated file: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public byte[] downloadFile(@NonNull String filePath) {
+        log.info("Attempting to download file from MinIO: {}", filePath);
+        try (InputStream stream = minioClient.getObject(
+                GetObjectArgs.builder()
+                        .bucket(bucketName)
+                        .object(filePath)
+                        .build())) {
+
+            return stream.readAllBytes();
+        } catch (Exception e) {
+            log.error("Error downloading file from MinIO path {}: {}", filePath, e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
     public void deleteFile(@NonNull String filePath) {
         if (filePath.isEmpty()) return;
 
@@ -87,6 +125,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             case TOUR -> "defaults/default-tour.png";
             case CITY -> "defaults/default-city.png";
             case ARTICLE -> "defaults/default-article.png";
+            default -> "";
         };
     }
 

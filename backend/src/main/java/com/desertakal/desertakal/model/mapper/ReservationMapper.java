@@ -12,11 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses = {PaymentMapper.class, FileStorageService.class}
+)
 public abstract class ReservationMapper {
 
     @Autowired
     protected FileStorageService fileStorageService;
+
 
     @Named("toDto")
     @Mapping(source = "tour.uuid", target = "tourUuid")
@@ -27,6 +32,7 @@ public abstract class ReservationMapper {
     @Mapping(expression = "java(reservation.getTourist().getFullName())", target = "touristName")
     @Mapping(source = "tourist.photo", target = "touristPhoto", qualifiedByName = "toPhotoUrl")
     @Mapping(source = "guide.photo", target = "guidePhoto", qualifiedByName = "toPhotoUrl")
+    @Mapping(source = "reference", target = "reference")
     public abstract ReservationDTO toDto(Reservation reservation);
 
     @Mapping(source = "tour.uuid", target = "tourUuid")
@@ -37,6 +43,10 @@ public abstract class ReservationMapper {
     @Mapping(expression = "java(reservation.getTourist().getFullName())", target = "touristName")
     @Mapping(source = "tourist.photo", target = "touristPhoto", qualifiedByName = "toPhotoUrl")
     @Mapping(source = "guide.photo", target = "guidePhoto", qualifiedByName = "toPhotoUrl")
+    @Mapping(source = "qrCode", target = "qrCode", qualifiedByName = "toFile")
+    @Mapping(source = "pdfUrl", target = "pdfUrl", qualifiedByName = "toFile")
+    @Mapping(source = "payments", target = "payments")
+    @Mapping(source = "reference", target = "reference")
     public abstract ReservationFindDTO toFindDto(Reservation reservation);
 
     @Mapping(target = "id", ignore = true)
@@ -62,6 +72,12 @@ public abstract class ReservationMapper {
 
     @Named("toPhotoUrl")
     protected String toPhotoUrl(String photo) {
+        return fileStorageService.getPublicUrl(photo, FileType.PROFILE);
+    }
+
+
+    @Named("toFile")
+    protected String toFile(String photo) {
         return fileStorageService.getPublicUrl(photo, FileType.PROFILE);
     }
 }

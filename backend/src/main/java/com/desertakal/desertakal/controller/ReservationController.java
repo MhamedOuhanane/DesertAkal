@@ -10,13 +10,15 @@ import com.desertakal.desertakal.model.enums.ReservationStatus;
 import com.desertakal.desertakal.service.interfaces.ReservationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -144,6 +146,35 @@ public class ReservationController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/ref/{reference}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<@NonNull StandardResponseDTO<ReservationFindDTO>> show(
+            @PathVariable String reference,
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to fetch Reservation by Reference: {} | Requested by User: {} | Path: {}",
+                reference, currentUser.getUuid(), request.getServletPath());
+
+        boolean isAdmin = currentUser.getAuthorities().stream()
+                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN"));
+
+        ReservationFindDTO result = service.get(reference, currentUser.getUuid(), isAdmin);
+
+        var response = StandardResponseDTO.<ReservationFindDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Reservation details retrieved successfully via Reference")
+                .status(HttpStatus.OK.value())
+                .data(result)
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Successfully dispatched details for Reference: {} to User: {}",
+                reference, currentUser.getUuid());
+
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<@NonNull StandardResponseDTO<PaginationDTO>> shows(
@@ -196,5 +227,26 @@ public class ReservationController {
         log.info("Successfully deleted Reservation with UUID: {} [Status: 200 OK]", uuid);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{uuid}/download")
+    public ResponseEntity<byte @NonNull []> downloadPdf(
+            @PathVariable UUID uuid,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+
+        log.info("REST request to download PDF for reservation: {}", uuid);
+
+        boolean isAdmin = currentUser.getAuthorities().stream()
+                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN"));
+
+        byte[] pdfContent = service.getReservationPdfContent(uuid, currentUser.getUuid(), isAdmin);
+
+        String fileName = "Voucher_DesertAkal_" + uuid.toString().substring(0, 8) + ".pdf";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfContent);
     }
 }

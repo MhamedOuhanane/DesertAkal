@@ -52,6 +52,9 @@ public class Reservation {
     @Column(nullable = false)
     private ReservationStatus status = ReservationStatus.PENDING;
 
+    @Column(name = "reference", length = 8, unique = true)
+    private String reference;
+
     @Column(name = "qr_code", nullable = false)
     private String qrCode;
 
@@ -86,6 +89,8 @@ public class Reservation {
     public void prePersist(){
         if (uuid == null)
             uuid = UUID.randomUUID();
+
+        reference = uuid.toString().substring(0, 8).toUpperCase();
 
         if (startDate != null && tour != null && tour.getDurationDays() != null)
             endDate = startDate.plusDays(tour.getDurationDays());

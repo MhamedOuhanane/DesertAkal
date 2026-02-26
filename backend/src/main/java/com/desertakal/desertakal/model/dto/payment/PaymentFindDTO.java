@@ -19,7 +19,6 @@ public class PaymentFindDTO {
     private UUID uuid;
     private LocalDateTime date;
     private BigDecimal amount;
-
     private PaymentStatus status;
     private PaymentType type;
     private String method;

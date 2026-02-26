@@ -9,6 +9,8 @@ import com.desertakal.desertakal.model.entity.*;
 import com.desertakal.desertakal.model.enums.ReservationStatus;
 import com.desertakal.desertakal.model.mapper.ReservationMapper;
 import com.desertakal.desertakal.repository.*;
+import com.desertakal.desertakal.service.interfaces.DocumentGeneratorService;
+import com.desertakal.desertakal.service.interfaces.FileStorageService;
 import com.desertakal.desertakal.service.interfaces.NotificationService;
 import com.desertakal.desertakal.service.interfaces.ReservationService;
 import jakarta.persistence.criteria.Expression;
@@ -41,7 +43,8 @@ public class ReservationServiceImpl implements ReservationService {
     private final GuideRepository guideRepository;
     private final TourRepository tourRepository;
     private final NotificationService notificationService;
-    private final UserRepository userRepository;
+    private final DocumentGeneratorService documentGeneratorService;
+    private final FileStorageService fileStorageService;
 
     @Override
     @Transactional
@@ -107,13 +110,16 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setTourist(tourist);
         reservation.setTour(tour);
         reservation.setGuide(guide);
-        reservation.setPdfUrl("https://desertakal.com/res/pdf/" + UUID.randomUUID());
-        reservation.setQrCode("QR_" + UUID.randomUUID());
 
         try {
             Reservation newReservation = repository.save(reservation);
+
+            log.info("Reservation saved. Generating PDF and QR assets...");
+            documentGeneratorService.generateConfirmationAssets(newReservation);
+
             log.info("Reservation successfully created with UUID: {} for Tourist: {}", newReservation.getUuid(), touristUuid);
             sendReservationNotifications(tour, tourist, guide);
+
             return mapper.toFindDto(newReservation);
         } catch (Exception e) {
             log.error("Database error while saving reservation: {}", e.getMessage());
@@ -199,6 +205,8 @@ public class ReservationServiceImpl implements ReservationService {
             reservation.setEndDate(dto.getStartDate().plusDays(reservation.getTour().getDurationDays()));
         }
 
+        documentGeneratorService.generateConfirmationAssets(reservation);
+
         repository.save(reservation);
         log.info("Reservation {} successfully updated", reservationUuid);
 
@@ -278,6 +286,32 @@ public class ReservationServiceImpl implements ReservationService {
 
         log.debug("Reservation found: Status={}, Tourist={}",
                 reservation.getStatus(), reservation.getTourist().getUuid());
+
+        return mapper.toFindDto(reservation);
+    }
+
+    @Override
+    public ReservationFindDTO get(@NonNull String reference, @NonNull UUID currentUserUuid, boolean isAdmin) {
+        log.info("Fetching details for Reservation reference: {}", reference);
+
+        Reservation reservation = repository.findByReference(reference)
+                .orElseThrow(() -> {
+                    log.error("Fetch failed: Reservation not found with reference: {}", reference);
+                    return new ResourceNotFoundException("Reservation", "reference", reference);
+                });
+
+        boolean isOwner = reservation.getTourist().getUuid().equals(currentUserUuid);
+        boolean isAssignedGuide = reservation.getGuide() != null &&
+                reservation.getGuide().getUuid().equals(currentUserUuid);
+
+        if (!isOwner && !isAssignedGuide && !isAdmin) {
+            log.error("Security Violation: Unauthorized fetch attempt for Reservation reference {} by User {}",
+                    reference, currentUserUuid);
+            throw new UnauthorizedActionException("Access denied: You are not authorized to view this reservation.");
+        }
+
+        log.debug("Reservation found by reference {}: Status={}, Tourist={}",
+                reference, reservation.getStatus(), reservation.getTourist().getUuid());
 
         return mapper.toFindDto(reservation);
     }
@@ -378,9 +412,61 @@ public class ReservationServiceImpl implements ReservationService {
             throw new BusinessRuleException(String.format("Cannot delete a reservation that is already %s.", status.name().toLowerCase()));
         }
 
+        try {
+            if (reservation.getPdfUrl() != null) {
+                fileStorageService.deleteFile(reservation.getPdfUrl());
+                log.debug("Deleted associated PDF from storage: {}", reservation.getPdfUrl());
+            }
+            if (reservation.getQrCode() != null) {
+                fileStorageService.deleteFile(reservation.getQrCode());
+                log.debug("Deleted associated QR code from storage: {}", reservation.getQrCode());
+            }
+        } catch (Exception e) {
+            log.error("Non-critical error: Failed to clean up files in MinIO for reservation {}: {}",
+                    reservationUuid, e.getMessage());
+        }
+
         repository.delete(reservation);
 
         log.info("Reservation {} successfully deleted (Original Status: {})", reservationUuid, status);
+    }
+
+    @Override
+    public byte[] getReservationPdfContent(@NonNull UUID reservationUuid, @NonNull UUID currentUserUuid, boolean isAdmin) {
+        log.info("Initiating PDF download request for Reservation: {} by User: {} (Admin: {})",
+                reservationUuid, currentUserUuid, isAdmin);
+
+        Reservation reservation = repository.findByUuid(reservationUuid)
+                .orElseThrow(() -> {
+                    log.error("Download failed: Reservation {} not found in database", reservationUuid);
+                    return new ResourceNotFoundException("Reservation", "uuid", reservationUuid.toString());
+                });
+
+        boolean isOwner = reservation.getTourist().getUuid().equals(currentUserUuid);
+
+        if (!isOwner && !isAdmin) {
+            log.warn("Security Alert: Unauthorized download attempt on Reservation {} by User {}",
+                    reservationUuid, currentUserUuid);
+            throw new UnauthorizedActionException("You are not authorized to download this document.");
+        }
+
+        if (reservation.getPdfUrl() == null || reservation.getPdfUrl().isBlank()) {
+            log.error("Integrity Error: Reservation {} exists but has no PDF path associated", reservationUuid);
+            throw new ResourceNotFoundException("PDF Document", "reservation", reservationUuid.toString());
+        }
+
+        log.debug("Fetching file bytes from storage for path: {}", reservation.getPdfUrl());
+        byte[] content = fileStorageService.downloadFile(reservation.getPdfUrl());
+
+        if (content == null || content.length == 0) {
+            log.error("Storage Error: MinIO returned empty or null content for path: {}", reservation.getPdfUrl());
+            throw new DocumentGenerationException("The PDF file could not be retrieved from storage.");
+        }
+
+        log.info("PDF successfully retrieved for Reservation: {}. Size: {} bytes",
+                reservationUuid, content.length);
+
+        return content;
     }
 
     private void sendReservationNotifications(Tour tour, Tourist tourist, Guide guide) {
