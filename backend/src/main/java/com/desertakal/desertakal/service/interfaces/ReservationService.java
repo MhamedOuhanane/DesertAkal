@@ -20,4 +20,5 @@ public interface ReservationService {
     PaginationDTO getByTourist(@NonNull UUID touristUuid, String tour, String guide, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, @NonNull Pageable pageable);
     PaginationDTO getByGuide(@NonNull UUID guideUuid, String tour, String tourist, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, @NonNull Pageable pageable);
     void delete(@NonNull UUID reservationUuid);
+    byte[] getReservationPdfContent(@NonNull UUID reservationUuid, @NonNull UUID currentUserUuid, boolean isAdmin);
 }
