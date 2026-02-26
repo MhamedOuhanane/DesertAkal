@@ -125,6 +125,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             case TOUR -> "defaults/default-tour.png";
             case CITY -> "defaults/default-city.png";
             case ARTICLE -> "defaults/default-article.png";
+            default -> "";
         };
     }
 
