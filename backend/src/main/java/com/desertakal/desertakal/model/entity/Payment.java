@@ -49,6 +49,12 @@ public class Payment {
     @Column(nullable = false)
     private String method;
 
+    @Column(name = "gateway_payment_id", unique = true)
+    private String gatewayPaymentId;
+
+    @Column(name = "gateway_session_id")
+    private String gatewaySessionId;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

@@ -233,7 +233,7 @@ public class DocumentGeneratorServiceImpl implements DocumentGeneratorService {
                 TEXT_PRIMARY);
 
         text(cs, col3, y, "TOTAL", REGULAR, 6.5f, TEXT_DISABLED);
-        String amount = dto.getAmount() != null ? "$" + dto.getAmount().toPlainString() : "N/A";
+        String amount = dto.getAmount() != null ? String.format("€%.2f", dto.getAmount()) : "N/A";
         text(cs, col3, y - 16, amount, BOLD, 16, PRIMARY);
 
         y -= 50;

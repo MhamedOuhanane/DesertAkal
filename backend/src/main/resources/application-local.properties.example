@@ -44,3 +44,8 @@ spring.security.oauth2.client.provider.discord.user-info-uri=https://discord.com
 spring.security.oauth2.client.provider.discord.user-name-attribute=username
 
 app.oauth2.redirect-uri=
+
+paypal.client-id=
+paypal.client-secret=
+paypal.mode=
+
