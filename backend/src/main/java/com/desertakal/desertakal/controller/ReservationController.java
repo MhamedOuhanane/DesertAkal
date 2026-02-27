@@ -4,6 +4,7 @@ import com.desertakal.desertakal.Security.user.CustomUserDetails;
 import com.desertakal.desertakal.model.dto.reservation.ReservationCreateDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationFindDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationUpdateDTO;
+import com.desertakal.desertakal.model.dto.reservation.ReservationVerificationDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.enums.ReservationStatus;
@@ -208,7 +209,7 @@ public class ReservationController {
 
     @DeleteMapping("/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<@org.jspecify.annotations.NonNull StandardResponseDTO<Void>> delete(
+    public ResponseEntity<@NonNull StandardResponseDTO<Void>> delete(
             @PathVariable UUID uuid,
             HttpServletRequest request
     ) {
@@ -248,5 +249,31 @@ public class ReservationController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdfContent);
+    }
+
+    @GetMapping("/verify/{uuid}")
+    public ResponseEntity<@NonNull StandardResponseDTO<ReservationVerificationDTO>> verify(
+            @PathVariable UUID uuid,
+            HttpServletRequest request
+    ) {
+        log.info("Public verification request for reservation: {}", uuid);
+
+        ReservationVerificationDTO result = service.verifyReservation(uuid);
+
+        String message = result.isValid()
+                ? "Reservation is valid and confirmed."
+                : "Warning: This reservation is " + result.getStatus().toLowerCase();
+
+        var response = StandardResponseDTO.<ReservationVerificationDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message(message)
+                .status(HttpStatus.OK.value())
+                .data(result)
+                .path(request.getServletPath())
+                .build();
+
+        log.info("Verification result for {}: {}", uuid, result.getStatus());
+
+        return ResponseEntity.ok(response);
     }
 }

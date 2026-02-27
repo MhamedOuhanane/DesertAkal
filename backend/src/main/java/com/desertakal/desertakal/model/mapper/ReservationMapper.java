@@ -1,9 +1,6 @@
 package com.desertakal.desertakal.model.mapper;
 
-import com.desertakal.desertakal.model.dto.reservation.ReservationCreateDTO;
-import com.desertakal.desertakal.model.dto.reservation.ReservationDTO;
-import com.desertakal.desertakal.model.dto.reservation.ReservationFindDTO;
-import com.desertakal.desertakal.model.dto.reservation.ReservationUpdateDTO;
+import com.desertakal.desertakal.model.dto.reservation.*;
 import com.desertakal.desertakal.model.entity.Reservation;
 import com.desertakal.desertakal.model.enums.FileType;
 import com.desertakal.desertakal.service.interfaces.FileStorageService;
@@ -48,6 +45,11 @@ public abstract class ReservationMapper {
     @Mapping(source = "payments", target = "payments")
     @Mapping(source = "reference", target = "reference")
     public abstract ReservationFindDTO toFindDto(Reservation reservation);
+
+    @Mapping(source = "tour.title", target = "tourTitle")
+    @Mapping(expression = "java(reservation.getTourist().getFullName())", target = "touristName")
+    @Mapping(expression = "java(reservation.getStatus() == com.desertakal.desertakal.model.enums.ReservationStatus.CONFIRMED)", target = "isValid")
+    public abstract ReservationVerificationDTO toVerificationDto(Reservation reservation);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uuid", ignore = true)

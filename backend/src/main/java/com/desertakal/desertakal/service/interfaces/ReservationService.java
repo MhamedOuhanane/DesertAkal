@@ -3,6 +3,7 @@ package com.desertakal.desertakal.service.interfaces;
 import com.desertakal.desertakal.model.dto.reservation.ReservationCreateDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationFindDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationUpdateDTO;
+import com.desertakal.desertakal.model.dto.reservation.ReservationVerificationDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.enums.ReservationStatus;
 import org.jspecify.annotations.NonNull;
@@ -22,4 +23,5 @@ public interface ReservationService {
     PaginationDTO getByGuide(@NonNull UUID guideUuid, String tour, String tourist, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, @NonNull Pageable pageable);
     void delete(@NonNull UUID reservationUuid);
     byte[] getReservationPdfContent(@NonNull UUID reservationUuid, @NonNull UUID currentUserUuid, boolean isAdmin);
+    public ReservationVerificationDTO verifyReservation(@NonNull UUID uuid);
 }

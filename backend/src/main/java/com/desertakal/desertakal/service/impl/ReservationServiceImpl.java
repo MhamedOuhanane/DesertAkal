@@ -4,6 +4,7 @@ import com.desertakal.desertakal.exception.custom.*;
 import com.desertakal.desertakal.model.dto.reservation.ReservationCreateDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationFindDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationUpdateDTO;
+import com.desertakal.desertakal.model.dto.reservation.ReservationVerificationDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.entity.*;
 import com.desertakal.desertakal.model.enums.ReservationStatus;
@@ -467,6 +468,19 @@ public class ReservationServiceImpl implements ReservationService {
                 reservationUuid, content.length);
 
         return content;
+    }
+
+    @Override
+    public ReservationVerificationDTO verifyReservation(@NonNull UUID reservationUuid) {
+        log.info("Verifying reservation authenticity: {}", reservationUuid);
+
+        Reservation reservation = repository.findByUuid(reservationUuid)
+                .orElseThrow(() -> {
+                    log.error("Verification failed: Reservation {} not found in database", reservationUuid);
+                    return new ResourceNotFoundException("Reservation", "uuid", reservationUuid.toString());
+                });
+
+        return mapper.toVerificationDto(reservation);
     }
 
     private void sendReservationNotifications(Tour tour, Tourist tourist, Guide guide) {
