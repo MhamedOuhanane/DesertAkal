@@ -8,8 +8,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentResponseDTO {
-    private String uuid;
+    private String paymentUuid;
     private String approvalUrl;
     private String gatewayPaymentId;
+    private String method;
     private String status;
 }

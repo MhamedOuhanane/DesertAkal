@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum PaymentMethod {
-    PAYPAL("PayPal");
+    PAYPAL("PayPal payment gateway");
 
     private final String description;
 
