@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.model.entity;
 
+import com.desertakal.desertakal.model.enums.PaymentMethod;
 import com.desertakal.desertakal.model.enums.PaymentStatus;
 import com.desertakal.desertakal.model.enums.PaymentType;
 import com.desertakal.desertakal.model.enums.ReservationStatus;
@@ -46,8 +47,10 @@ public class Payment {
     @Column(nullable = false)
     private PaymentType type = PaymentType.PAYMENT;
 
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String method;
+    private PaymentMethod method;
 
     @Column(name = "gateway_payment_id", unique = true)
     private String gatewayPaymentId;

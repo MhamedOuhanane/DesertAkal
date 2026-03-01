@@ -322,7 +322,7 @@ public class ReservationServiceImpl implements ReservationService {
         log.info("REST Request to fetch all Reservations with filters | Tour: {}, Status: {}, Period: [{} to {}] | Page: {}, Size: {}",
                 tour, status, startDate, endDate, pageable.getPageNumber(), pageable.getPageSize());
 
-        Specification<@NonNull Reservation> spec = getToursSpecification(null, null, tour, guide, tourist, status, startDate, endDate);
+        Specification<@NonNull Reservation> spec = getSpecification(null, null, tour, guide, tourist, status, startDate, endDate);
 
         log.debug("Executing paginated database query for Reservations...");
         Page<@NonNull Reservation> reservationPages = repository.findAll(spec, pageable);
@@ -347,7 +347,7 @@ public class ReservationServiceImpl implements ReservationService {
         log.info("Fetching reservations for Tourist: {} | Filters -> Tour: {}, Guide: {}, Status: {}",
                 touristUuid, tour, guide, status);
 
-        Specification<@NonNull Reservation> spec = getToursSpecification(touristUuid, null, tour, guide, null, status, startDate, endDate);
+        Specification<@NonNull Reservation> spec = getSpecification(touristUuid, null, tour, guide, null, status, startDate, endDate);
 
         log.debug("Executing paginated query for Tourist reservations. Page: {}, Size: {}",
                 pageable.getPageNumber(), pageable.getPageSize());
@@ -374,7 +374,7 @@ public class ReservationServiceImpl implements ReservationService {
         log.info("Fetching assigned tours for Guide: {} | Filters -> Tour: {}, Tourist: {}, Status: {}",
                 guideUuid, tour, tourist, status);
 
-        Specification<@NonNull Reservation> spec = getToursSpecification(null, guideUuid, tour, null, tourist, status, startDate, endDate);
+        Specification<@NonNull Reservation> spec = getSpecification(null, guideUuid, tour, null, tourist, status, startDate, endDate);
 
         log.debug("Executing paginated query for Guide assignments. Page: {}, Size: {}",
                 pageable.getPageNumber(), pageable.getPageSize());
@@ -532,7 +532,7 @@ public class ReservationServiceImpl implements ReservationService {
         log.debug("Cancellation notifications dispatched to Tourist: {} and Guide: {}", tourist.getUuid(), guide.getUuid());
     }
 
-    private Specification<@NonNull Reservation> getToursSpecification(
+    private Specification<@NonNull Reservation> getSpecification(
             UUID touristUuid, UUID guideUuid,
             String tour, String guide, String tourist,
             ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate) {
