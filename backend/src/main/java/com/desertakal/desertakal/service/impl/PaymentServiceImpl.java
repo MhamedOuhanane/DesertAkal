@@ -226,10 +226,68 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public void processRefundOnCancel(@NonNull Reservation reservation, boolean isAdmin) {
 
-    }
+        log.info("Processing cancel refund for reservation: {} (by: {})",
+                reservation.getUuid(), isAdmin ? "ADMIN" : "TOURIST");
 
+        List<@NonNull Payment> completedPayments = repository.findCompletedPaymentsByReservation(reservation);
+
+        if (completedPayments.isEmpty()) {
+            log.info("No completed payments for reservation: {}", reservation.getUuid());
+            return;
+        }
+
+        BigDecimal refundFactor = isAdmin
+                ? BigDecimal.ONE
+                : BigDecimal.valueOf(0.90);
+
+        BigDecimal totalRefundAmount = reservation.getAmount()
+                .multiply(refundFactor)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        log.info("Reservation {}: Total: ${}, Refundable: ${} ({}%)",
+                reservation.getUuid(),
+                reservation.getAmount(),
+                totalRefundAmount,
+                refundFactor.multiply(BigDecimal.valueOf(100)).intValue()
+        );
+
+        BigDecimal remaining = totalRefundAmount;
+
+        for (Payment original : completedPayments) {
+
+            if (remaining.compareTo(BigDecimal.ZERO) <= 0) break;
+
+            BigDecimal captureMax = original.getAmount();
+            BigDecimal refundForThis = remaining.min(captureMax);
+
+            try {
+                PaymentGateway gateway = gatewayFactory.getGateway(original.getMethod());
+                gateway.refundPayment(original.getGatewaySessionId(), refundForThis);
+            } catch (Exception e) {
+                log.error("Gateway refund failed for payment {}: {}",
+                        original.getUuid(), e.getMessage());
+                throw new PaymentException("Refund failed. Cancellation aborted.");
+            }
+
+            createRefundPayment(original, refundForThis);
+
+            boolean fullyRefunded = refundForThis.compareTo(captureMax) >= 0;
+            original.setStatus(fullyRefunded
+                    ? PaymentStatus.REFUNDED
+                    : PaymentStatus.REFUNDED_PARTIAL);
+            repository.save(original);
+
+            remaining = remaining.subtract(refundForThis);
+
+            log.info("Refunded ${} from payment {} (remaining: ${})",
+                    refundForThis, original.getUuid(), remaining);
+        }
+
+        sendCancelRefundNotification(reservation, totalRefundAmount, isAdmin);
+    }
 
     @Override
     public PaymentFindDTO getPayment(@NonNull UUID paymentUuid) {
