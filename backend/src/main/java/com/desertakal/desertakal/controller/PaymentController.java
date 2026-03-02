@@ -22,6 +22,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -108,6 +109,38 @@ public class PaymentController {
         PaymentFindDTO result = paymentService.partialRefundPayment(uuid, dto.getAmount(), currentUser.getUuid());
 
         return ResponseEntity.ok(buildResponse("Partial refund processed successfully", HttpStatus.OK, request, result));
+    }
+
+    @GetMapping("/{uuid}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TOURIST')")
+    public ResponseEntity<@NonNull StandardResponseDTO<PaymentFindDTO>> get(
+            @PathVariable UUID uuid,
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @NonNull HttpServletRequest request) {
+
+        log.debug("REST request to get payment details: {}", uuid);
+        boolean isAdmin = currentUser.getAuthorities().stream()
+                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN"));
+
+        PaymentFindDTO result = paymentService.getPayment(uuid, currentUser.getUuid(), isAdmin);
+
+        return ResponseEntity.ok(buildResponse("Payment details retrieved", HttpStatus.OK, request, result));
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<PaginationDTO>> all(
+            @RequestParam(required = false) PaymentStatus status,
+            @RequestParam(required = false) PaymentType type,
+            @RequestParam(required = false) PaymentMethod method,
+            @ParameterObject Pageable pageable,
+            @NonNull HttpServletRequest request) {
+
+        log.info("ADMIN SEARCH: payments status: {}, type: {}, method: {}", status, type, method);
+
+        PaginationDTO result = paymentService.getAllPayments(status, type, method, pageable);
+
+        return ResponseEntity.ok(buildResponse("Global payments list retrieved", HttpStatus.OK, request, result));
     }
 
     private <T> StandardResponseDTO<T> buildResponse(String message, HttpStatus status, HttpServletRequest request, T data) {

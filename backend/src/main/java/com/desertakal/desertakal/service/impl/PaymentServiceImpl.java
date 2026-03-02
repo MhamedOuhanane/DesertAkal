@@ -47,7 +47,7 @@ public class PaymentServiceImpl implements PaymentService {
         log.info("Initiating {} payment for reservation: {}", dto.getMethod(), dto.getReservationUuid());
 
         Reservation reservation = findReservation(dto.getReservationUuid());
-        validateOwnership(reservation, touristUuid);
+        validateOwnership(reservation, touristUuid, false);
         validatePayableStatus(reservation);
         rejectIfPendingPaymentExists(reservation);
 
@@ -93,7 +93,7 @@ public class PaymentServiceImpl implements PaymentService {
                     return new ResourceNotFoundException("Payment", "gatewayPaymentId", gatewayPaymentId);
                 });
 
-        validateOwnership(payment.getReservation(), touristUuid);
+        validateOwnership(payment.getReservation(), touristUuid, false);
 
         if (payment.getStatus() != PaymentStatus.PENDING) {
             log.warn("Payment {} already in status {}", gatewayPaymentId, payment.getStatus());
@@ -138,7 +138,7 @@ public class PaymentServiceImpl implements PaymentService {
         log.info("Cancelling payment: {}", paymentUuid);
 
         Payment payment = findPayment(paymentUuid);
-        validateOwnership(payment.getReservation(), touristUuid);
+        validateOwnership(payment.getReservation(), touristUuid, false);
 
         if (payment.getStatus() != PaymentStatus.PENDING) {
             throw new BusinessRuleException("Only pending payments can be cancelled. Current status: " + payment.getStatus());
@@ -290,18 +290,20 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentFindDTO getPayment(@NonNull UUID paymentUuid) {
+    public PaymentFindDTO getPayment(@NonNull UUID paymentUuid, @NonNull UUID touristUuid, boolean isAdmin) {
         log.info("Fetching payment: {}", paymentUuid);
-        return mapper.toFindDto(findPayment(paymentUuid));
+        Payment payment = findPayment(paymentUuid);
+        validateOwnership(payment.getReservation(), touristUuid, isAdmin);
+        return mapper.toFindDto(payment);
     }
 
     @Override
-    public PaginationDTO getPaymentsByReservation(
-            @NonNull UUID reservationUuid,
-            @NonNull Pageable pageable) {
+    public PaginationDTO getPaymentsByReservation(@NonNull UUID reservationUuid, @NonNull Pageable pageable, @NonNull UUID touristUuid, boolean isAdmin) {
 
         log.info("Fetching payments for reservation: {} [Page: {}, Size: {}]",
                 reservationUuid, pageable.getPageNumber(), pageable.getPageSize());
+
+        validateOwnership(findReservation(reservationUuid), touristUuid, isAdmin);
 
         Specification<@NonNull Payment> spec = buildSpecification(reservationUuid, null, null, null, null);
         Page<@NonNull Payment> page = repository.findAll(spec, pageable);
@@ -451,8 +453,8 @@ public class PaymentServiceImpl implements PaymentService {
                 });
     }
 
-    private void validateOwnership(Reservation reservation, UUID touristUuid) {
-        if (!reservation.getTourist().getUuid().equals(touristUuid)) {
+    private void validateOwnership(Reservation reservation, UUID touristUuid, boolean isAdmin) {
+        if (!reservation.getTourist().getUuid().equals(touristUuid) && !isAdmin) {
             throw new UnauthorizedActionException("Not the owner of this reservation.");
         }
     }

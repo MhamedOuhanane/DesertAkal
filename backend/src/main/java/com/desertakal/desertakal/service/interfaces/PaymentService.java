@@ -21,8 +21,8 @@ public interface PaymentService {
     PaymentFindDTO refundPayment(@NonNull UUID paymentUuid, @NonNull UUID adminUuid);
     PaymentFindDTO partialRefundPayment(@NonNull UUID paymentUuid, @NonNull BigDecimal amount, @NonNull UUID adminUuid);
     void processRefundOnCancel(@NonNull Reservation reservation, boolean isAdmin);
-    PaymentFindDTO getPayment(@NonNull UUID paymentUuid);
-    PaginationDTO getPaymentsByReservation(@NonNull UUID reservationUuid, @NonNull Pageable pageable);
+    PaymentFindDTO getPayment(@NonNull UUID paymentUuid, @NonNull UUID touristUuid, boolean isAdmin);
+    PaginationDTO getPaymentsByReservation(@NonNull UUID reservationUuid, @NonNull Pageable pageable, @NonNull UUID touristUuid, boolean isAdmin);
     PaginationDTO getPaymentsByTourist(@NonNull UUID touristUuid, PaymentStatus status, @NonNull Pageable pageable);
     PaginationDTO getAllPayments(PaymentStatus status, PaymentType type, PaymentMethod method, @NonNull Pageable pageable);
 }

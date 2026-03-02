@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.controller;
 
+import com.desertakal.desertakal.Security.user.CustomUserDetails;
 import com.desertakal.desertakal.exception.custom.FileUploadException;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
@@ -7,7 +8,9 @@ import com.desertakal.desertakal.model.dto.tourist.TouristDTO;
 import com.desertakal.desertakal.model.dto.tourist.TouristUpdateDTO;
 import com.desertakal.desertakal.model.dto.user.UserFindDTO;
 import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
+import com.desertakal.desertakal.model.enums.PaymentStatus;
 import com.desertakal.desertakal.model.enums.ReservationStatus;
+import com.desertakal.desertakal.service.interfaces.PaymentService;
 import com.desertakal.desertakal.service.interfaces.ReservationService;
 import com.desertakal.desertakal.service.interfaces.TourService;
 import com.desertakal.desertakal.service.interfaces.TouristService;
@@ -24,6 +27,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +42,7 @@ public class TouristController {
     private final TouristService service;
     private final TourService tourService;
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
     @GetMapping("/{uuid}")
     @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true)")
@@ -52,17 +57,8 @@ public class TouristController {
 
         log.debug("Found tourist data: {}", result);
 
-        var response = StandardResponseDTO.<TouristDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Tourist details retrieved successfully")
-                .status(200)
-                .path(request.getServletPath())
-                .data(result)
-                .build();
-
         log.info("Successfully retrieved tourist for UUID: {}", uuid);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse("Tourist details retrieved successfully", HttpStatus.OK, request, result));
     }
 
     @PatchMapping("/{uuid}/avatar")
@@ -83,16 +79,7 @@ public class TouristController {
         var result = service.updateAvatar(uuid, avatar);
 
         log.info("Successfully updated avatar for Tourist: {}. New Path stored.", uuid);
-
-        var response = StandardResponseDTO.<TouristDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Profile updated successfully")
-                .status(200)
-                .data(result)
-                .path(request.getServletPath())
-                .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse("Profile Avatar updated successfully", HttpStatus.OK, request, result));
     }
 
     @PatchMapping("/{uuid}")
@@ -108,17 +95,9 @@ public class TouristController {
 
         var result = service.update(uuid, dto);
 
-        var response = StandardResponseDTO.<TouristDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("")
-                .status(200)
-                .path(request.getServletPath())
-                .data(result)
-                .build();
-
         log.info("Tourist with UUID: {} has been successfully patched via {}", uuid, request.getServletPath());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse("Profile updated successfully", HttpStatus.OK, request, result));
     }
 
     @GetMapping("/{uuid}/tours")
@@ -142,18 +121,10 @@ public class TouristController {
         String message = String.format("Successfully retrieved %d tour(s) for the requested tourist profile.",
                 result.getTotalElements());
 
-        var response = StandardResponseDTO.<PaginationDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message(message)
-                .status(200)
-                .path(request.getServletPath())
-                .data(result)
-                .build();
-
         log.info("Successfully returned {} tours for Tourist UUID: {} [Status: 200]",
                 result.getTotalElements(), uuid);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse(message, HttpStatus.OK, request, result));
     }
 
     @GetMapping("/{uuid}/reservations")
@@ -172,17 +143,34 @@ public class TouristController {
 
         PaginationDTO result = reservationService.getByTourist(uuid, tour, guide, status, startDate, endDate, pageable);
 
-        var response = StandardResponseDTO.<PaginationDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Your reservations have been retrieved successfully")
-                .status(HttpStatus.OK.value())
-                .path(request.getServletPath())
-                .data(result)
-                .build();
-
         log.info("Successfully dispatched {} reservations to owner: {}", result.getTotalElements(), uuid);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse("Your reservations have been retrieved successfully", HttpStatus.OK, request, result));
+    }
+
+    @GetMapping("/{uuid}/payments")
+    @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, false ) and hasRole('TOURIST')")
+    public ResponseEntity<@NonNull StandardResponseDTO<PaginationDTO>> myPayments(
+            @PathVariable UUID uuid,
+            @RequestParam(required = false) PaymentStatus status,
+            @ParameterObject Pageable pageable,
+            @NonNull HttpServletRequest request) {
+
+        log.info("REST request by tourist {} to get payments with status: {}", uuid, status);
+
+        PaginationDTO result = paymentService.getPaymentsByTourist(uuid, status, pageable);
+
+        return ResponseEntity.ok(buildResponse("Personal payments history retrieved", HttpStatus.OK, request, result));
+    }
+
+    private <T> StandardResponseDTO<T> buildResponse(String message, HttpStatus status, HttpServletRequest request, T data) {
+        return StandardResponseDTO.<T>builder()
+                .timestamp(LocalDateTime.now())
+                .message(message)
+                .status(status.value())
+                .path(request.getServletPath())
+                .data(data)
+                .build();
     }
 
 }

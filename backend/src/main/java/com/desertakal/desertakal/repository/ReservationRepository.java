@@ -7,6 +7,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -16,5 +17,10 @@ import java.util.UUID;
 public interface ReservationRepository extends JpaRepository<@NonNull Reservation, @NonNull UUID>, JpaSpecificationExecutor<@NonNull Reservation> {
     Optional<@NonNull Reservation> findByUuid(@NonNull UUID uuid);
 
+    @EntityGraph(attributePaths = {
+            "tour",
+            "guide",
+            "tourist"
+    })
     Optional<Reservation> findByReference(String reference);
 }

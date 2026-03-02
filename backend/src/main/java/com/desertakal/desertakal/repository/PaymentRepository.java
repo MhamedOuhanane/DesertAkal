@@ -17,6 +17,12 @@ import java.util.UUID;
 
 public interface PaymentRepository extends JpaRepository<@NonNull Payment, @NonNull UUID>, JpaSpecificationExecutor<@NonNull Payment> {
 
+    @EntityGraph(attributePaths = {
+            "reservation",
+            "reservation.tour",
+            "reservation.guide",
+            "reservation.tourist"
+    })
     Optional<Payment> findByUuid(UUID uuid);
 
     Optional<Payment> findByGatewayPaymentId(String gatewayPaymentId);
