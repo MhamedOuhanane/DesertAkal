@@ -65,6 +65,51 @@ public class PaymentController {
         return ResponseEntity.ok(buildResponse("Payment captured successfully", HttpStatus.OK, request, result));
     }
 
+    @PostMapping("/{uuid}/cancel")
+    @PreAuthorize("hasRole('TOURIST')")
+    public ResponseEntity<@NonNull StandardResponseDTO<PaymentFindDTO>> cancel(
+            @PathVariable UUID uuid,
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @NonNull HttpServletRequest request
+    ) {
+
+        log.info("REST request to cancel pending payment: {} by user: {}", uuid, currentUser.getUuid());
+
+        PaymentFindDTO result = paymentService.cancelPayment(uuid, currentUser.getUuid());
+
+        return ResponseEntity.ok(buildResponse("Payment cancelled successfully", HttpStatus.OK, request, result));
+    }
+
+    @PostMapping("/{uuid}/refund")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<PaymentFindDTO>> refund(
+            @PathVariable UUID uuid,
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @NonNull HttpServletRequest request) {
+
+        log.warn("ADMIN ACTION: Full refund for payment: {} by admin: {}", uuid, currentUser.getUuid());
+
+        PaymentFindDTO result = paymentService.refundPayment(uuid, currentUser.getUuid());
+
+        return ResponseEntity.ok(buildResponse("Full refund processed successfully", HttpStatus.OK, request, result));
+    }
+
+    @PostMapping("/{uuid}/refund/partial")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<PaymentFindDTO>> partialRefund(
+            @PathVariable UUID uuid,
+            @Valid @RequestBody RefundRequestDTO dto,
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @NonNull HttpServletRequest request) {
+
+        log.warn("ADMIN ACTION: Partial refund (${}) for payment: {} by admin: {}",
+                dto.getAmount(), uuid, currentUser.getUuid());
+
+        PaymentFindDTO result = paymentService.partialRefundPayment(uuid, dto.getAmount(), currentUser.getUuid());
+
+        return ResponseEntity.ok(buildResponse("Partial refund processed successfully", HttpStatus.OK, request, result));
+    }
+
     private <T> StandardResponseDTO<T> buildResponse(String message, HttpStatus status, HttpServletRequest request, T data) {
         return StandardResponseDTO.<T>builder()
                 .timestamp(LocalDateTime.now())

@@ -4,6 +4,7 @@ import com.desertakal.desertakal.model.entity.Payment;
 import com.desertakal.desertakal.model.entity.Reservation;
 import com.desertakal.desertakal.model.enums.PaymentStatus;
 import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -20,6 +21,12 @@ public interface PaymentRepository extends JpaRepository<@NonNull Payment, @NonN
 
     Optional<Payment> findByGatewayPaymentId(String gatewayPaymentId);
 
+    @EntityGraph(attributePaths = {
+            "reservation",
+            "reservation.tour",
+            "reservation.guide",
+            "reservation.tourist"
+    })
     boolean existsByReservationAndStatus(Reservation reservation, PaymentStatus status);
 
     @Query("""
