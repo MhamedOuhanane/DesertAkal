@@ -4,6 +4,7 @@ import com.desertakal.desertakal.model.dto.payment.PaymentCreateDTO;
 import com.desertakal.desertakal.model.dto.payment.PaymentFindDTO;
 import com.desertakal.desertakal.model.dto.payment.PaymentResponseDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
+import com.desertakal.desertakal.model.entity.Reservation;
 import com.desertakal.desertakal.model.enums.PaymentMethod;
 import com.desertakal.desertakal.model.enums.PaymentStatus;
 import com.desertakal.desertakal.model.enums.PaymentType;
@@ -19,6 +20,7 @@ public interface PaymentService {
     PaymentFindDTO cancelPayment(@NonNull UUID paymentUuid, @NonNull UUID touristUuid);
     PaymentFindDTO refundPayment(@NonNull UUID paymentUuid, @NonNull UUID adminUuid);
     PaymentFindDTO partialRefundPayment(@NonNull UUID paymentUuid, @NonNull BigDecimal amount, @NonNull UUID adminUuid);
+    void processRefundOnCancel(@NonNull Reservation reservation, boolean isAdmin);
     PaymentFindDTO getPayment(@NonNull UUID paymentUuid);
     PaginationDTO getPaymentsByReservation(@NonNull UUID reservationUuid, @NonNull Pageable pageable);
     PaginationDTO getPaymentsByTourist(@NonNull UUID touristUuid, PaymentStatus status, @NonNull Pageable pageable);

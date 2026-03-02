@@ -3,11 +3,11 @@ package com.desertakal.desertakal.repository;
 import com.desertakal.desertakal.model.entity.Payment;
 import com.desertakal.desertakal.model.entity.Reservation;
 import com.desertakal.desertakal.model.enums.PaymentStatus;
-import io.lettuce.core.dynamic.annotation.Param;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface PaymentRepository extends JpaRepository<@NonNull Payment, @NonNull UUID>, JpaSpecificationExecutor<@NonNull Payment> {
+
     Optional<Payment> findByUuid(UUID uuid);
 
     Optional<Payment> findByGatewayPaymentId(String gatewayPaymentId);
@@ -28,7 +29,6 @@ public interface PaymentRepository extends JpaRepository<@NonNull Payment, @NonN
                     AND p.status = :status
                         AND p.type = 'PAYMENT'
     """)
-
     BigDecimal getTotalPaidForReservation(@Param("reservation") Reservation reservation, @Param("status") PaymentStatus status);
 
     @Query("""
