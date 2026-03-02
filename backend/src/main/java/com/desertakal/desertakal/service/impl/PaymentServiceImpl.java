@@ -141,8 +141,25 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public PaymentFindDTO cancelPayment(@NonNull UUID paymentUuid, @NonNull UUID touristUuid) {
-        return null;
+        log.info("Cancelling payment: {}", paymentUuid);
+
+        Payment payment = findPayment(paymentUuid);
+
+        validateOwnership(payment.getReservation(), touristUuid);
+
+        if (payment.getStatus() != PaymentStatus.PENDING) {
+            throw new BusinessRuleException("Only pending payments can be cancelled. Current status: " + payment.getStatus());
+        }
+
+        payment.setStatus(PaymentStatus.CANCELED);
+        repository.save(payment);
+
+        log.info("Payment {} cancelled by tourist {}",
+                paymentUuid, touristUuid);
+
+        return mapper.toFindDto(payment);
     }
 
     @Override
