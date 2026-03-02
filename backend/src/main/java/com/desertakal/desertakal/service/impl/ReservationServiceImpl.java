@@ -10,10 +10,7 @@ import com.desertakal.desertakal.model.entity.*;
 import com.desertakal.desertakal.model.enums.ReservationStatus;
 import com.desertakal.desertakal.model.mapper.ReservationMapper;
 import com.desertakal.desertakal.repository.*;
-import com.desertakal.desertakal.service.interfaces.DocumentGeneratorService;
-import com.desertakal.desertakal.service.interfaces.FileStorageService;
-import com.desertakal.desertakal.service.interfaces.NotificationService;
-import com.desertakal.desertakal.service.interfaces.ReservationService;
+import com.desertakal.desertakal.service.interfaces.*;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
@@ -46,6 +43,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final NotificationService notificationService;
     private final DocumentGeneratorService documentGeneratorService;
     private final FileStorageService fileStorageService;
+    private final PaymentService paymentService;
 
     @Override
     @Transactional
@@ -250,13 +248,7 @@ public class ReservationServiceImpl implements ReservationService {
             throw new BusinessRuleException("This reservation has already been rejected and cannot be cancelled.");
         }
 
-        if (reservation.getStatus().equals(ReservationStatus.CONFIRMED)) {
-            BigDecimal refundFactor = isAdmin ? BigDecimal.ONE : BigDecimal.valueOf(0.9);
-            BigDecimal refundAmount = reservation.getAmount().multiply(refundFactor);
-
-            log.info("Processing Refund for confirmed reservation {}: Total Amount: {}, Refundable: {} (Factor: {})",
-                    reservationUuid, reservation.getAmount(), refundAmount, refundFactor);
-        }
+        paymentService.processRefundOnCancel(reservation, isAdmin);
 
         reservation.setStatus(ReservationStatus.CANCELLED);
         repository.save(reservation);
