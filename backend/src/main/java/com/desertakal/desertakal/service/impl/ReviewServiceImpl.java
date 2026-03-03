@@ -70,8 +70,27 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional
     public ReviewDTO update(@NonNull UUID reviewUuid, @NonNull ReviewUpdateDTO dto, @NonNull UUID touristUuid) {
-        return null;
+
+        log.info("Updating review {} by tourist {}",
+                reviewUuid, touristUuid);
+
+        Review review = findReview(reviewUuid);
+
+        validateOwnership(review, touristUuid);
+
+        mapper.updateEntityFromDto(dto, review);
+        review = repository.save(review);
+
+        resolver.recalculateRating(review.getReviewableUuid(), review.getReviewableType());
+
+        log.info("Review {} updated", reviewUuid);
+
+        ReviewDTO findDto = mapper.toDto(review);
+        findDto.setReviewableName(resolver.getDisplayName(review.getReviewableUuid(), review.getReviewableType()));
+
+        return findDto;
     }
 
     @Override
@@ -117,8 +136,8 @@ public class ReviewServiceImpl implements ReviewService {
                 });
     }
 
-    private void validateOwnership(Review review, UUID touristUuid, boolean isAdmin) {
-        if (!review.getTourist().getUuid().equals(touristUuid) && !isAdmin) {
+    private void validateOwnership(Review review, UUID touristUuid) {
+        if (!review.getTourist().getUuid().equals(touristUuid)) {
             throw new UnauthorizedActionException("You can only modify or delete your own reviews.");
         }
     }
