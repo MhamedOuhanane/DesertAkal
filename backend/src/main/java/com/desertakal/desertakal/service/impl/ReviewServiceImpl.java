@@ -14,15 +14,19 @@ import com.desertakal.desertakal.model.mapper.ReviewMapper;
 import com.desertakal.desertakal.repository.ReviewRepository;
 import com.desertakal.desertakal.repository.TouristRepository;
 import com.desertakal.desertakal.service.interfaces.ReviewService;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -119,22 +123,39 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewDTO get(@NonNull UUID reviewUuid) {
-        return null;
+        log.info("Fetching review: {}", reviewUuid);
+
+        Review review = findReview(reviewUuid);
+
+        ReviewDTO dto = mapper.toDto(review);
+        dto.setReviewableName(resolver.getDisplayName(review.getReviewableUuid(), review.getReviewableType()));
+        return dto;
     }
 
     @Override
     public PaginationDTO getByReviewable(@NonNull UUID reviewableUuid, @NonNull ReviewableType type, BigDecimal minRating, @NonNull Pageable pageable) {
-        return null;
+        log.info("Fetching reviews for {} {} [Page: {}]",
+                type, reviewableUuid, pageable.getPageNumber());
+
+        Specification<@NonNull Review> spec = getSpecification(null, reviewableUuid, type, minRating);
+
+        Page<@NonNull Review> page = repository.findAll(spec, pageable);
+
+        return buildPaginationDTO(page);
     }
 
     @Override
     public PaginationDTO getByTourist(@NonNull UUID touristUuid, BigDecimal minRating, @NonNull Pageable pageable) {
-        return null;
+        log.info("Fetching reviews by tourist {} (minRating: {})", touristUuid, minRating);
+        Specification<@NonNull Review> spec = getSpecification(touristUuid, null, null, minRating);
+        return buildPaginationDTO(repository.findAll(spec, pageable));
     }
 
     @Override
     public PaginationDTO getAll(ReviewableType type, BigDecimal minRating, @NonNull Pageable pageable) {
-        return null;
+        log.info("Admin fetching all reviews [Type: {}, minRating: {}]", type, minRating);
+        Specification<@NonNull Review> spec = getSpecification(null, null, type, minRating);
+        return buildPaginationDTO(repository.findAll(spec, pageable));
     }
 
     private Review findReview(UUID uuid) {
@@ -171,5 +192,37 @@ public class ReviewServiceImpl implements ReviewService {
                 .isFirst(page.isFirst())
                 .isLast(page.isLast())
                 .build();
+    }
+
+    private Specification<@NonNull Review> getSpecification(UUID touristUuid, UUID reviewableUuid, ReviewableType type, BigDecimal minRating) {
+        return (root, query, cb) -> {
+
+            log.debug("Building Review Specification [touristUuid: {}, reviewableUuid: {}, type: {}, minRating: {}]",
+                    touristUuid, reviewableUuid, type, minRating);
+
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (touristUuid != null) {
+                predicates.add(cb.equal(root.get("tourist").get("uuid"), touristUuid));
+                log.debug("Filter applied: tourist.uuid = '{}'", touristUuid);
+            }
+
+            if (reviewableUuid != null) {
+                predicates.add(cb.equal(root.get("reviewableUuid"), reviewableUuid));
+                log.debug("Filter applied: reviewableUuid = '{}'", reviewableUuid);
+            }
+
+            if (type != null) {
+                predicates.add(cb.equal(root.get("reviewableType"), type));
+                log.debug("Filter applied: reviewableType = '{}'", type);
+            }
+
+            if (minRating != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("rating"), minRating));
+                log.debug("Filter applied: rating >= '{}'", minRating);
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
     }
 }
