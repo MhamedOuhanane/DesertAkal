@@ -94,8 +94,27 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional
     public void delete(@NonNull UUID reviewUuid, @NonNull UUID currentUserUuid, boolean isAdmin) {
 
+        log.info("Deleting review {} by user {} (admin: {})",
+                reviewUuid, currentUserUuid, isAdmin);
+
+        Review review = findReview(reviewUuid);
+
+        if (!isAdmin) {
+            validateOwnership(review, currentUserUuid);
+        }
+
+        UUID reviewableUuid = review.getReviewableUuid();
+        ReviewableType reviewableType = review.getReviewableType();
+
+        repository.delete(review);
+
+        resolver.recalculateRating(reviewableUuid, reviewableType);
+
+        log.info("Review {} deleted. Rating recalculated for {} {}",
+                reviewUuid, reviewableType, reviewableUuid);
     }
 
     @Override
