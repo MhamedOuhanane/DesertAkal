@@ -69,3 +69,5 @@ databaseChangeLog:
       file: db/changelog/034_update_column_update_at name_table_payments.xml
   - include:
       file: db/changelog/035_add_column_reference_table_reservation.xml
+  - include:
+      file: db/changelog/036_update_column_transaction_id_table_payments.xml

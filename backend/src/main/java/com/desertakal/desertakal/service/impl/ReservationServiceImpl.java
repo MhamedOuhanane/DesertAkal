@@ -4,15 +4,13 @@ import com.desertakal.desertakal.exception.custom.*;
 import com.desertakal.desertakal.model.dto.reservation.ReservationCreateDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationFindDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationUpdateDTO;
+import com.desertakal.desertakal.model.dto.reservation.ReservationVerificationDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.entity.*;
 import com.desertakal.desertakal.model.enums.ReservationStatus;
 import com.desertakal.desertakal.model.mapper.ReservationMapper;
 import com.desertakal.desertakal.repository.*;
-import com.desertakal.desertakal.service.interfaces.DocumentGeneratorService;
-import com.desertakal.desertakal.service.interfaces.FileStorageService;
-import com.desertakal.desertakal.service.interfaces.NotificationService;
-import com.desertakal.desertakal.service.interfaces.ReservationService;
+import com.desertakal.desertakal.service.interfaces.*;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
@@ -45,6 +43,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final NotificationService notificationService;
     private final DocumentGeneratorService documentGeneratorService;
     private final FileStorageService fileStorageService;
+    private final PaymentService paymentService;
 
     @Override
     @Transactional
@@ -249,13 +248,7 @@ public class ReservationServiceImpl implements ReservationService {
             throw new BusinessRuleException("This reservation has already been rejected and cannot be cancelled.");
         }
 
-        if (reservation.getStatus().equals(ReservationStatus.CONFIRMED)) {
-            BigDecimal refundFactor = isAdmin ? BigDecimal.ONE : BigDecimal.valueOf(0.9);
-            BigDecimal refundAmount = reservation.getAmount().multiply(refundFactor);
-
-            log.info("Processing Refund for confirmed reservation {}: Total Amount: {}, Refundable: {} (Factor: {})",
-                    reservationUuid, reservation.getAmount(), refundAmount, refundFactor);
-        }
+        paymentService.processRefundOnCancel(reservation, isAdmin);
 
         reservation.setStatus(ReservationStatus.CANCELLED);
         repository.save(reservation);
@@ -321,7 +314,7 @@ public class ReservationServiceImpl implements ReservationService {
         log.info("REST Request to fetch all Reservations with filters | Tour: {}, Status: {}, Period: [{} to {}] | Page: {}, Size: {}",
                 tour, status, startDate, endDate, pageable.getPageNumber(), pageable.getPageSize());
 
-        Specification<@NonNull Reservation> spec = getToursSpecification(null, null, tour, guide, tourist, status, startDate, endDate);
+        Specification<@NonNull Reservation> spec = getSpecification(null, null, tour, guide, tourist, status, startDate, endDate);
 
         log.debug("Executing paginated database query for Reservations...");
         Page<@NonNull Reservation> reservationPages = repository.findAll(spec, pageable);
@@ -346,7 +339,7 @@ public class ReservationServiceImpl implements ReservationService {
         log.info("Fetching reservations for Tourist: {} | Filters -> Tour: {}, Guide: {}, Status: {}",
                 touristUuid, tour, guide, status);
 
-        Specification<@NonNull Reservation> spec = getToursSpecification(touristUuid, null, tour, guide, null, status, startDate, endDate);
+        Specification<@NonNull Reservation> spec = getSpecification(touristUuid, null, tour, guide, null, status, startDate, endDate);
 
         log.debug("Executing paginated query for Tourist reservations. Page: {}, Size: {}",
                 pageable.getPageNumber(), pageable.getPageSize());
@@ -373,7 +366,7 @@ public class ReservationServiceImpl implements ReservationService {
         log.info("Fetching assigned tours for Guide: {} | Filters -> Tour: {}, Tourist: {}, Status: {}",
                 guideUuid, tour, tourist, status);
 
-        Specification<@NonNull Reservation> spec = getToursSpecification(null, guideUuid, tour, null, tourist, status, startDate, endDate);
+        Specification<@NonNull Reservation> spec = getSpecification(null, guideUuid, tour, null, tourist, status, startDate, endDate);
 
         log.debug("Executing paginated query for Guide assignments. Page: {}, Size: {}",
                 pageable.getPageNumber(), pageable.getPageSize());
@@ -405,8 +398,12 @@ public class ReservationServiceImpl implements ReservationService {
                     return new ResourceNotFoundException("Reservation", "identifier", reservationUuid.toString());
                 });
 
-        ReservationStatus status = reservation.getStatus();
+        if (reservation.getPayments() != null && !reservation.getPayments().isEmpty()) {
+            log.warn("Deletion rejected: Reservation {} has associated payment records.", reservationUuid);
+            throw new BusinessRuleException("Cannot delete a reservation that has payment history. Please cancel it instead for audit purposes.");
+        }
 
+        ReservationStatus status = reservation.getStatus();
         if (status.equals(ReservationStatus.CONFIRMED) || status.equals(ReservationStatus.COMPLETED)) {
             log.warn("Forbidden Action: Attempted to delete a {} reservation: {}", status, reservationUuid);
             throw new BusinessRuleException(String.format("Cannot delete a reservation that is already %s.", status.name().toLowerCase()));
@@ -469,6 +466,19 @@ public class ReservationServiceImpl implements ReservationService {
         return content;
     }
 
+    @Override
+    public ReservationVerificationDTO verifyReservation(@NonNull UUID reservationUuid) {
+        log.info("Verifying reservation authenticity: {}", reservationUuid);
+
+        Reservation reservation = repository.findByUuid(reservationUuid)
+                .orElseThrow(() -> {
+                    log.error("Verification failed: Reservation {} not found in database", reservationUuid);
+                    return new ResourceNotFoundException("Reservation", "uuid", reservationUuid.toString());
+                });
+
+        return mapper.toVerificationDto(reservation);
+    }
+
     private void sendReservationNotifications(Tour tour, Tourist tourist, Guide guide) {
         log.info("Sending notification to Tourist: {} and Guide: {}", tourist.getUuid(), guide.getUuid());
 
@@ -518,7 +528,7 @@ public class ReservationServiceImpl implements ReservationService {
         log.debug("Cancellation notifications dispatched to Tourist: {} and Guide: {}", tourist.getUuid(), guide.getUuid());
     }
 
-    private Specification<@NonNull Reservation> getToursSpecification(
+    private Specification<@NonNull Reservation> getSpecification(
             UUID touristUuid, UUID guideUuid,
             String tour, String guide, String tourist,
             ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate) {

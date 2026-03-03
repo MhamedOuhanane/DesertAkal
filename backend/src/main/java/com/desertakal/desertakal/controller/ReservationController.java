@@ -4,9 +4,11 @@ import com.desertakal.desertakal.Security.user.CustomUserDetails;
 import com.desertakal.desertakal.model.dto.reservation.ReservationCreateDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationFindDTO;
 import com.desertakal.desertakal.model.dto.reservation.ReservationUpdateDTO;
+import com.desertakal.desertakal.model.dto.reservation.ReservationVerificationDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.enums.ReservationStatus;
+import com.desertakal.desertakal.service.interfaces.PaymentService;
 import com.desertakal.desertakal.service.interfaces.ReservationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -34,6 +36,7 @@ import java.util.UUID;
 @Slf4j
 public class ReservationController {
     private final ReservationService service;
+    private final PaymentService paymentService;
 
     @PostMapping
     @PreAuthorize("hasRole('TOURIST')")
@@ -50,18 +53,11 @@ public class ReservationController {
 
         ReservationFindDTO result = service.create(dto, currentUser.getUuid());
 
-        var response = StandardResponseDTO.<ReservationFindDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Reservation created successfully")
-                .status(HttpStatus.CREATED.value())
-                .data(result)
-                .path(request.getServletPath())
-                .build();
-
         log.info("Reservation created successfully for Tourist: {} | Reservation UUID: {}",
                 currentUser.getUuid(), result.getUuid());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(buildResponse("Reservation created successfully", HttpStatus.CREATED, request, result));
+
     }
 
     @PatchMapping("/{uuid}")
@@ -77,18 +73,10 @@ public class ReservationController {
 
         ReservationFindDTO result = service.update(uuid, dto, currentUser.getUuid());
 
-        var response = StandardResponseDTO.<ReservationFindDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Reservation updated successfully")
-                .status(HttpStatus.CREATED.value())
-                .data(result)
-                .path(request.getServletPath())
-                .build();
-
         log.info("Reservation updated successfully for Tourist: {} | Reservation UUID: {}",
                 result.getTourUuid(), result.getUuid());
 
-        return ResponseEntity.status(200).body(response);
+        return ResponseEntity.ok(buildResponse("Reservation updated successfully", HttpStatus.OK, request, result));
     }
 
     @PatchMapping("/{uuid}/cancel")
@@ -106,16 +94,8 @@ public class ReservationController {
 
         service.cancel(uuid, currentUser.getUuid(), isAdmin);
 
-        var response = StandardResponseDTO.<Void>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Reservation has been cancelled successfully")
-                .status(HttpStatus.OK.value())
-                .path(request.getServletPath())
-                .build();
-
         log.info("Reservation {} cancelled successfully", uuid);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse("Reservation has been cancelled successfully", HttpStatus.OK, request, null));
     }
 
     @GetMapping("/{uuid}")
@@ -133,17 +113,8 @@ public class ReservationController {
 
         ReservationFindDTO result = service.get(uuid, currentUser.getUuid(), isAdmin);
 
-        var response = StandardResponseDTO.<ReservationFindDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Reservation details retrieved successfully")
-                .status(HttpStatus.OK.value())
-                .data(result)
-                .path(request.getServletPath())
-                .build();
-
         log.info("Successfully dispatched details for Reservation: {} to User: {}", uuid, currentUser.getUuid());
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse("Reservation details retrieved successfully", HttpStatus.OK, request, result));
     }
 
     @GetMapping("/ref/{reference}")
@@ -161,18 +132,9 @@ public class ReservationController {
 
         ReservationFindDTO result = service.get(reference, currentUser.getUuid(), isAdmin);
 
-        var response = StandardResponseDTO.<ReservationFindDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Reservation details retrieved successfully via Reference")
-                .status(HttpStatus.OK.value())
-                .data(result)
-                .path(request.getServletPath())
-                .build();
-
         log.info("Successfully dispatched details for Reference: {} to User: {}",
                 reference, currentUser.getUuid());
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse("Reservation details retrieved successfully via Reference", HttpStatus.OK, request, result));
     }
 
     @GetMapping
@@ -192,23 +154,14 @@ public class ReservationController {
 
         PaginationDTO result = service.getAll(tour, guide, tourist, status, startDate, endDate, pageable);
 
-        var response = StandardResponseDTO.<PaginationDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Reservations retrieved successfully")
-                .status(HttpStatus.OK.value())
-                .data(result)
-                .path(request.getServletPath())
-                .build();
-
         log.info("Successfully returned {} reservations for page {}",
                 result.getTotalElements(), pageable.getPageNumber());
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse("Reservations retrieved successfully", HttpStatus.OK, request, result));
     }
 
     @DeleteMapping("/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<@org.jspecify.annotations.NonNull StandardResponseDTO<Void>> delete(
+    public ResponseEntity<@NonNull StandardResponseDTO<Void>> delete(
             @PathVariable UUID uuid,
             HttpServletRequest request
     ) {
@@ -217,16 +170,8 @@ public class ReservationController {
 
         service.delete(uuid);
 
-        var response = StandardResponseDTO.<Void>builder()
-                .timestamp(LocalDateTime.now())
-                .status(200)
-                .message("Reservation has been successfully deleted")
-                .path(request.getServletPath())
-                .build();
-
         log.info("Successfully deleted Reservation with UUID: {} [Status: 200 OK]", uuid);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse("Payments", HttpStatus.OK, request, null));
     }
 
     @GetMapping("/{uuid}/download")
@@ -248,5 +193,50 @@ public class ReservationController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdfContent);
+    }
+
+    @GetMapping("/verify/{uuid}")
+    public ResponseEntity<@NonNull StandardResponseDTO<ReservationVerificationDTO>> verify(
+            @PathVariable UUID uuid,
+            HttpServletRequest request
+    ) {
+        log.info("Public verification request for reservation: {}", uuid);
+
+        ReservationVerificationDTO result = service.verifyReservation(uuid);
+
+        String message = result.isValid()
+                ? "Reservation is valid and confirmed."
+                : "Warning: This reservation is " + result.getStatus().toLowerCase();
+
+        log.info("Verification result for {}: {}", uuid, result.getStatus());
+        return ResponseEntity.ok(buildResponse(message, HttpStatus.OK, request, result));
+    }
+
+    @GetMapping("/{uuid}/payments")
+    @PreAuthorize("hasAnyRole('TOURIST','ADMIN')")
+    public ResponseEntity<@NonNull StandardResponseDTO<PaginationDTO>> byReservation(
+            @PathVariable UUID uuid,
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @ParameterObject Pageable pageable,
+
+            @NonNull HttpServletRequest request) {
+
+        log.info("REST request to get payments for reservation: {}", uuid);
+        boolean isAdmin = currentUser.getAuthorities().stream()
+                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN"));
+
+        PaginationDTO result = paymentService.getPaymentsByReservation(uuid, pageable, currentUser.getUuid(), isAdmin);
+
+        return ResponseEntity.ok(buildResponse("Payments retrieved for reservation", HttpStatus.OK, request, result));
+    }
+
+    private <T> StandardResponseDTO<T> buildResponse(String message, HttpStatus status, HttpServletRequest request, T data) {
+        return StandardResponseDTO.<T>builder()
+                .timestamp(LocalDateTime.now())
+                .message(message)
+                .status(status.value())
+                .path(request.getServletPath())
+                .data(data)
+                .build();
     }
 }
