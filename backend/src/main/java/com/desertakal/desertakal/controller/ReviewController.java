@@ -51,7 +51,7 @@ public class ReviewController {
                 .body(buildResponse("Review created successfully.", HttpStatus.CREATED, request, result));
     }
 
-    @PutMapping("/{uuid}")
+    @PatchMapping("/{uuid}")
     @PreAuthorize("hasRole('TOURIST')")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull ReviewDTO>> update(
             @PathVariable UUID uuid,

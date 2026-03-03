@@ -37,10 +37,10 @@ public class Review {
     @Column(nullable = false)
     private String comment;
 
-    @Column(nullable = false)
+    @Column(name = "reviewable_name", nullable = false)
     private String reviewableName;
 
-    @Column(name = "reviewable_uuid", nullable = false)
+    @Column(name = "reviewable_uuid", columnDefinition = "uuid", nullable = false)
     private UUID reviewableUuid;
 
     @Enumerated(EnumType.STRING)
@@ -56,7 +56,7 @@ public class Review {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tourist")
+    @JoinColumn(name = "tourist_id")
     private Tourist tourist;
 
     @PrePersist

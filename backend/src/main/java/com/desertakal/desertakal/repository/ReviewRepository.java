@@ -16,7 +16,7 @@ public interface ReviewRepository extends JpaRepository<@NonNull Review, @NonNul
     
     Optional<@NonNull Review> findByUuid(@NonNull UUID uuid);
 
-    boolean existsByTouristUuidAndReviewableUuidAndReviewableType(UUID touristUuid, UUID reviewableUuid, ReviewableType reviewableType);
+    boolean existsByTourist_UuidAndReviewableUuidAndReviewableType(UUID touristUuid, UUID reviewableUuid, ReviewableType reviewableType);
 
     @Query("""
         select coalesce(avg(r.rating), 0) from Review r

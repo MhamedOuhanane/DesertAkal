@@ -36,10 +36,11 @@ import java.util.UUID;
 public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository repository;
     private final ReviewMapper mapper;
-    private ReviewableResolver resolver;
+    private final ReviewableResolver resolver;
     private final TouristRepository touristRepository;
 
     @Override
+    @Transactional
     public ReviewDTO create(@NonNull ReviewCreateDTO dto, @NonNull UUID touristUuid) {
         log.info("Creating review for {} {} by tourist {}",
                 dto.getReviewableType(), dto.getReviewableUuid(), touristUuid);
@@ -48,7 +49,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         resolver.resolve(dto.getReviewableUuid(), dto.getReviewableType());
 
-        if (repository.existsByTouristUuidAndReviewableUuidAndReviewableType(
+        if (repository.existsByTourist_UuidAndReviewableUuidAndReviewableType(
                         tourist.getUuid(),
                         dto.getReviewableUuid(),
                         dto.getReviewableType())
@@ -89,9 +90,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         log.info("Review {} updated", reviewUuid);
 
-        ReviewDTO findDto = mapper.toDto(review);
-
-        return findDto;
+        return mapper.toDto(review);
     }
 
     @Override
@@ -124,8 +123,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         Review review = findReview(reviewUuid);
 
-        ReviewDTO dto = mapper.toDto(review);
-        return dto;
+        return mapper.toDto(review);
     }
 
     @Override
