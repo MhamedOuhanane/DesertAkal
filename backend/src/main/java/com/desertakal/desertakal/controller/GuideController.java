@@ -6,9 +6,12 @@ import com.desertakal.desertakal.model.dto.guide.GuideUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.enums.ReservationStatus;
+import com.desertakal.desertakal.model.enums.ReviewableType;
 import com.desertakal.desertakal.service.interfaces.GuideService;
 import com.desertakal.desertakal.service.interfaces.ReservationService;
+import com.desertakal.desertakal.service.interfaces.ReviewService;
 import com.desertakal.desertakal.service.interfaces.TourService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -35,6 +39,7 @@ public class GuideController {
     private final GuideService service;
     private final TourService tourService;
     private final ReservationService reservationService;
+    private final ReviewService reviewService;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -46,17 +51,13 @@ public class GuideController {
 
         var result = service.create(dto);
 
-        var response = StandardResponseDTO.<GuideFindDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Guide account has been created successfully. A welcome email with credentials has been sent.")
-                .status(201)
-                .data(result)
-                .path(request.getServletPath())
-                .build();
-
         log.info("Successfully created Guide with UUID: {}", result.getUuid());
 
-        return ResponseEntity.status(201).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(buildResponse(
+                "Guide account has been created successfully. A welcome email with credentials has been sent.",
+                HttpStatus.CREATED,
+                request, result
+        ));
     }
 
     @GetMapping("/{uuid}")
@@ -69,17 +70,12 @@ public class GuideController {
 
         var result = service.find(uuid);
 
-        var response = StandardResponseDTO.<GuideFindDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Guide details retrieved successfully")
-                .status(200)
-                .path(request.getServletPath())
-                .data(result)
-                .build();
-
         log.info("Successfully retrieved guide details for UUID: {}", uuid);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse(
+                "Guide details retrieved successfully",
+                HttpStatus.OK,
+                request, result));
     }
 
     @GetMapping
@@ -101,17 +97,12 @@ public class GuideController {
 
         var result = service.findAll(search, language, pageable);
 
-        var response = StandardResponseDTO.<PaginationDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Guides retrieved successfully")
-                .status(200)
-                .path(request.getServletPath())
-                .data(result)
-                .build();
-
         log.info("Successfully processed Guides request for path: {}", request.getServletPath());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse(
+                "Guides retrieved successfully",
+                HttpStatus.OK,
+                request, result));
     }
 
     @PatchMapping("/{uuid}")
@@ -127,17 +118,12 @@ public class GuideController {
 
         var result = service.update(uuid, dto);
 
-        var response = StandardResponseDTO.<GuideFindDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Guide info updated successfully")
-                .status(200)
-                .path(request.getServletPath())
-                .data(result)
-                .build();
-
         log.info("Guide with UUID: {} has been successfully patched via {}", uuid, request.getServletPath());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse(
+                "Guide info updated successfully",
+                HttpStatus.OK,
+                request, result));
     }
 
     @GetMapping("/{uuid}/tours")
@@ -161,18 +147,13 @@ public class GuideController {
         String message = String.format("Successfully retrieved %d tour(s) for the requested guide profile.",
                 result.getTotalElements());
 
-        var response = StandardResponseDTO.<PaginationDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message(message)
-                .status(200)
-                .path(request.getServletPath())
-                .data(result)
-                .build();
-
         log.info("Successfully returned {} tours for Guide UUID: {} [Status: 200]",
                 result.getTotalElements(), uuid);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse(
+                message,
+                HttpStatus.OK,
+                request, result));
     }
 
     @GetMapping("/{uuid}/reservations")
@@ -195,17 +176,44 @@ public class GuideController {
 
         PaginationDTO result = reservationService.getByGuide(uuid, tour, tourist, status, startDate, endDate, pageable);
 
-        var response = StandardResponseDTO.<PaginationDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Your assigned reservations have been retrieved successfully")
-                .status(HttpStatus.OK.value())
-                .path(request.getServletPath())
-                .data(result)
-                .build();
-
         log.info("Successfully returned {} assignments for Guide: {} | Page: {}",
                 result.getTotalElements(), uuid, pageable.getPageNumber());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse(
+                "Your assigned reservations have been retrieved successfully",
+                HttpStatus.OK,
+                request, result));
+    }
+
+    @GetMapping("/{uuid}/reviews")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> getReviews(
+            @PathVariable UUID uuid,
+            @RequestParam(required = false) BigDecimal minRating,
+            Pageable pageable,
+            HttpServletRequest request
+    ) {
+        log.info("Guide [{}] is accessing their own reviews. Filter: minRating={}", uuid, minRating);
+
+        log.debug("Guide reviews pagination - Page: {}, Size: {}", pageable.getPageNumber(), pageable.getPageSize());
+
+        PaginationDTO result = reviewService.getByReviewable(uuid, ReviewableType.GUIDE, minRating, pageable);
+
+        log.info("Successfully fetched {} reviews for Guide [{}].", result.getTotalElements(), uuid);
+
+        return ResponseEntity.ok(buildResponse(
+                "Reviews retrieved.",
+                HttpStatus.OK,
+                request, result));
+    }
+
+    private <T> StandardResponseDTO<T> buildResponse(String message, HttpStatus status, HttpServletRequest request, T data) {
+        return StandardResponseDTO.<T>builder()
+                .timestamp(LocalDateTime.now())
+                .message(message)
+                .status(status.value())
+                .path(request.getServletPath())
+                .data(data)
+                .build();
     }
 }

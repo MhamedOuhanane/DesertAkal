@@ -10,10 +10,8 @@ import com.desertakal.desertakal.model.dto.user.UserFindDTO;
 import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
 import com.desertakal.desertakal.model.enums.PaymentStatus;
 import com.desertakal.desertakal.model.enums.ReservationStatus;
-import com.desertakal.desertakal.service.interfaces.PaymentService;
-import com.desertakal.desertakal.service.interfaces.ReservationService;
-import com.desertakal.desertakal.service.interfaces.TourService;
-import com.desertakal.desertakal.service.interfaces.TouristService;
+import com.desertakal.desertakal.service.interfaces.*;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +29,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -43,6 +42,7 @@ public class TouristController {
     private final TourService tourService;
     private final ReservationService reservationService;
     private final PaymentService paymentService;
+    private final ReviewService reviewService;
 
     @GetMapping("/{uuid}")
     @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true)")
@@ -161,6 +161,32 @@ public class TouristController {
         PaginationDTO result = paymentService.getPaymentsByTourist(uuid, status, pageable);
 
         return ResponseEntity.ok(buildResponse("Personal payments history retrieved", HttpStatus.OK, request, result));
+    }
+
+
+    @GetMapping("/{uuid}/reviews")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> getReviews(
+            @PathVariable UUID uuid,
+            @RequestParam(required = false) BigDecimal minRating,
+            Pageable pageable,
+            HttpServletRequest request) {
+
+        log.info("REST request to fetch review history for Tourist [{}]. Filter: minRating={}",
+                uuid, minRating != null ? minRating : "NONE");
+
+        log.debug("Tourist reviews pagination - Page: {}, Size: {}, Sort: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+
+        PaginationDTO result = reviewService.getByTourist(uuid, minRating, pageable);
+
+        log.info("Successfully retrieved {} reviews written by Tourist [{}].",
+                result.getTotalElements(), uuid);
+
+        return ResponseEntity.ok(buildResponse(
+                "Tourist review history retrieved successfully.",
+                HttpStatus.OK,
+                request, result));
     }
 
     private <T> StandardResponseDTO<T> buildResponse(String message, HttpStatus status, HttpServletRequest request, T data) {

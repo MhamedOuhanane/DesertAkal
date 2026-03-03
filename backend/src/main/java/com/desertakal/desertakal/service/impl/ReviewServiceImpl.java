@@ -60,6 +60,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         Review review = mapper.toEntity(dto);
         review.setTourist(tourist);
+        review.setReviewableName(resolver.getDisplayName(dto.getReviewableUuid(), dto.getReviewableType()));
         repository.save(review);
 
         resolver.recalculateRating(dto.getReviewableUuid(), dto.getReviewableType());
@@ -67,10 +68,7 @@ public class ReviewServiceImpl implements ReviewService {
         log.info("Review {} created for {} {}",
                 review.getUuid(), dto.getReviewableType(), dto.getReviewableUuid());
 
-        ReviewDTO reviewDTO = mapper.toDto(review);
-        reviewDTO.setReviewableName(resolver.getDisplayName(dto.getReviewableUuid(), dto.getReviewableType()));
-
-        return reviewDTO;
+        return mapper.toDto(review);
     }
 
     @Override
@@ -92,7 +90,6 @@ public class ReviewServiceImpl implements ReviewService {
         log.info("Review {} updated", reviewUuid);
 
         ReviewDTO findDto = mapper.toDto(review);
-        findDto.setReviewableName(resolver.getDisplayName(review.getReviewableUuid(), review.getReviewableType()));
 
         return findDto;
     }
@@ -128,7 +125,6 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = findReview(reviewUuid);
 
         ReviewDTO dto = mapper.toDto(review);
-        dto.setReviewableName(resolver.getDisplayName(review.getReviewableUuid(), review.getReviewableType()));
         return dto;
     }
 
