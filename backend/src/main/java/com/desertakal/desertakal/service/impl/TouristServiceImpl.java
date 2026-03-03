@@ -3,7 +3,6 @@ package com.desertakal.desertakal.service.impl;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.tourist.TouristDTO;
 import com.desertakal.desertakal.model.dto.tourist.TouristUpdateDTO;
-import com.desertakal.desertakal.model.dto.user.UserFindDTO;
 import com.desertakal.desertakal.model.entity.Tourist;
 import com.desertakal.desertakal.model.mapper.TouristMapper;
 import com.desertakal.desertakal.repository.TouristRepository;

@@ -5,7 +5,6 @@ import com.desertakal.desertakal.model.interfaces.Reviewable;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import lombok.extern.apachecommons.CommonsLog;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

@@ -25,14 +25,14 @@ public interface PaymentRepository extends JpaRepository<@NonNull Payment, @NonN
     })
     Optional<Payment> findByUuid(UUID uuid);
 
-    Optional<Payment> findByGatewayPaymentId(String gatewayPaymentId);
-
     @EntityGraph(attributePaths = {
             "reservation",
             "reservation.tour",
             "reservation.guide",
             "reservation.tourist"
     })
+    Optional<Payment> findByGatewayPaymentId(String gatewayPaymentId);
+
     boolean existsByReservationAndStatus(Reservation reservation, PaymentStatus status);
 
     @Query("""

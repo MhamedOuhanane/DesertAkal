@@ -398,8 +398,12 @@ public class ReservationServiceImpl implements ReservationService {
                     return new ResourceNotFoundException("Reservation", "identifier", reservationUuid.toString());
                 });
 
-        ReservationStatus status = reservation.getStatus();
+        if (reservation.getPayments() != null && !reservation.getPayments().isEmpty()) {
+            log.warn("Deletion rejected: Reservation {} has associated payment records.", reservationUuid);
+            throw new BusinessRuleException("Cannot delete a reservation that has payment history. Please cancel it instead for audit purposes.");
+        }
 
+        ReservationStatus status = reservation.getStatus();
         if (status.equals(ReservationStatus.CONFIRMED) || status.equals(ReservationStatus.COMPLETED)) {
             log.warn("Forbidden Action: Attempted to delete a {} reservation: {}", status, reservationUuid);
             throw new BusinessRuleException(String.format("Cannot delete a reservation that is already %s.", status.name().toLowerCase()));

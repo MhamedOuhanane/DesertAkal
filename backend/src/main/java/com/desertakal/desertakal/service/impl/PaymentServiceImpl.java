@@ -14,6 +14,7 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -115,7 +116,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             handlePaymentCompletion(payment);
 
-            return mapper.toFindDto(payment);
+            return mapper.toFindDto(loadRelations(payment));
 
         } catch (PaymentException e) {
             log.error("Gateway capture failed for {}: {}", gatewayPaymentId, e.getMessage());
@@ -148,7 +149,7 @@ public class PaymentServiceImpl implements PaymentService {
         repository.save(payment);
 
         log.info("Payment {} cancelled by tourist {}", paymentUuid, touristUuid);
-        return mapper.toFindDto(payment);
+        return mapper.toFindDto(loadRelations(payment));
     }
 
 
@@ -294,7 +295,7 @@ public class PaymentServiceImpl implements PaymentService {
         log.info("Fetching payment: {}", paymentUuid);
         Payment payment = findPayment(paymentUuid);
         validateOwnership(payment.getReservation(), touristUuid, isAdmin);
-        return mapper.toFindDto(payment);
+        return mapper.toFindDto(loadRelations(payment));
     }
 
     @Override
@@ -544,5 +545,15 @@ public class PaymentServiceImpl implements PaymentService {
                 .isFirst(page.isFirst())
                 .isLast(page.isLast())
                 .build();
+    }
+
+    private Payment loadRelations(Payment payment) {
+        Reservation r = payment.getReservation();
+        if (r != null) {
+            Hibernate.initialize(r.getTour());
+            Hibernate.initialize(r.getGuide());
+            Hibernate.initialize(r.getTourist());
+        }
+        return payment;
     }
 }
