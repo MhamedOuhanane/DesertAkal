@@ -21,6 +21,7 @@ public abstract class ReviewMapper {
     @Mapping(source = "tourist.uuid", target = "touristUuid")
     @Mapping(expression = "java(review.getTourist().getFullName())", target = "touristName")
     @Mapping(source = "tourist.photo", target = "touristPhoto", qualifiedByName = "toPhotoUrl")
+    @Mapping(target = "reviewableName", expression = "java(review.Re)")
     public abstract ReviewDTO toDto(Review review);
 
     @Mapping(target = "id", ignore = true)
