@@ -23,4 +23,5 @@ public class ReviewDTO {
     private String touristPhoto;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String reviewableName;
 }

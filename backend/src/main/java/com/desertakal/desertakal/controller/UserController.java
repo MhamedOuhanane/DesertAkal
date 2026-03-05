@@ -6,6 +6,7 @@ import com.desertakal.desertakal.model.dto.user.UserFindDTO;
 import com.desertakal.desertakal.model.dto.user.UserStatusUpdateDTO;
 import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
 import com.desertakal.desertakal.model.enums.UserStatus;
+import com.desertakal.desertakal.service.interfaces.ArticleService;
 import com.desertakal.desertakal.service.interfaces.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -15,6 +16,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +32,7 @@ import java.util.UUID;
 @Slf4j
 public class UserController {
     private final UserService userService;
+    private final ArticleService articleService;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -51,13 +54,9 @@ public class UserController {
 
         var result = userService.findAll(search, status, roleName, pageable);
 
-        var response = StandardResponseDTO.<PaginationDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Users retrieved successfully")
-                .status(200)
-                .path(request.getServletPath())
-                .data(result)
-                .build();
+        var response = buildResponse(
+                "Users retrieved successfully",
+                request, result);
 
         log.info("Successfully processed users request for path: {}", request.getServletPath());
 
@@ -74,13 +73,9 @@ public class UserController {
 
         var result = userService.find(uuid);
 
-        var response = StandardResponseDTO.<UserFindDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("User details retrieved successfully")
-                .status(200)
-                .path(request.getServletPath())
-                .data(result)
-                .build();
+        var response = buildResponse(
+                "User details retrieved successfully",
+                request, result);
 
         log.info("Successfully retrieved user details for UUID: {}", uuid);
 
@@ -100,13 +95,9 @@ public class UserController {
 
         var result = userService.update(uuid, dto);
 
-        var response = StandardResponseDTO.<UserFindDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("User info updated successfully")
-                .status(200)
-                .path(request.getServletPath())
-                .data(result)
-                .build();
+        var response = buildResponse(
+                "User info updated successfully",
+                request, result);
 
         log.info("User with UUID: {} has been successfully patched via {}", uuid, request.getServletPath());
 
@@ -125,14 +116,9 @@ public class UserController {
 
         var result = userService.updateStatus(uuid, dto.getStatus());
 
-        return ResponseEntity.ok(
-                StandardResponseDTO.<UserFindDTO>builder()
-                        .timestamp(LocalDateTime.now())
-                        .message("User status updated successfully")
-                        .status(200)
-                        .path(request.getServletPath())
-                        .data(result)
-                        .build()
+        return ResponseEntity.ok(buildResponse(
+                "User status updated successfully",
+                request, result)
         );
     }
 
@@ -147,14 +133,9 @@ public class UserController {
 
         var result = userService.updatePhoto(uuid, photo);
 
-        return ResponseEntity.ok(
-                StandardResponseDTO.<UserFindDTO>builder()
-                        .timestamp(LocalDateTime.now())
-                        .message("User photo updated successfully")
-                        .status(200)
-                        .path(request.getServletPath())
-                        .data(result)
-                        .build()
+        return ResponseEntity.ok(buildResponse(
+                "User photo updated successfully",
+                request, result)
         );
     }
 
@@ -168,17 +149,43 @@ public class UserController {
 
         userService.delete(uuid);
 
-        var response = StandardResponseDTO.<Void>builder()
-                .timestamp(LocalDateTime.now())
-                .message("User has been successfully deleted")
-                .status(200)
-                .path(request.getServletPath())
-                .data(null)
-                .build();
-
 
         log.info("User with UUID: {} deleted successfully", uuid);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse(
+                "User has been successfully deleted",
+                request, null)
+        );
+    }
+
+    @GetMapping("/{uuid}/articles")
+    @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true )")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> getArticles(
+            @PathVariable UUID uuid,
+            Pageable pageable,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to get articles for user: {} | Page: {} | Size: {}",
+                uuid, pageable.getPageNumber(), pageable.getPageSize());
+
+        PaginationDTO result = articleService.getByUser(uuid, pageable);
+
+        log.info("Successfully retrieved {} articles for user: {}",
+                result.getTotalElements(), uuid);
+
+        return ResponseEntity.ok(buildResponse(
+                "Articles retrieved successfully",
+                request, result
+        ));
+    }
+
+    private <T> StandardResponseDTO<T> buildResponse(String message, HttpServletRequest request, T data) {
+        return StandardResponseDTO.<T>builder()
+                .timestamp(LocalDateTime.now())
+                .message(message)
+                .status(HttpStatus.OK.value())
+                .path(request.getServletPath())
+                .data(data)
+                .build();
     }
 }

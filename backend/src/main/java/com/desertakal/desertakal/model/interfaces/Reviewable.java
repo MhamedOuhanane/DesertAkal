@@ -8,7 +8,10 @@ public interface Reviewable {
     Long getId();
     ReviewableType getReviewableType();
     String getDisplayName();
+
     default void updateAverageRating(BigDecimal newAverage) {}
+    void setReviewCount(Integer count);
+
     default void incrementReviewCount() {}
     default void decrementReviewCount() {}
 }

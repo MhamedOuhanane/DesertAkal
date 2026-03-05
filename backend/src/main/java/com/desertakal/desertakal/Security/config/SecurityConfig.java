@@ -42,9 +42,16 @@ public class SecurityConfig {
                                 "/error",
                                 "/favicon.ico"
                         ).permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/api/cities/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tours/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/guides/*/reviews").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/tourists/*/reviews").permitAll()
+
                         .requestMatchers("/api/admins/**").hasRole("ADMIN")
+
                         .requestMatchers("/api/guides/**").hasAnyRole("ADMIN", "GUIDE", "TOURIST")
                         .requestMatchers("/api/tourists/**").hasAnyRole("ADMIN", "TOURIST")
                         .anyRequest().authenticated()

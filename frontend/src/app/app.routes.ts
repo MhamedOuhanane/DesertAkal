@@ -29,7 +29,7 @@ export const routes: Routes = [
 
     {
         path: 'guide',
-        canActivate: [authGuard, roleGuard],
+        // canActivate: [authGuard, roleGuard],
         data: { roles: ['GUIDE'] },
         loadChildren: () => import('./features/guide/guide.routes').then((r) => r.GUIDE_ROUTES),
     },

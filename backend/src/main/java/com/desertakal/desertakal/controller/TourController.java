@@ -7,8 +7,11 @@ import com.desertakal.desertakal.model.dto.tour.TourCreateDTO;
 import com.desertakal.desertakal.model.dto.tour.TourDTO;
 import com.desertakal.desertakal.model.dto.tour.TourFindDTO;
 import com.desertakal.desertakal.model.dto.tour.TourUpdateDTO;
+import com.desertakal.desertakal.model.enums.ReviewableType;
 import com.desertakal.desertakal.service.interfaces.CityService;
+import com.desertakal.desertakal.service.interfaces.ReviewService;
 import com.desertakal.desertakal.service.interfaces.TourService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +38,7 @@ import java.util.UUID;
 public class TourController {
     private final TourService service;
     private final CityService cityService;
+    private final ReviewService reviewService;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -46,17 +51,12 @@ public class TourController {
 
         var result = service.create(dto, image);
 
-        var response = StandardResponseDTO.<TourFindDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Tour has been created successfully.")
-                .status(201)
-                .data(result)
-                .path(request.getServletPath())
-                .build();
-
         log.info("Successfully created Tour with UUID: {}", result.getUuid());
 
-        return ResponseEntity.status(201).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(buildResponse(
+                "Tour has been created successfully.",
+                HttpStatus.CREATED,
+                request, result));
     }
 
     @GetMapping("/{uuid}")
@@ -69,17 +69,12 @@ public class TourController {
 
         var result = service.find(uuid);
 
-        var response = StandardResponseDTO.<TourFindDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Tour details retrieved successfully")
-                .status(200)
-                .path(request.getServletPath())
-                .data(result)
-                .build();
-
         log.info("Successfully retrieved tour details for UUID: {}", uuid);
 
-        return ResponseEntity.ok(response);
+                return ResponseEntity.ok(buildResponse(
+                "Tour details retrieved successfully",
+                HttpStatus.OK,
+                request, result));
     }
 
     @GetMapping
@@ -103,18 +98,13 @@ public class TourController {
 
         var result = service.findAll(search, city, durationStr, minRating, pageable);
 
-        var response = StandardResponseDTO.<PaginationDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Tours list retrieved successfully")
-                .status(200)
-                .data(result)
-                .path(request.getServletPath())
-                .build();
-
         log.info("Successfully fetched {} cities out of {} total elements [Status: 200]",
                 result.getTotalElements(), result.getTotalElements());
 
-        return ResponseEntity.ok(response);
+                return ResponseEntity.ok(buildResponse(
+                "Tours list retrieved successfully",
+                HttpStatus.OK,
+                request, result));
     }
 
     @PatchMapping("/{uuid}")
@@ -129,17 +119,12 @@ public class TourController {
 
         var result = service.update(uuid, dto);
 
-        var response = StandardResponseDTO.<TourFindDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Tour updated successfully: " + result.getTitle())
-                .status(200)
-                .data(result)
-                .path(request.getServletPath())
-                .build();
-
         log.info("Successfully updated Tour with UUID: {} [Status: 200 OK]", uuid);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse(
+                "Tour updated successfully: " + result.getTitle(),
+                HttpStatus.OK,
+                request, result));
     }
 
     @PatchMapping("/{tourUuid}/image")
@@ -153,17 +138,12 @@ public class TourController {
 
         var result = service.updateImage(tourUuid, image);
 
-        var response = StandardResponseDTO.<TourFindDTO>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Tour updated image successfully: " + result.getTitle())
-                .status(200)
-                .data(result)
-                .path(request.getServletPath())
-                .build();
-
         log.info("The tour image was successfully updated using: {} [Status: 200 OK]", tourUuid);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse(
+                "Tour updated image successfully: " + result.getTitle(),
+                HttpStatus.OK,
+                request, result));
     }
 
     @DeleteMapping("/{uuid}")
@@ -177,16 +157,12 @@ public class TourController {
 
         service.delete(uuid);
 
-        var response = StandardResponseDTO.<Void>builder()
-                .timestamp(LocalDateTime.now())
-                .status(200)
-                .message("Tour has been successfully deleted")
-                .path(request.getServletPath())
-                .build();
-
         log.info("Successfully deleted Tour with UUID: {} [Status: 200 OK]", uuid);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse(
+                "Tour has been successfully deleted.",
+                HttpStatus.OK,
+                request, null));
     }
 
     @GetMapping("{uuid}/cities")
@@ -199,17 +175,12 @@ public class TourController {
 
         var result = cityService.findByTour(uuid);
 
-        var response = StandardResponseDTO.<List<CityDTO>>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Successfully retrieved all cities associated with Tour {" + uuid + "} retrieved successfully")
-                .status(200)
-                .path(request.getServletPath())
-                .data(result)
-                .build();
-
         log.info("Successfully retrieved all cities associated with Tour UUID: {}", uuid);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(buildResponse(
+             "Successfully retrieved all cities associated with Tour {" + uuid + "} retrieved successfully",
+             HttpStatus.OK,
+             request, result));
     }
 
     @GetMapping("/top5")
@@ -221,14 +192,40 @@ public class TourController {
 
         List<TourDTO> result = service.findTop5();
 
-        var response = StandardResponseDTO.<List<TourDTO>>builder()
-                .timestamp(LocalDateTime.now())
-                .message("Top 5 highest rated tours retrieved successfully")
-                .status(200)
-                .path(request.getServletPath())
-                .data(result)
-                .build();
+        return ResponseEntity.ok(buildResponse(
+                "Top 5 highest rated tours retrieved successfully",
+                HttpStatus.OK,
+                request, result));
+    }
 
-        return ResponseEntity.ok(response);
+    @GetMapping("/{uuid}/reviews")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> getReviews(
+            @PathVariable UUID uuid,
+            @RequestParam(required = false) BigDecimal minRating,
+            Pageable pageable,
+            HttpServletRequest request
+    ) {
+        log.info("Public access: Fetching reviews for Tour [{}]. Filter: minRating={}", uuid, minRating);
+
+        PaginationDTO result = reviewService.getByReviewable(uuid, ReviewableType.TOUR, minRating, pageable);
+
+        log.info("Tour [{}] reviews retrieved. Total: {}, Current Page: {}",
+                uuid, result.getTotalElements(), result.getPage());
+
+        return ResponseEntity.ok(buildResponse(
+                "Tour reviews retrieved.",
+                HttpStatus.OK,
+                request, result));
+    }
+
+    private <T> StandardResponseDTO<T> buildResponse(String message, HttpStatus status, HttpServletRequest request, T data) {
+        return StandardResponseDTO.<T>builder()
+                .timestamp(LocalDateTime.now())
+                .message(message)
+                .status(status.value())
+                .path(request.getServletPath())
+                .data(data)
+                .build();
     }
 }
