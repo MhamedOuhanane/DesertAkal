@@ -18,5 +18,5 @@ import { RouterLink } from '@angular/router';
 })
 export class BrandLogo {
     readonly link = input<string>('/');
-    readonly isExpanded = input<boolean>(false);
+    readonly isExpanded = input<boolean>(true);
 }

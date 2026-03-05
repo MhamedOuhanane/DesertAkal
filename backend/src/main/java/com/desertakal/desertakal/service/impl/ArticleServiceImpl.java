@@ -73,7 +73,9 @@ public class ArticleServiceImpl implements ArticleService {
         validateOwnership(article, currentUserUuid);
 
         log.debug("Mapping UpdateDTO to Article entity");
-        mapper.updateEntityFromDto(dto, article);
+        if (dto != null) {
+            mapper.updateEntityFromDto(dto, article);
+        }
 
         if (coverImage != null && !coverImage.isEmpty()) {
             replaceImage(article, coverImage);
