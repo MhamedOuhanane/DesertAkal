@@ -18,6 +18,8 @@ public interface UserRepository extends JpaRepository<@NonNull User, @NonNull UU
 
     Optional<User> findByUuid(UUID uuid);
 
+    boolean existsByUuid(@NonNull UUID uuid);
+
     @EntityGraph(attributePaths = {"role", "role.permissions"})
     @Query("SELECT u FROM User u WHERE u.email = :identifier OR u.username = :identifier")
     Optional<User> findByEmailOrUsernameWithSecurity(@Param("identifier") String identifier);

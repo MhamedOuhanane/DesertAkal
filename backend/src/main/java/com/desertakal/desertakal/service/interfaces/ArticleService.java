@@ -3,6 +3,7 @@ package com.desertakal.desertakal.service.interfaces;
 import com.desertakal.desertakal.model.dto.article.ArticleCreateDTO;
 import com.desertakal.desertakal.model.dto.article.ArticleDTO;
 import com.desertakal.desertakal.model.dto.article.ArticleUpdateDTO;
+import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,9 +18,7 @@ public interface ArticleService {
 
     void delete(@NonNull UUID articleUuid, @NonNull UUID currentUserUuid, boolean isAdmin);
 
-    ArticleDTO getByUuid(UUID articleUuid);
+    PaginationDTO getAll(String owner, @NonNull Pageable pageable);
 
-    Page<@NonNull ArticleDTO> getAll(String owner, @NonNull Pageable pageable);
-
-    Page<@NonNull ArticleDTO> getByUser(UUID userUuid, @NonNull Pageable pageable);
+    PaginationDTO getByUser(UUID userUuid, @NonNull Pageable pageable);
 }

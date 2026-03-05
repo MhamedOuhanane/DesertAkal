@@ -32,7 +32,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
+@Transactional(readOnly = true)
 public class ArticleServiceImpl implements ArticleService {
     private final ArticleRepository repository;
     private final ArticleMapper mapper;
@@ -87,23 +87,64 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Transactional
     public void delete(@NonNull UUID articleUuid, @NonNull UUID currentUserUuid, boolean isAdmin) {
 
+        log.info("Starting deletion for Article UUID: {} by user: {} (admin: {})",
+                articleUuid, currentUserUuid, isAdmin);
+
+        Article article = findArticleWithUser(articleUuid);
+
+        if (!isAdmin) {
+            validateOwnership(article, currentUserUuid);
+        }
+
+        log.warn("Article identified for deletion - UUID: {}, CreatedAt: {}",
+                article.getUuid(), article.getCreatedAt());
+
+        String imagePath = article.getCoverImage();
+
+        repository.delete(article);
+
+        deleteImageSafely(imagePath);
+
+        log.info("Article with UUID: {} successfully deleted", articleUuid);
     }
 
     @Override
-    public ArticleDTO getByUuid(UUID articleUuid) {
-        return null;
+    public PaginationDTO getAll(String owner, @NonNull Pageable pageable) {
+        log.info("Fetching all articles [Page: {}, Size: {}]",
+                pageable.getPageNumber(), pageable.getPageSize());
+
+        Specification<@NonNull Article> spec = getSpecification(null, owner);
+
+        Page<@NonNull Article> articlePage = repository.findAll(spec, pageable);
+
+        log.info("Found {} articles on page {} of {}",
+                articlePage.getNumberOfElements(), articlePage.getNumber(), articlePage.getTotalPages());
+
+        return buildPaginationDTO(articlePage);
     }
 
     @Override
-    public Page<@NonNull ArticleDTO> getAll(String owner, @NonNull Pageable pageable) {
-        return null;
-    }
+    public PaginationDTO getByUser(@NonNull UUID userUuid, @NonNull Pageable pageable) {
+        log.info("Fetching articles for user: {} [Page: {}, Size: {}]",
+                userUuid, pageable.getPageNumber(), pageable.getPageSize());
 
-    @Override
-    public Page<@NonNull ArticleDTO> getByUser(UUID userUuid, @NonNull Pageable pageable) {
-        return null;
+        if (!userRepository.existsByUuid(userUuid)) {
+            log.error("Fetch failed: User with UUID {} not found", userUuid);
+            throw new ResourceNotFoundException("User", "identifier", userUuid.toString());
+        }
+
+        Specification<@NonNull Article> spec = getSpecification(userUuid, null);
+
+        Page<@NonNull Article> articlePage = repository.findAll(spec, pageable);
+
+        log.info("Found {} articles for user {} on page {} of {}",
+                articlePage.getTotalElements(), userUuid,
+                articlePage.getNumber(), articlePage.getTotalPages());
+
+        return buildPaginationDTO(articlePage);
     }
 
     private Article findArticleWithUser(UUID uuid) {
@@ -181,5 +222,22 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         article.setCoverImage(newImagePath);
+    }
+
+    private void deleteImageSafely(String path) {
+        if (path == null || path.isBlank()) return;
+
+        if (path.contains("defaults/")) {
+            log.debug("Skipping deletion of default image: {}",path);
+            return;
+        }
+
+        try {
+            fileStorageService.deleteFile(path);
+            log.info("Image deleted from MinIO: {}", path);
+        } catch (Exception e) {
+            log.warn("Failed to delete image '{}': {}",
+                    path, e.getMessage());
+        }
     }
 }
