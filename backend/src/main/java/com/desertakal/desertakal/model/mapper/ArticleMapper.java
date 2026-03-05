@@ -2,6 +2,7 @@ package com.desertakal.desertakal.model.mapper;
 
 import com.desertakal.desertakal.model.dto.article.ArticleCreateDTO;
 import com.desertakal.desertakal.model.dto.article.ArticleDTO;
+import com.desertakal.desertakal.model.dto.article.ArticleUpdateDTO;
 import com.desertakal.desertakal.model.entity.Article;
 import com.desertakal.desertakal.model.enums.FileType;
 import com.desertakal.desertakal.service.interfaces.FileStorageService;
@@ -36,7 +37,7 @@ public abstract class ArticleMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @InheritConfiguration(name = "toEntity")
-    public abstract void updateEntityFromDto(ArticleCreateDTO dto, @MappingTarget Article article);
+    public abstract void updateEntityFromDto(ArticleUpdateDTO dto, @MappingTarget Article article);
 
     public abstract List<ArticleDTO> toDtos(List<Article> articles);
 
