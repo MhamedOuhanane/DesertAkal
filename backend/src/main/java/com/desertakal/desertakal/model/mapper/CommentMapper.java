@@ -2,6 +2,7 @@ package com.desertakal.desertakal.model.mapper;
 
 import com.desertakal.desertakal.model.dto.comment.CommentCreateDTO;
 import com.desertakal.desertakal.model.dto.comment.CommentDTO;
+import com.desertakal.desertakal.model.dto.comment.CommentUpdateDTO;
 import com.desertakal.desertakal.model.entity.Comment;
 import com.desertakal.desertakal.model.enums.FileType;
 import com.desertakal.desertakal.service.interfaces.FileStorageService;
@@ -31,7 +32,7 @@ public abstract class CommentMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @InheritConfiguration(name = "toEntity")
-    public abstract void updateEntityFromDto(CommentCreateDTO dto, @MappingTarget Comment comment);
+    public abstract void updateEntityFromDto(CommentUpdateDTO dto, @MappingTarget Comment comment);
 
     public abstract List<CommentDTO> toDtos(List<Comment> comments);
 
