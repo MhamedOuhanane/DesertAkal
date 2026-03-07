@@ -1,22 +1,17 @@
 package com.desertakal.desertakal.model.dto.comment;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-
-import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentCreateDTO {
+public class CommentUpdateDTO {
     @NotBlank(message = "Content is required")
-    @Size(min = 1, max = 500, message = "Content must be between 1 and 1000 characters")
+    @Size(min = 1, max = 1000,
+            message = "Content must be between 1 and 1000 characters")
     private String content;
-
-    @NotNull(message = "Article UUID is required")
-    private UUID articleUuid;
 }
