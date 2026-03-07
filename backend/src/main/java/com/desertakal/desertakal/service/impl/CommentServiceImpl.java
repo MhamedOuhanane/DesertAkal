@@ -8,13 +8,13 @@ import com.desertakal.desertakal.model.dto.comment.CommentUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.entity.Article;
 import com.desertakal.desertakal.model.entity.Comment;
-import com.desertakal.desertakal.model.enums.ReviewableType;
 import com.desertakal.desertakal.model.mapper.CommentMapper;
 import com.desertakal.desertakal.repository.ArticleRepository;
 import com.desertakal.desertakal.repository.CommentRepository;
 import com.desertakal.desertakal.repository.UserRepository;
 import com.desertakal.desertakal.model.entity.User;
 import com.desertakal.desertakal.service.interfaces.CommentService;
+import com.desertakal.desertakal.service.interfaces.NotificationService;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -39,6 +38,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentMapper mapper;
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
+    private final NotificationService notificationService;
 
 
     @Override
@@ -60,10 +60,10 @@ public class CommentServiceImpl implements CommentService {
         article.incrementCommentCount();
         articleRepository.save(article);
 
-        log.info("Comment created: {} on article: {} "
-                        + "(new count: {})",
-                savedComment.getUuid(), dto.getArticleUuid(),
-                article.getCommentCount());
+        sendNotificationToArticleOwner(article, author);
+
+        log.info("Comment created: {} on article: {} (new count: {})",
+                savedComment.getUuid(), dto.getArticleUuid(), article.getCommentCount());
 
         return mapper.toDto(savedComment);
     }
@@ -162,6 +162,27 @@ public class CommentServiceImpl implements CommentService {
         return buildPaginationDTO(commentPage);
     }
 
+    private void sendNotificationToArticleOwner(Article article, User commentAuthor) {
+        User articleOwner = article.getUser();
+
+        if (!articleOwner.getUuid().equals(commentAuthor.getUuid())) {
+            String title = "New Comment on your article";
+            String articlePreview = article.getContent().length() > 30
+                    ? article.getContent().substring(0, 30) + "..."
+                    : article.getContent();
+
+            String message = String.format("%s commented on your article: '%s'",
+                    commentAuthor.getFullName(), articlePreview);
+
+            try {
+                notificationService.create(title, message, articleOwner.getUuid());
+                log.info("Notification sent to article owner: {}", articleOwner.getUuid());
+            } catch (Exception e) {
+                log.error("Failed to send notification to article owner: {}", e.getMessage());
+            }
+        }
+    }
+
     private Comment findComment(@NonNull UUID uuid) {
         return repository.findByUuid(uuid)
                 .orElseThrow(() -> {
@@ -222,7 +243,7 @@ public class CommentServiceImpl implements CommentService {
             }
 
             if (articleUuid != null) {
-                predicates.add(cb.equal(root.get("articleUuid"), articleUuid));
+                predicates.add(cb.equal(root.get("article").get("uuid"), articleUuid));
                 log.debug("Filter applied: articleUuid = '{}'", articleUuid);
             }
 

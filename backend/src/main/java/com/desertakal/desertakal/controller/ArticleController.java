@@ -7,13 +7,16 @@ import com.desertakal.desertakal.model.dto.article.ArticleUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.service.interfaces.ArticleService;
+import com.desertakal.desertakal.service.interfaces.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +35,7 @@ import java.util.UUID;
 @Slf4j
 public class ArticleController {
     private final ArticleService service;
+    private final CommentService commentService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("isAuthenticated()")
@@ -163,6 +167,21 @@ public class ArticleController {
                 HttpStatus.OK,
                 request, null)
         );
+    }
+
+
+    @GetMapping("/{uuid}/comments")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<@NonNull StandardResponseDTO<PaginationDTO>> getComments(
+            @PathVariable UUID uuid,
+            @ParameterObject @PageableDefault(size = 20) Pageable pageable,
+            HttpServletRequest request) {
+
+        log.info("REST request to get comments for article: {} | Page: {}", uuid, pageable.getPageNumber());
+
+        PaginationDTO result = commentService.getByArticle(uuid, pageable);
+
+        return ResponseEntity.ok(buildResponse("Comments retrieved successfully for article", HttpStatus.OK, request, result));
     }
 
     private <T> StandardResponseDTO<T> buildResponse(String message, HttpStatus status, HttpServletRequest request, T data) {
