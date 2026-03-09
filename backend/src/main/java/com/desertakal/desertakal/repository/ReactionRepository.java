@@ -3,6 +3,7 @@ package com.desertakal.desertakal.repository;
 import com.desertakal.desertakal.model.entity.Article;
 import com.desertakal.desertakal.model.entity.Reaction;
 import com.desertakal.desertakal.model.entity.User;
+import com.desertakal.desertakal.model.enums.ReactionEnum;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,8 @@ public interface ReactionRepository extends JpaRepository<@NonNull Reaction, @No
     List<Object[]> countByArticleUuidGroupByType(@Param("articleUuid") UUID articleUuid);
 
     Page<@NonNull Reaction> findByArticle_Uuid(@NonNull UUID articleUuid, @NonNull Pageable pageable);
+
+    Page<@NonNull Reaction> findByArticle_UuidAndReaction(@NonNull UUID articleUuid, @NonNull ReactionEnum reaction, @NonNull Pageable pageable);
 
     boolean existsByUserAndArticle(@NonNull User user, @NonNull Article article);
 }

@@ -7,7 +7,6 @@ import com.desertakal.desertakal.model.dto.reaction.ReactionToggleResponseDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.entity.Article;
 import com.desertakal.desertakal.model.entity.Reaction;
-import com.desertakal.desertakal.model.entity.Review;
 import com.desertakal.desertakal.model.entity.User;
 import com.desertakal.desertakal.model.enums.ReactionEnum;
 import com.desertakal.desertakal.model.mapper.ReactionMapper;
@@ -36,6 +35,7 @@ public class ReactionServiceImpl implements ReactionService {
     private final ArticleRepository articleRepository;
 
     @Override
+    @Transactional
     public ReactionToggleResponseDTO toggle(@NonNull ReactionCreateDTO dto, @NonNull UUID userUuid) {
 
         log.info("Toggling reaction {} on article: {} by user: {}",
@@ -140,7 +140,7 @@ public class ReactionServiceImpl implements ReactionService {
     }
 
     @Override
-    public PaginationDTO getByArticle(@NonNull UUID articleUuid, @NonNull Pageable pageable) {
+    public PaginationDTO getByArticle(@NonNull UUID articleUuid, ReactionEnum type, @NonNull Pageable pageable) {
         log.info("Fetching reaction list | Article: {} | Page: {} | Size: {}",
                 articleUuid, pageable.getPageNumber(), pageable.getPageSize());
 
@@ -149,7 +149,12 @@ public class ReactionServiceImpl implements ReactionService {
             throw new ResourceNotFoundException("Article", "identifier", articleUuid.toString());
         }
 
-        Page<@NonNull Reaction> reactionPage = repository.findByArticle_Uuid(articleUuid, pageable);
+        Page<@NonNull Reaction> reactionPage;
+        if (type != null) {
+            reactionPage = repository.findByArticle_UuidAndReaction(articleUuid, type, pageable);
+        } else {
+            reactionPage = repository.findByArticle_Uuid(articleUuid, pageable);
+        }
 
         log.info("Reactions retrieved successfully | Total elements: {} | Total pages: {}",
                 reactionPage.getTotalElements(), reactionPage.getTotalPages());

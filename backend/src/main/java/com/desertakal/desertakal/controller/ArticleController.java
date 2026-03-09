@@ -4,16 +4,21 @@ import com.desertakal.desertakal.Security.user.CustomUserDetails;
 import com.desertakal.desertakal.model.dto.article.ArticleCreateDTO;
 import com.desertakal.desertakal.model.dto.article.ArticleDTO;
 import com.desertakal.desertakal.model.dto.article.ArticleUpdateDTO;
+import com.desertakal.desertakal.model.dto.reaction.ReactionDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
+import com.desertakal.desertakal.model.enums.ReactionEnum;
 import com.desertakal.desertakal.service.interfaces.ArticleService;
+import com.desertakal.desertakal.service.interfaces.ReactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +37,7 @@ import java.util.UUID;
 @Slf4j
 public class ArticleController {
     private final ArticleService service;
+    private final ReactionService reactionService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("isAuthenticated()")
@@ -163,6 +169,26 @@ public class ArticleController {
                 HttpStatus.OK,
                 request, null)
         );
+    }
+
+    @GetMapping("/{uuid}/reactions")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<@NonNull StandardResponseDTO<PaginationDTO>> getReactions(
+            @PathVariable UUID uuid,
+            @RequestParam(required = false) ReactionEnum type,
+            Pageable pageable,
+            HttpServletRequest request) {
+
+        log.info("REST request to list reactions for article: {} | Page: {} | Size: {}",
+                uuid, pageable.getPageNumber(), pageable.getPageSize());
+
+        PaginationDTO result = reactionService.getByArticle(uuid, type, pageable);
+
+        log.info("Successfully retrieved {} reactions for article: {}",
+                result.getTotalElements(), uuid);
+
+        return ResponseEntity.ok(
+                buildResponse("Reactions retrieved successfully.", HttpStatus.OK, request, result));
     }
 
     private <T> StandardResponseDTO<T> buildResponse(String message, HttpStatus status, HttpServletRequest request, T data) {

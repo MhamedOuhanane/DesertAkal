@@ -4,6 +4,7 @@ import com.desertakal.desertakal.model.dto.reaction.ReactionCreateDTO;
 import com.desertakal.desertakal.model.dto.reaction.ReactionSummaryDTO;
 import com.desertakal.desertakal.model.dto.reaction.ReactionToggleResponseDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
+import com.desertakal.desertakal.model.enums.ReactionEnum;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
 
@@ -14,5 +15,5 @@ public interface ReactionService {
 
     ReactionSummaryDTO getSummary(@NonNull UUID articleUuid, @NonNull UUID currentUserUuid);
 
-    PaginationDTO getByArticle(@NonNull UUID articleUuid, @NonNull Pageable pageable);
+    PaginationDTO getByArticle(@NonNull UUID articleUuid, ReactionEnum type, @NonNull Pageable pageable);
 }
