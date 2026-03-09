@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 public interface ReactionService {
-    ReactionToggleResponseDTO toggle(@NonNull UUID articleUuid, @NonNull ReactionCreateDTO dto, @NonNull UUID userUuid);
+    ReactionToggleResponseDTO toggle(@NonNull ReactionCreateDTO dto, @NonNull UUID userUuid);
 
     ReactionSummaryDTO getSummary(@NonNull UUID articleUuid, @NonNull UUID currentUserUuid);
 

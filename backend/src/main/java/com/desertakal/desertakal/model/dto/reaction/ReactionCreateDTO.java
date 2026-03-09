@@ -4,6 +4,8 @@ import com.desertakal.desertakal.model.enums.ReactionEnum;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -12,4 +14,7 @@ import lombok.*;
 public class ReactionCreateDTO {
     @NotNull(message = "Reaction is required")
     private ReactionEnum reaction;
+
+    @NotNull(message = "Article UUID is required")
+    private UUID articleUuid;
 }
