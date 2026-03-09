@@ -1,16 +1,16 @@
-import { UserRole } from './user.models';
+import { RoleEnum } from "../enums/role.enum";
 
 export interface MenuItem {
     label: string;
     icon: string;
     path: string;
-    roles: UserRole[];
+    roles: RoleEnum[];
     exact?: boolean;
 }
 
 export interface MenuGroup {
     title: string;
-    roles: UserRole[];
+    roles: RoleEnum[];
     items: MenuItem[];
 }
 
@@ -18,7 +18,7 @@ export interface PublicNavLink {
     label: string;
     path: string;
     icon: string;
-    roles: UserRole[];
+    roles: RoleEnum[];
     requiresAuth: boolean;
     exact?: boolean;
 }
