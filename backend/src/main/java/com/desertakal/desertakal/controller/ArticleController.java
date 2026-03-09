@@ -192,6 +192,7 @@ public class ArticleController {
 
         return ResponseEntity.ok(
                 buildResponse("Reactions retrieved successfully.", HttpStatus.OK, request, result));
+    }
 
     @GetMapping("/{uuid}/comments")
     @PreAuthorize("isAuthenticated()")
