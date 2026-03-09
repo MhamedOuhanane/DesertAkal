@@ -1,9 +1,9 @@
 package com.desertakal.desertakal.model.dto.reaction;
 
 import com.desertakal.desertakal.model.enums.ReactionEnum;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -11,10 +11,11 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReactionCreateDTO {
-    @NotNull(message = "Reaction is required")
-    private ReactionEnum reaction;
+public class ReactionToggleResponseDTO {
+    private String action;
 
-    @NotNull(message = "Article UUID is required")
+    private ReactionEnum userReaction;
+    private long totalCount;
+    private Map<ReactionEnum, Long> countByType;
     private UUID articleUuid;
 }

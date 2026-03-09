@@ -24,7 +24,6 @@ public abstract class ReactionMapper {
 
     @Mapping(target = "id" , ignore = true)
     @Mapping(target = "uuid" , ignore = true)
-    @Mapping(target = "reaction" , ignore = true)
     @Mapping(target = "createdAt" , ignore = true)
     @Mapping(target = "user" , ignore = true)
     @Mapping(target = "article" , ignore = true)
