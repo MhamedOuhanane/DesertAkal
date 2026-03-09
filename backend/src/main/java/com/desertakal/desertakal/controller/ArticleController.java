@@ -10,6 +10,7 @@ import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.enums.ReactionEnum;
 import com.desertakal.desertakal.service.interfaces.ArticleService;
 import com.desertakal.desertakal.service.interfaces.ReactionService;
+import com.desertakal.desertakal.service.interfaces.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -38,6 +40,7 @@ import java.util.UUID;
 public class ArticleController {
     private final ArticleService service;
     private final ReactionService reactionService;
+    private final CommentService commentService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("isAuthenticated()")
@@ -189,6 +192,19 @@ public class ArticleController {
 
         return ResponseEntity.ok(
                 buildResponse("Reactions retrieved successfully.", HttpStatus.OK, request, result));
+
+    @GetMapping("/{uuid}/comments")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<@NonNull StandardResponseDTO<PaginationDTO>> getComments(
+            @PathVariable UUID uuid,
+            @ParameterObject @PageableDefault(size = 20) Pageable pageable,
+            HttpServletRequest request) {
+
+        log.info("REST request to get comments for article: {} | Page: {}", uuid, pageable.getPageNumber());
+
+        PaginationDTO result = commentService.getByArticle(uuid, pageable);
+
+        return ResponseEntity.ok(buildResponse("Comments retrieved successfully for article", HttpStatus.OK, request, result));
     }
 
     private <T> StandardResponseDTO<T> buildResponse(String message, HttpStatus status, HttpServletRequest request, T data) {

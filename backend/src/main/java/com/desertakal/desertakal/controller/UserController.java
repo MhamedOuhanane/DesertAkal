@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.controller;
 
+import com.desertakal.desertakal.model.dto.comment.CommentDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
 import com.desertakal.desertakal.model.dto.user.UserFindDTO;
@@ -7,6 +8,7 @@ import com.desertakal.desertakal.model.dto.user.UserStatusUpdateDTO;
 import com.desertakal.desertakal.model.dto.user.UserUpdateDTO;
 import com.desertakal.desertakal.model.enums.UserStatus;
 import com.desertakal.desertakal.service.interfaces.ArticleService;
+import com.desertakal.desertakal.service.interfaces.CommentService;
 import com.desertakal.desertakal.service.interfaces.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -33,6 +35,7 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
     private final ArticleService articleService;
+    private final CommentService commentService;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -177,6 +180,20 @@ public class UserController {
                 "Articles retrieved successfully",
                 request, result
         ));
+    }
+
+    @GetMapping("/{uuid}/comments")
+    @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, true )")
+    public ResponseEntity<@NonNull StandardResponseDTO<PaginationDTO>> getComments(
+            @PathVariable UUID uuid,
+            Pageable pageable,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to fetch comment by user: {} | Path: {}", uuid, request.getServletPath());
+
+        PaginationDTO result = commentService.getByUser(uuid, pageable);
+
+        return ResponseEntity.ok(buildResponse("Comment retrieved successfully", request, result));
     }
 
     private <T> StandardResponseDTO<T> buildResponse(String message, HttpServletRequest request, T data) {
