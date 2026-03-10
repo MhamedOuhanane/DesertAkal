@@ -15,6 +15,8 @@ import { firstValueFrom } from 'rxjs';
 import { AuthService } from './auth-service';
 import { Router } from '@angular/router';
 import { RoleEnum } from '../enums/role.enum';
+import { LoginRequest, LoginResponse } from './auth.models';
+import { ApiResponse } from '../models/response.models';
 
 export interface AuthState {
     user: UserAuth | null;
@@ -46,30 +48,35 @@ export const AuthStore = signalStore(
             authService = inject(AuthService),
             router = inject(Router),
         ) => ({
-            setLogin(token: string, user: UserAuth) {
+            async login(credentials: LoginRequest) {
                 patchState(store, { loading: true });
+                try {
+                    const response: ApiResponse<LoginResponse> = await firstValueFrom(authService.login(credentials));
+                    
+                    if (response.status === 200 && response.data) {
+                        this.setLogin(response.data.accessToken, response.data);
+                        toast.success('Welcome back to DesertAkal!');
+                        
+                        const role = response.data.role;
+                        router.navigate(['/']);
+                    }
+                } catch (error: any) {
+                    const msg = error.error?.message || 'Login failed. Please check your credentials.';
+                    toast.error(msg);
+                } finally {
+                    patchState(store, { loading: false });
+                }
+            },
 
+            setLogin(token: string, user: UserAuth) {
+                const isSecure = environment.secureCookie;
                 const expires = new Date();
                 expires.setMinutes(expires.getMinutes() + 15);
 
-                const isSecure = environment.secureCookie;
-
                 cookieService.set('auth_token', token, expires, '/', '', isSecure, 'Strict');
-                cookieService.set(
-                    'user_data',
-                    JSON.stringify(user),
-                    30,
-                    '/',
-                    '',
-                    isSecure,
-                    'Strict',
-                );
+                cookieService.set('user_data', JSON.stringify(user), 30, '/', '', isSecure, 'Strict');
 
-                patchState(store, {
-                    token,
-                    user,
-                    loading: false,
-                });
+                patchState(store, { token, user });
             },
 
             setRefreshToken(newToken: string) {

@@ -7,6 +7,7 @@ import { HasRole } from '../../directives';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatRipple } from '@angular/material/core';
 import { SignOutButton } from '../sign-out-button/sign-out-button';
+import { RoleEnum } from '../../../core/enums/role.enum';
 
 @Component({
     selector: 'app-user-dropdown',
@@ -25,6 +26,7 @@ import { SignOutButton } from '../sign-out-button/sign-out-button';
 export class UserDropdown {
     readonly authStore = inject(AuthStore);
     readonly navService = inject(NavigationService);
+    protected readonly RoleEnum = RoleEnum;
 
     readonly userMenuLinks = input.required<MenuItem[]>();
     readonly loggedOut = output<void>();

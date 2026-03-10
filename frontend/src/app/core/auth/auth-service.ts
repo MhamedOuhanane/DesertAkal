@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
-import { LoginRequest, Register } from '../auth/auth.models';
+import { LoginRequest, LoginResponse, Register } from '../auth/auth.models';
 import { Observable } from 'rxjs';
 import { UserAuth } from '../models/user.models';
 import { ApiResponse } from '../models/response.models';
@@ -20,12 +20,12 @@ export class AuthService {
         return this.http.post<ApiResponse<null>>(`${this.apiUrl}/register`, credentials);
     }
 
-    login(credentials: Omit<LoginRequest, 'deviceId'>): Observable<ApiResponse<UserAuth>> {
+    login(credentials: Omit<LoginRequest, 'deviceId'>): Observable<ApiResponse<LoginResponse>> {
         const loginBody: LoginRequest = {
             ...credentials,
             deviceId: this.deviceService.getDeviceId(),
         };
-        return this.http.post<ApiResponse<UserAuth>>(`${this.apiUrl}/login`, loginBody);
+        return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrl}/login`, loginBody);
     }
 
     refresh(): Observable<ApiResponse<UserAuth>> {

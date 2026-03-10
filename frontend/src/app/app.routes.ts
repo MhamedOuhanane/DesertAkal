@@ -1,13 +1,11 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/auth/auth-guard';
-import { roleGuard } from './core/guards/role-guard';
+import { homeGuard } from './core/guards/home-guard';
 
 export const routes: Routes = [
     {
         path: '',
+        canActivate: [homeGuard],
         loadComponent: () => import('./layouts/main-layout/main-layout').then((m) => m.MainLayout),
-        canActivate: [roleGuard],
-        data: { roles: ['VISITOR', 'TOURIST'] },
         children: [
             {
                 path: '',
@@ -18,6 +16,12 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/tour/tour').then((m) => m.Tour),
             },
         ],
+    },
+
+    {
+        path: 'auth',
+        canActivate: [homeGuard],
+        loadChildren: () => import('./features/auth/auth.routes').then(r => r.AUTH_ROUTES),
     },
 
     {

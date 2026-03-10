@@ -3,7 +3,7 @@ import { RoleEnum } from "../enums/role.enum";
 export interface LoginRequest {
     username: string;
     password: string;
-    deviceId: string;
+    deviceId?: string;
     provider?: string;
     providerId?: string;
 }
