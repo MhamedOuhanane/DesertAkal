@@ -25,21 +25,25 @@ export class Login {
 
     loginForm = this.fb.nonNullable.group({
         username: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(6)]],
+        password: ['', [Validators.required, Validators.minLength(8)]],
     });
 
     togglePassword(): void {
         this.showPassword.update((v) => !v);
     }
 
-    onSubmit(): void {
+    async onSubmit(): Promise<void> {
         if (this.loginForm.invalid) {
             this.loginForm.markAllAsTouched();
             return;
         }
 
-        const credentials = this.loginForm.getRawValue();
-        this.authStore.login(credentials);
+        const credentials: LoginRequest = this.loginForm.getRawValue();
+        const success = await this.authStore.login(credentials);
+
+        if (success) {
+            this.loginForm.get('password')?.reset();
+        }
     }
 
     loginWithGoogle(): void {

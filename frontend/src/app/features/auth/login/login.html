@@ -141,13 +141,12 @@
                             } @else if (
                                 loginForm.get('password')?.hasError('minlength')
                             ) {
-                                Password must be at least 6 characters.
+                                Password must be at least 8 characters.
                             }
                         </p>
                     }
                 </div>
 
-                <!-- Forgot Password -->
                 <div class="flex justify-end">
                     <a
                         routerLink="/auth/forgot-password"
@@ -157,7 +156,6 @@
                     </a>
                 </div>
 
-                <!-- Submit -->
                 <button
                     type="submit"
                     [disabled]="isLoading()"
@@ -192,7 +190,6 @@
                 </button>
             </form>
 
-            <!-- Divider -->
             <div class="my-7 flex items-center gap-4">
                 <div class="divider flex-1"></div>
                 <span
@@ -202,7 +199,6 @@
                 <div class="divider flex-1"></div>
             </div>
 
-            <!-- Google -->
             <button
                 type="button"
                 (click)="loginWithGoogle()"
@@ -229,7 +225,6 @@
                 Continue with Google
             </button>
 
-            <!-- Sign up link -->
             <div class="mt-7 text-center">
                 <p class="text-sm text-text-secondary">
                     Don't have an account?
@@ -243,7 +238,6 @@
             </div>
         </div>
 
-        <!-- Footer -->
         <div
             class="mt-8 flex items-center justify-center gap-5 text-[13px] text-white/40"
         >
@@ -257,8 +251,7 @@
         </div>
     </div>
 
-    <!-- Bottom Glow -->
     <div
-        class="pointer-events-none fixed bottom-0 left-0 z-0 h-40 w-full bg-gradient-to-t from-primary/8 to-transparent"
+        class="pointer-events-none fixed bottom-0 left-0 z-0 h-40 w-full bg-linear-to-t from-primary/8 to-transparent"
     ></div>
 </div>

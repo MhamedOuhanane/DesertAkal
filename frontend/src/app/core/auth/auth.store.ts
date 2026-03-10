@@ -7,7 +7,8 @@ import {
     withState,
 } from '@ngrx/signals';
 import { UserAuth } from '../models/user.models';
-import { computed, inject, signal } from '@angular/core';
+import { computed, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../environments/environment.development';
 import { toast } from 'ngx-sonner';
@@ -36,67 +37,111 @@ export const AuthStore = signalStore(
     withState(initialState),
 
     withComputed(({ token, user }) => ({
-        isAuthenticated: signal(false),
+        isAuthenticated: computed(() => !!token()),
         userRole: computed(() => user()?.role || RoleEnum.VISITOR),
-        userPhoto: computed(() => user()?.photo || 'assets/defaults/default-profile.png'),
+        userPhoto: computed(
+            () => user()?.photo || 'assets/defaults/default-profile.png'
+        ),
     })),
 
     withMethods(
         (
             store,
+            platformId = inject(PLATFORM_ID),
             cookieService = inject(CookieService),
             authService = inject(AuthService),
             router = inject(Router),
         ) => ({
-            async login(credentials: LoginRequest) {
+
+            async login(credentials: LoginRequest): Promise<boolean> {
+                if (!isPlatformBrowser(platformId)) return false;
+
                 patchState(store, { loading: true });
+
                 try {
-                    const response: ApiResponse<LoginResponse> = await firstValueFrom(authService.login(credentials));
-                    
+                    const response: ApiResponse<LoginResponse> =
+                        await firstValueFrom(
+                            authService.login(credentials)
+                        );
+
                     if (response.status === 200 && response.data) {
-                        this.setLogin(response.data.accessToken, response.data);
+                        const userData: UserAuth = {
+                            uuid: response.data.uuid,
+                            username: response.data.username,
+                            fullName: response.data.fullName,
+                            photo: response.data.photo,
+                            role: response.data.role,
+                        };
+
+                        this.setLogin(
+                            response.data.accessToken,
+                            userData
+                        );
+
                         toast.success('Welcome back to DesertAkal!');
-                        
-                        const role = response.data.role;
-                        router.navigate(['/']);
+
+                        patchState(store, { loading: false });
+
+                        await router.navigate(['/']);
+
+                        return true;
                     }
-                } catch (error: any) {
-                    const msg = error.error?.message || 'Login failed. Please check your credentials.';
-                    toast.error(msg);
-                } finally {
+
                     patchState(store, { loading: false });
+                    return false;
+
+                } catch (error: any) {
+                    const msg =
+                        error?.error?.message ||
+                        'Login failed. Please check your credentials.';
+                    toast.error(msg);
+
+                    patchState(store, { loading: false });
+
+                    return false;
                 }
             },
 
             setLogin(token: string, user: UserAuth) {
-                const isSecure = environment.secureCookie;
-                const expires = new Date();
-                expires.setMinutes(expires.getMinutes() + 15);
+                if (!isPlatformBrowser(platformId)) return;
 
-                cookieService.set('auth_token', token, expires, '/', '', isSecure, 'Strict');
-                cookieService.set('user_data', JSON.stringify(user), 30, '/', '', isSecure, 'Strict');
+                const isSecure = environment.secureCookie;
+
+                const tokenExpires = new Date();
+                tokenExpires.setMinutes(
+                    tokenExpires.getMinutes() + 15
+                );
+                cookieService.set(
+                    'auth_token', token, tokenExpires,
+                    '/', '', isSecure, 'Strict'
+                );
+
+                cookieService.set(
+                    'user_data', JSON.stringify(user), 30,
+                    '/', '', isSecure, 'Strict'
+                );
 
                 patchState(store, { token, user });
             },
 
             setRefreshToken(newToken: string) {
-                const isSecure = environment.secureCookie;
+                if (!isPlatformBrowser(platformId)) return;
 
+                const isSecure = environment.secureCookie;
                 const expires = new Date();
                 expires.setMinutes(expires.getMinutes() + 15);
 
-                cookieService.set('auth_token', newToken, expires, '/', '', isSecure, 'Strict');
+                cookieService.set(
+                    'auth_token', newToken, expires,
+                    '/', '', isSecure, 'Strict'
+                );
 
                 const currentUser = store.user();
                 if (currentUser) {
                     cookieService.set(
                         'user_data',
                         JSON.stringify(currentUser),
-                        30,
-                        '/',
-                        '',
-                        isSecure,
-                        'Strict',
+                        30, '/', '', isSecure, 'Strict'
                     );
                 }
 
@@ -104,17 +149,20 @@ export const AuthStore = signalStore(
             },
 
             async logout() {
-                this.setLoading(true);
+                if (!isPlatformBrowser(platformId)) return;
+
+                patchState(store, { loading: true });
+
                 try {
                     await firstValueFrom(authService.logout());
                 } catch (error) {
                     toast.error('Server logout failed, cleaning local storage anyway.');
-                } finally {
-                    cookieService.delete('auth_token', '/');
-                    cookieService.delete('user_data', '/');
-                    patchState(store, initialState);
-                    router.navigate(['/login']);
                 }
+
+                cookieService.delete('auth_token', '/');
+                cookieService.delete('user_data', '/');
+                patchState(store, initialState);
+                await router.navigate(['/auth/login']);
             },
 
             setLoading(value: boolean) {
@@ -124,17 +172,24 @@ export const AuthStore = signalStore(
     ),
 
     withHooks({
-        onInit(store, cookieService = inject(CookieService)) {
+        onInit(
+            store,
+            platformId = inject(PLATFORM_ID),
+            cookieService = inject(CookieService),
+        ) {
+            if (!isPlatformBrowser(platformId)) return;
+
             const savedToken = cookieService.get('auth_token');
             const savedUserJson = cookieService.get('user_data');
 
             if (savedToken && savedUserJson) {
                 try {
                     const user = JSON.parse(savedUserJson) as UserAuth;
-
                     patchState(store, { token: savedToken, user });
-                } catch (error) {
-                    store.logout();
+                } catch {
+                    cookieService.delete('auth_token', '/');
+                    cookieService.delete('user_data', '/');
+                    patchState(store, initialState);
                 }
             }
         },
