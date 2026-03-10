@@ -13,7 +13,8 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
     const isRefreshPath = req.url.includes('/auth/refresh');
     const isAuthPath = req.url.includes('/auth');
     const isLogoutPath = req.url.includes('/auth/logout');
-
+    const isLoginPath = req.url.includes('/auth/login');
+    
     let headers = req.headers;
 
     if (isRefreshPath) {
@@ -24,7 +25,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
 
     const authReq = req.clone({
         headers,
-        withCredentials: isRefreshPath || isLogoutPath,
+        withCredentials: isLoginPath || isLogoutPath || isRefreshPath,
     });
 
     return next(authReq).pipe(
