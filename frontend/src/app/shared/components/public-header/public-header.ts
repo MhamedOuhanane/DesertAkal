@@ -32,10 +32,8 @@ export class PublicHeader {
     mobileMenuOpen = signal(false);
 
     readonly isWeb = toSignal(
-        this.breakpointObserver.observe('(min-width: 768px)').pipe(
-            map(result => result.matches)
-        ),
-        { initialValue: true }
+        this.breakpointObserver.observe('(min-width: 768px)').pipe(map((result) => result.matches)),
+        { initialValue: true },
     );
 
     readonly userMenuLinks = this.navService.filteredUserMenuLinks;

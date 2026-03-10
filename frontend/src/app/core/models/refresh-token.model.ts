@@ -30,4 +30,4 @@ export interface ActiveSession {
 export interface RemoteLogoutRequest {
     readonly sessionUuid: string;
     readonly password: string;
-} 
+}

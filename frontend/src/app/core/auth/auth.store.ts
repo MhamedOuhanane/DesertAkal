@@ -39,9 +39,7 @@ export const AuthStore = signalStore(
     withComputed(({ token, user }) => ({
         isAuthenticated: computed(() => !!token()),
         userRole: computed(() => user()?.role || RoleEnum.VISITOR),
-        userPhoto: computed(
-            () => user()?.photo || 'assets/defaults/default-profile.png'
-        ),
+        userPhoto: computed(() => user()?.photo || 'assets/defaults/default-profile.png'),
     })),
 
     withMethods(
@@ -52,17 +50,15 @@ export const AuthStore = signalStore(
             authService = inject(AuthService),
             router = inject(Router),
         ) => ({
-
             async login(credentials: LoginRequest): Promise<boolean> {
                 if (!isPlatformBrowser(platformId)) return false;
 
                 patchState(store, { loading: true });
 
                 try {
-                    const response: ApiResponse<LoginResponse> =
-                        await firstValueFrom(
-                            authService.login(credentials)
-                        );
+                    const response: ApiResponse<LoginResponse> = await firstValueFrom(
+                        authService.login(credentials),
+                    );
 
                     if (response.status === 200 && response.data) {
                         const userData: UserAuth = {
@@ -73,10 +69,7 @@ export const AuthStore = signalStore(
                             role: response.data.role,
                         };
 
-                        this.setLogin(
-                            response.data.accessToken,
-                            userData
-                        );
+                        this.setLogin(response.data.accessToken, userData);
 
                         toast.success('Welcome back to DesertAkal!');
 
@@ -89,11 +82,9 @@ export const AuthStore = signalStore(
 
                     patchState(store, { loading: false });
                     return false;
-
                 } catch (error: any) {
                     const msg =
-                        error?.error?.message ||
-                        'Login failed. Please check your credentials.';
+                        error?.error?.message || 'Login failed. Please check your credentials.';
                     toast.error(msg);
 
                     patchState(store, { loading: false });
@@ -108,17 +99,17 @@ export const AuthStore = signalStore(
                 const isSecure = environment.secureCookie;
 
                 const tokenExpires = new Date();
-                tokenExpires.setMinutes(
-                    tokenExpires.getMinutes() + 15
-                );
-                cookieService.set(
-                    'auth_token', token, tokenExpires,
-                    '/', '', isSecure, 'Strict'
-                );
+                tokenExpires.setMinutes(tokenExpires.getMinutes() + 15);
+                cookieService.set('auth_token', token, tokenExpires, '/', '', isSecure, 'Strict');
 
                 cookieService.set(
-                    'user_data', JSON.stringify(user), 30,
-                    '/', '', isSecure, 'Strict'
+                    'user_data',
+                    JSON.stringify(user),
+                    30,
+                    '/',
+                    '',
+                    isSecure,
+                    'Strict',
                 );
 
                 patchState(store, { token, user });
@@ -131,17 +122,18 @@ export const AuthStore = signalStore(
                 const expires = new Date();
                 expires.setMinutes(expires.getMinutes() + 15);
 
-                cookieService.set(
-                    'auth_token', newToken, expires,
-                    '/', '', isSecure, 'Strict'
-                );
+                cookieService.set('auth_token', newToken, expires, '/', '', isSecure, 'Strict');
 
                 const currentUser = store.user();
                 if (currentUser) {
                     cookieService.set(
                         'user_data',
                         JSON.stringify(currentUser),
-                        30, '/', '', isSecure, 'Strict'
+                        30,
+                        '/',
+                        '',
+                        isSecure,
+                        'Strict',
                     );
                 }
 
@@ -172,11 +164,7 @@ export const AuthStore = signalStore(
     ),
 
     withHooks({
-        onInit(
-            store,
-            platformId = inject(PLATFORM_ID),
-            cookieService = inject(CookieService),
-        ) {
+        onInit(store, platformId = inject(PLATFORM_ID), cookieService = inject(CookieService)) {
             if (!isPlatformBrowser(platformId)) return;
 
             const savedToken = cookieService.get('auth_token');

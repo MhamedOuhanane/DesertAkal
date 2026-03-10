@@ -1,9 +1,9 @@
-import { Language } from "./language.model";
-import { User, UserFind, UserUpdate } from "./user.models";
+import { Language } from './language.model';
+import { User, UserFind, UserUpdate } from './user.models';
 
 export interface Guide extends User {
     readonly rating: number;
-    readonly languages: Language[]
+    readonly languages: Language[];
 }
 
 export interface GuideFind extends UserFind {

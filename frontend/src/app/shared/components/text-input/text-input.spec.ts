@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AuthLayout } from './auth-layout';
+import { TextInput } from './text-input';
 
-describe('AuthLayout', () => {
-    let component: AuthLayout;
-    let fixture: ComponentFixture<AuthLayout>;
+describe('TextInput', () => {
+    let component: TextInput;
+    let fixture: ComponentFixture<TextInput>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [AuthLayout],
+            imports: [TextInput],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(AuthLayout);
+        fixture = TestBed.createComponent(TextInput);
         component = fixture.componentInstance;
         await fixture.whenStable();
     });

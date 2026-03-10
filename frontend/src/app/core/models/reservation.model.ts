@@ -1,6 +1,6 @@
-import { ResourceStatus } from "@angular/core";
-import { ReservationStatus } from "../enums/reservation-status.enum";
-import { Payment } from "./payment.model";
+import { ResourceStatus } from '@angular/core';
+import { ReservationStatus } from '../enums/reservation-status.enum';
+import { Payment } from './payment.model';
 
 export interface Reservation {
     readonly uuid: string;
@@ -21,10 +21,10 @@ export interface Reservation {
     readonly touristPhoto: string;
 }
 
-export interface ReservationFind extends Reservation{
-    readonly qrCode: string; 
-    readonly pdfUrl: string; 
-    readonly createdAt: string | Date; 
+export interface ReservationFind extends Reservation {
+    readonly qrCode: string;
+    readonly pdfUrl: string;
+    readonly createdAt: string | Date;
     readonly updatedAt: string | Date;
     readonly payments: Payment;
 }

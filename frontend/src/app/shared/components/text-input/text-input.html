@@ -1,0 +1,54 @@
+<div class="w-full">
+    @if (label()) {
+        <label [for]="id()" class="mb-1.5 block text-sm font-medium text-text-primary">
+            {{ label() }}
+        </label>
+    }
+
+    <div class="relative">
+        @if (matIcon()) {
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <mat-icon
+                    class="text-text-disabled"
+                    style="font-size: 20px; width: 20px; height: 20px"
+                >
+                    {{ matIcon() }}
+                </mat-icon>
+            </div>
+        }
+
+        <!-- Input -->
+        <input
+            [id]="id()"
+            [type]="inputType"
+            [placeholder]="placeholder()"
+            [autocomplete]="autocomplete()"
+            [formControl]="$any(ngControl.control)"
+            [disabled]="disabled"
+            class="input w-full transition-all duration-200"
+            [class.pl-10]="hasIcon"
+            [class.pr-12]="isPassword()"
+            [class.!border-error]="hasError"
+            [class.!ring-error/20]="hasError"
+        />
+
+        @if (isPassword()) {
+            <button
+                type="button"
+                (click)="togglePassword()"
+                class="absolute inset-y-0 right-0 flex items-center pr-3 text-text-disabled transition-colors duration-200 hover:text-text-secondary"
+                tabindex="-1"
+            >
+                <mat-icon style="font-size: 20px; width: 20px; height: 20px">
+                    {{ showPassword() ? 'visibility_off' : 'visibility' }}
+                </mat-icon>
+            </button>
+        }
+    </div>
+
+    <div class="min-h-6">
+        <p class="mt-1 text-xs font-medium text-error">
+                {{ errorMessage }}
+            </p>
+    </div>
+</div>

@@ -24,7 +24,7 @@ export const routes: Routes = [
     {
         path: 'auth',
         canActivate: [guestGuard],
-        loadChildren: () => import('./features/auth/auth.routes').then(r => r.AUTH_ROUTES),
+        loadChildren: () => import('./features/auth/auth.routes').then((r) => r.AUTH_ROUTES),
     },
 
     {

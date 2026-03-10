@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ThemeService } from './core/services/theme-service';
-import { NgxSonnerToaster } from "ngx-sonner";
+import { NgxSonnerToaster } from 'ngx-sonner';
 
 @Component({
     selector: 'app-root',

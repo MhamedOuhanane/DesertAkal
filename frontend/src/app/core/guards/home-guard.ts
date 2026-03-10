@@ -13,6 +13,5 @@ export const homeGuard: CanActivateFn = (route, state) => {
         if (role === 'GUIDE') return router.createUrlTree(['/dashboard/guide']);
     }
 
-
     return true;
 };

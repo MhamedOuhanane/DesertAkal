@@ -3,7 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { LoginRequest } from '../../../core/auth/auth.models';
-import { BrandLogo } from "../../../shared/components/brand-logo/brand-logo";
+import { BrandLogo } from '../../../shared/components/brand-logo/brand-logo';
 import { ScreenService } from '../../../core/services/screen-service';
 import { toast } from 'ngx-sonner';
 import { AuthStore } from '../../../core/auth/auth.store';
@@ -16,7 +16,6 @@ import { AuthStore } from '../../../core/auth/auth.store';
 })
 export class Login {
     private fb = inject(FormBuilder);
-    protected readonly screenService = inject(ScreenService);
     protected readonly authStore = inject(AuthStore);
 
     isLoading = this.authStore.loading;

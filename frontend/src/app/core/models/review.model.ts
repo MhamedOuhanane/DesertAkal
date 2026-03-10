@@ -1,4 +1,4 @@
-import { ReviewableType } from "../enums/reviewable-type.enum";
+import { ReviewableType } from '../enums/reviewable-type.enum';
 
 export interface Review {
     readonly uuid: string;
@@ -25,4 +25,3 @@ export interface ReviewUpdate {
     rating?: string;
     comment?: string;
 }
-

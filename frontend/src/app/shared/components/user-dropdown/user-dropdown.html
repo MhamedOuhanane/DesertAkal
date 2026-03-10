@@ -126,7 +126,10 @@
                 </a>
             </div>
 
-            <div *appHasRole="[RoleEnum.GUIDE, RoleEnum.TOURIST]" class="border-t border-border p-2">
+            <div
+                *appHasRole="[RoleEnum.GUIDE, RoleEnum.TOURIST]"
+                class="border-t border-border p-2"
+            >
                 <a
                     routerLink="/"
                     (click)="close()"

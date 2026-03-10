@@ -8,27 +8,19 @@
             class="h-full w-full object-cover"
             loading="eager"
         />
-        <div
-            class="absolute inset-0 bg-linear-to-b from-black/25 via-black/50 to-black/85"
-        ></div>
+        <div class="absolute inset-0 bg-linear-to-b from-black/25 via-black/50 to-black/85"></div>
     </div>
 
     <div class="relative z-10 w-full max-w-md px-5 py-10 sm:px-6 md:px-0 md:py-12">
-        
         <div class="mb-4 flex items-center justify-center gap-3">
-            <app-brand-logo
-                classLogo="h-20"
-                [isExpanded]="screenService.isWeb()" 
-            />
+            <app-brand-logo classLogo="h-30" [isExpanded]="false" />
         </div>
 
         <div
             class="animate-scale-in overflow-hidden rounded-2xl border border-border/50 bg-surface/95 p-7 shadow-2xl backdrop-blur-xl sm:p-8"
         >
             <div class="mb-7">
-                <h2
-                    class="text-[28px] font-bold leading-tight text-text-primary sm:text-3xl"
-                >
+                <h2 class="text-[28px] font-bold leading-tight text-text-primary sm:text-3xl">
                     Welcome back
                 </h2>
                 <p class="mt-2 text-[15px] leading-relaxed text-text-secondary">
@@ -38,10 +30,7 @@
 
             <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
                 <div class="space-y-1.5">
-                    <label
-                        for="login-email"
-                        class="block text-sm font-medium text-text-secondary"
-                    >
+                    <label for="login-email" class="block text-sm font-medium text-text-secondary">
                         Email Address
                     </label>
                     <input
@@ -52,14 +41,10 @@
                         autocomplete="email"
                         class="input w-full"
                         [class.!border-error]="
-                            loginForm.get('username')?.invalid &&
-                            loginForm.get('username')?.touched
+                            loginForm.get('username')?.invalid && loginForm.get('username')?.touched
                         "
                     />
-                    @if (
-                        loginForm.get('username')?.invalid &&
-                        loginForm.get('username')?.touched
-                    ) {
+                    @if (loginForm.get('username')?.invalid && loginForm.get('username')?.touched) {
                         <p class="mt-1 text-xs font-medium text-error">
                             @if (loginForm.get('username')?.hasError('required')) {
                                 Email address is required.
@@ -131,16 +116,11 @@
                             }
                         </button>
                     </div>
-                    @if (
-                        loginForm.get('password')?.invalid &&
-                        loginForm.get('password')?.touched
-                    ) {
+                    @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
                         <p class="mt-1 text-xs font-medium text-error">
                             @if (loginForm.get('password')?.hasError('required')) {
                                 Password is required.
-                            } @else if (
-                                loginForm.get('password')?.hasError('minlength')
-                            ) {
+                            } @else if (loginForm.get('password')?.hasError('minlength')) {
                                 Password must be at least 8 characters.
                             }
                         </p>
@@ -164,11 +144,7 @@
                     [class.pointer-events-none]="isLoading()"
                 >
                     @if (isLoading()) {
-                        <svg
-                            class="h-5 w-5 animate-spin"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
+                        <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
                             <circle
                                 class="opacity-25"
                                 cx="12"
@@ -192,8 +168,7 @@
 
             <div class="my-7 flex items-center gap-4">
                 <div class="divider flex-1"></div>
-                <span
-                    class="text-xs font-semibold uppercase tracking-widest text-text-disabled"
+                <span class="text-xs font-semibold uppercase tracking-widest text-text-disabled"
                     >Or</span
                 >
                 <div class="divider flex-1"></div>
@@ -238,9 +213,7 @@
             </div>
         </div>
 
-        <div
-            class="mt-8 flex items-center justify-center gap-5 text-[13px] text-white/40"
-        >
+        <div class="mt-8 flex items-center justify-center gap-5 text-[13px] text-white/40">
             <a href="#" class="transition-colors duration-200 hover:text-white/70"
                 >Privacy Policy</a
             >
