@@ -8,6 +8,7 @@ import { MatRipple } from '@angular/material/core';
 import { UserDropdown } from '../user-dropdown/user-dropdown';
 import { MenuItem } from '../../../core/models/navigation.models';
 import { BrandLogo } from '../brand-logo/brand-logo';
+import { RoleEnum } from '../../../core/enums/role.enum';
 
 @Component({
     selector: 'app-dashboard-header',
@@ -29,13 +30,13 @@ export class DashboardHeader {
             label: 'My Profile',
             path: this.navService.dashboardHome() + '/profile',
             icon: 'person',
-            roles: ['ADMIN', 'GUIDE', 'TOURIST'],
+            roles: [RoleEnum.ADMIN, RoleEnum.GUIDE, RoleEnum.TOURIST],
         },
         {
             label: 'Settings',
             path: this.navService.dashboardHome() + '/settings',
             icon: 'settings',
-            roles: ['ADMIN', 'GUIDE', 'TOURIST'],
+            roles: [RoleEnum.ADMIN, RoleEnum.GUIDE, RoleEnum.TOURIST],
         },
     ]);
 

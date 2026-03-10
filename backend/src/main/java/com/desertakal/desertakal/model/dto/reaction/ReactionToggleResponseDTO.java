@@ -13,7 +13,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ReactionToggleResponseDTO {
     private String action;
-
     private ReactionEnum userReaction;
     private long totalCount;
     private Map<ReactionEnum, Long> countByType;

@@ -1,6 +1,8 @@
 import { RoleEnum } from "../enums/role.enum";
 import { UserStatus } from "../enums/user-status.enum";
 
+export type UserRole = RoleEnum;
+
 export interface UserAuth {
     uuid: string;
     username: string;

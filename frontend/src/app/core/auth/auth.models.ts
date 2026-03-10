@@ -1,7 +1,21 @@
+import { RoleEnum } from "../enums/role.enum";
+
 export interface LoginRequest {
     username: string;
     password: string;
-    deviceId: string | null;
+    deviceId: string;
+    provider?: string;
+    providerId?: string;
+}
+
+export interface LoginResponse {
+    readonly uuid: string;
+    readonly username: string;
+    readonly fullName: string;
+    readonly photo: string;
+    readonly role: RoleEnum;
+    readonly accessToken: string;
+    readonly refreshToken?: string | null;
 }
 
 export interface Register {
@@ -11,15 +25,13 @@ export interface Register {
     email: string;
     password: string;
     confirmPassword: string;
-    roleUuid: string | null;
-    nationality: string | null;
-    language: string | null;
+    roleUuid: string;
+    nationality?: string;
+    language?: string;
+    oauthProvider?: string;
+    providerId?: string;
 }
 
-export interface ActiveSession {
-    sessionUuid: string;
-    ipAddress: string;
-    userAgent: string;
-    lastActive: string;
-    expiresAt: string;
+export interface EmailVerification {
+    email: string;
 }

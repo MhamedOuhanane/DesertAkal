@@ -1,11 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
-import { ActiveSession, LoginRequest, Register } from '../auth/auth.models';
+import { LoginRequest, Register } from '../auth/auth.models';
 import { Observable } from 'rxjs';
 import { UserAuth } from '../models/user.models';
 import { ApiResponse } from '../models/response.models';
 import { DeviceService } from '../services/device-service';
+import { ActiveSession } from '../models/refresh-token.model';
 
 @Injectable({
     providedIn: 'root',

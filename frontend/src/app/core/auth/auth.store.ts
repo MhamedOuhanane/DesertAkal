@@ -14,6 +14,7 @@ import { toast } from 'ngx-sonner';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from './auth-service';
 import { Router } from '@angular/router';
+import { RoleEnum } from '../enums/role.enum';
 
 export interface AuthState {
     user: UserAuth | null;
@@ -33,8 +34,8 @@ export const AuthStore = signalStore(
     withState(initialState),
 
     withComputed(({ token, user }) => ({
-        isAuthenticated: signal(true),
-        userRole: computed(() => user()?.role || 'TOURIST'),
+        isAuthenticated: signal(false),
+        userRole: computed(() => user()?.role || RoleEnum.VISITOR),
         userPhoto: computed(() => user()?.photo || 'assets/defaults/default-profile.png'),
     })),
 

@@ -135,8 +135,13 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
-                        .queryParam("token", accessToken)
-                        .build().toUriString();
+                .queryParam("token", accessToken)
+                .queryParam("userUuid", user.getUuid().toString())
+                .queryParam("username", user.getUsername())
+                .queryParam("fullName", user.getFirstName() + " " + user.getLastName())
+                .queryParam("photo", user.getPhoto())
+                .queryParam("role", user.getRole().getName())
+                .build().toUriString();
 
         log.info("OAuth2 Success: Redirecting user {} to frontend", user.getEmail());
 
