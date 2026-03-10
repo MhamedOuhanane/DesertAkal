@@ -126,18 +126,35 @@ export const AuthStore = signalStore(
 
                 const currentUser = store.user();
                 if (currentUser) {
-                    cookieService.set(
-                        'user_data',
-                        JSON.stringify(currentUser),
-                        30,
-                        '/',
-                        '',
-                        isSecure,
-                        'Strict',
-                    );
+                    cookieService.set('user_data', JSON.stringify(currentUser), 30, '/', '', isSecure, 'Strict',);
                 }
 
                 patchState(store, { token: newToken });
+            },
+
+            handleOAuthSuccess(data: any) {
+                patchState(store, { loading: true });
+
+                const isSecure = environment.secureCookie;
+                const expires = new Date();
+                expires.setMinutes(expires.getMinutes() + 15);
+
+                cookieService.set('auth_token', data.token, expires, '/', '', isSecure, 'Strict');
+                const user: UserAuth = {
+                    uuid: data.userUuid,
+                    username: data.username,
+                    fullName: data.fullName,
+                    role: data.role,
+                    photo: data.photo
+                };
+                
+                cookieService.set('user_data', JSON.stringify(user), 30, '/', '', isSecure, 'Strict',);
+
+                patchState(store, { 
+                    user: user, 
+                    token: data.token, 
+                    loading: false
+                });
             },
 
             async logout() {
@@ -146,15 +163,16 @@ export const AuthStore = signalStore(
                 patchState(store, { loading: true });
 
                 try {
-                    await firstValueFrom(authService.logout());
+                    const response = await firstValueFrom(authService.logout());
+                    toast.success(response.message);    
+
+                    cookieService.delete('auth_token', '/');
+                    cookieService.delete('user_data', '/');
+                    patchState(store, initialState);
+                    await router.navigate(['/auth/login']);
                 } catch (error) {
                     toast.error('Server logout failed, cleaning local storage anyway.');
                 }
-
-                cookieService.delete('auth_token', '/');
-                cookieService.delete('user_data', '/');
-                patchState(store, initialState);
-                await router.navigate(['/auth/login']);
             },
 
             setLoading(value: boolean) {

@@ -23,7 +23,6 @@ export class TextInput implements ControlValueAccessor {
     private onChange: (value: any) => void = () => {};
     private onTouched: () => void = () => {};
     value: any = '';
-    disabled = false;
 
     constructor(@Self() @Optional() public ngControl: NgControl) {
         if (this.ngControl) {
@@ -97,9 +96,5 @@ export class TextInput implements ControlValueAccessor {
 
     registerOnTouched(fn: any): void {
         this.onTouched = fn;
-    }
-
-    setDisabledState(isDisabled: boolean): void {
-        this.disabled = isDisabled;
     }
 }

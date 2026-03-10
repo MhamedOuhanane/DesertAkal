@@ -24,7 +24,6 @@
             [placeholder]="placeholder()"
             [autocomplete]="autocomplete()"
             [formControl]="$any(ngControl.control)"
-            [disabled]="disabled"
             class="input w-full transition-all duration-200"
             [class.pl-10]="hasIcon"
             [class.pr-12]="isPassword()"
@@ -48,7 +47,7 @@
 
     <div class="min-h-6">
         <p class="mt-1 text-xs font-medium text-error">
-                {{ errorMessage }}
-            </p>
+            {{ errorMessage }}
+        </p>
     </div>
 </div>

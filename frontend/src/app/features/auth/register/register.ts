@@ -15,11 +15,12 @@ import { AuthService } from '../../../core/auth/auth-service';
 import { toast } from 'ngx-sonner';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
+import { OauthLogin } from "../../../shared/components/oauth-login/oauth-login";
 
 @Component({
     selector: 'app-register',
     standalone: true,
-    imports: [ReactiveFormsModule, RouterLink, BrandLogo, TextInput],
+    imports: [ReactiveFormsModule, RouterLink, BrandLogo, TextInput, OauthLogin],
     templateUrl: './register.html',
 })
 export class Register {
@@ -112,11 +113,11 @@ export class Register {
                 queryParams: { registered: 'true' },
             });
         } catch (error: any) {
-            console.log(error)
+            console.log(error);
             if (error.status === 400 && error.error?.error) {
                 const serverErrors = error.error.error;
-                
-                Object.keys(serverErrors).forEach(key => {
+
+                Object.keys(serverErrors).forEach((key) => {
                     const control = this.registerForm.get(key);
                     if (control) {
                         control.setErrors({ serverError: serverErrors[key] });
