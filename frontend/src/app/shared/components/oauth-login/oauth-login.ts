@@ -62,7 +62,7 @@ import { DeviceService } from '../../../core/services/device-service';
 })
 export class OauthLogin {
     private readonly deviceService = inject(DeviceService);
-    
+
     loginWith(provider: string): void {
         const deviceId = this.deviceService.getDeviceId();
         window.location.href = `${environment.backUrl}/oauth2/authorization/${provider}?device_id=${deviceId}`;

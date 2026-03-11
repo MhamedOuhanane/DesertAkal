@@ -98,7 +98,7 @@ export const AuthStore = signalStore(
 
                 // const tokenExpires = new Date();
                 // tokenExpires.setMinutes(tokenExpires.getMinutes() + 15);
-                
+
                 const longTerm = 30;
                 cookieService.set('auth_token', token, longTerm, '/', '', isSecure, 'Strict');
 
@@ -232,11 +232,10 @@ export const AuthStore = signalStore(
             } else if (!savedToken && savedUserJson) {
                 try {
                     patchState(store, { loading: true });
-                    
+
                     const response = await firstValueFrom(authService.refresh());
                     console.log(response);
-                    
-                    
+
                     if (response.status === 200 && response.data) {
                         const user = JSON.parse(savedUserJson) as UserAuth;
                         store.setRefreshToken(response.data.accessToken);

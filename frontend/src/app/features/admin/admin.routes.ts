@@ -13,8 +13,7 @@ export const ADMIN_ROUTES: Routes = [
             },
             {
                 path: 'tours',
-                loadComponent: () =>
-                    import('./tours/tour-list/tour-list').then((m) => m.TourList),
+                loadComponent: () => import('./tours/tour-list/tour-list').then((m) => m.TourList),
                 data: { breadcrumb: 'Tours Management' },
             },
         ],

@@ -7,12 +7,13 @@ import { Pagination } from '../../../../core/models/response.models';
 import { toast } from 'ngx-sonner';
 import { firstValueFrom } from 'rxjs';
 import { TourService } from '../../../../core/services/tour-service';
-import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
+import { PaginationComponent } from '../../../../shared/components/pagination/pagination';
+import { DeleteDialog } from '../../../../shared/components/delete-dialog/delete-dialog';
 
 @Component({
     selector: 'app-tour-list',
     standalone: true,
-    imports: [RouterLink, FormsModule, DecimalPipe, PaginationComponent],
+    imports: [RouterLink, FormsModule, DecimalPipe, PaginationComponent, DeleteDialog],
     templateUrl: './tour-list.html',
 })
 export class TourList implements OnInit {
@@ -57,7 +58,6 @@ export class TourList implements OnInit {
         } finally {
             this.isLoading.set(false);
         }
-        
     }
 
     onSearch(): void {
@@ -77,7 +77,36 @@ export class TourList implements OnInit {
     editTour(uuid: string): void {
         this.router.navigate(['/dashboard/tours', uuid, 'edit']);
     }
-    
+
+    confirmDelete(tour: Tour): void {
+        this.tourToDelete.set(tour);
+        this.showDeleteDialog.set(true);
+    }
+
+    cancelDelete(): void {
+        this.showDeleteDialog.set(false);
+        this.tourToDelete.set(null);
+    }
+
+    async deleteTour(): Promise<void> {
+        const tour = this.tourToDelete();
+        if (!tour) return;
+
+        this.showDeleteDialog.set(false);
+        this.isDeleting.set(tour.uuid);
+
+        try {
+            await firstValueFrom(this.tourService.delete(tour.uuid));
+            this.tours.update((list) => list.filter((t) => t.uuid !== tour.uuid));
+            toast.success(`"${tour.title}" deleted successfully.`);
+        } catch (err: any) {
+            toast.error(err?.error?.message || 'Failed to delete tour.');
+        } finally {
+            this.isDeleting.set(null);
+            this.tourToDelete.set(null);
+        }
+    }
+
     onPageChange(page: number): void {
         this.currentPage = page;
         this.loadTours();

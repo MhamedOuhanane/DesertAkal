@@ -3,19 +3,19 @@ import { CommonModule } from '@angular/common';
 import { Pagination } from '../../../core/models/response.models';
 
 @Component({
-  selector: 'app-pagination',
-  imports: [CommonModule],
-  templateUrl: './pagination.html'
+    selector: 'app-pagination',
+    imports: [CommonModule],
+    templateUrl: './pagination.html',
 })
 export class PaginationComponent<T> {
-  pagination = input.required<Pagination<T>>();
-  pageChange = output<number>();
+    pagination = input.required<Pagination<T>>();
+    pageChange = output<number>();
 
     get totalPages(): number {
         return this.pagination()?.totalPages ?? 0;
     }
 
-  get pageNumbers(): number[] {
+    get pageNumbers(): number[] {
         const total = this.pagination()?.totalPages || 0;
         const current = this.pagination()?.page || 0;
         const pages: number[] = [];
@@ -25,9 +25,9 @@ export class PaginationComponent<T> {
         return pages;
     }
 
-  goToPage(page: number) {
-    if (page >= 0 && page < this.pagination().totalPages) {
-      this.pageChange.emit(page);
+    goToPage(page: number) {
+        if (page >= 0 && page < this.pagination().totalPages) {
+            this.pageChange.emit(page);
+        }
     }
-  }
 }

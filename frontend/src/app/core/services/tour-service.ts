@@ -6,19 +6,20 @@ import { Observable } from 'rxjs';
 import { ApiResponse, Pagination } from '../models/response.models';
 
 @Injectable({
-  providedIn: 'root',
+    providedIn: 'root',
 })
 export class TourService {
     private readonly http = inject(HttpClient);
     private readonly apiUrl = `${environment.apiUrl}/tours`;
 
-    findAll(filters: TourFilters ): Observable<ApiResponse<Pagination<Tour>>> {
-        let params = new HttpParams;
-        if (filters.search) params = params.set("search", filters.search); 
-        if (filters.city) params = params.set("city", filters.city); 
-        if (filters.durationStr) params = params.set("durationStr", filters.durationStr); 
-        if (filters.minRating) params = params.set("minRating", filters.minRating.toString()); 
-        params = params.set('page', (filters.page ?? 0).toString())
+    findAll(filters: TourFilters): Observable<ApiResponse<Pagination<Tour>>> {
+        let params = new HttpParams();
+        if (filters.search) params = params.set('search', filters.search);
+        if (filters.city) params = params.set('city', filters.city);
+        if (filters.durationStr) params = params.set('durationStr', filters.durationStr);
+        if (filters.minRating) params = params.set('minRating', filters.minRating.toString());
+        params = params
+            .set('page', (filters.page ?? 0).toString())
             .set('size', (filters.size ?? 10).toString())
             .set('sortBy', filters.sortBy ?? 'createdAt')
             .set('order', filters.order ?? 'desc');

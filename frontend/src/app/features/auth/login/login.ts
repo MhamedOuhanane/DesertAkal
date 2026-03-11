@@ -25,13 +25,13 @@ export class Login {
 
     constructor() {
         effect(() => {
-            this.route.queryParams.subscribe(params => {
+            this.route.queryParams.subscribe((params) => {
                 const error = params['error'];
                 if (error) {
                     toast.error(error);
                 }
-            })
-        })
+            });
+        });
     }
 
     isLoading = this.authStore.loading;
