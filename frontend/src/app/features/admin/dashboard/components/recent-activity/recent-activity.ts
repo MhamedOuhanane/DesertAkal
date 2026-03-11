@@ -9,7 +9,6 @@ export interface ActivityItem {
 
 @Component({
     selector: 'app-recent-activity',
-    standalone: true,
     template: `
         <div class="card p-6">
             <h3 class="mb-5 text-base font-bold text-text-primary">Quick Overview</h3>
