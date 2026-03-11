@@ -1,6 +1,8 @@
 package com.desertakal.desertakal.repository;
 
+import com.desertakal.desertakal.model.entity.Role;
 import com.desertakal.desertakal.model.entity.User;
+import com.desertakal.desertakal.model.enums.UserStatus;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,6 +28,8 @@ public interface UserRepository extends JpaRepository<@NonNull User, @NonNull UU
 
     @EntityGraph(attributePaths = {"role", "role.permissions"})
     Optional<User> findWithSecurityByUuid(UUID uuid);
+
+    long countByRole_NameAndStatus(String roleName, UserStatus status);
 
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
