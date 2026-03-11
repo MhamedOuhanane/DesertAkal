@@ -12,7 +12,6 @@ import { DashboardHeader } from '../../shared/components/dashboard-header/dashbo
     },
     template: `
         <div class="flex min-h-screen bg-main-bg">
-            <!-- Sidebar -->
             <app-sidebar
                 [collapsed]="sidebarCollapsed()"
                 [mobileOpen]="sidebarMobileOpen()"
@@ -26,7 +25,7 @@ import { DashboardHeader } from '../../shared/components/dashboard-header/dashbo
             >
                 <app-dashboard-header (sidebarToggle)="toggleMobileSidebar()" />
 
-                <main class="flex-1 overflow-y-auto p-4 sm:p-6">
+                <main class="flex-1 overflow-y-hidden p-6 md:py-2 md:px-4 ">
                     <app-breadcrumb />
                     <router-outlet />
                 </main>

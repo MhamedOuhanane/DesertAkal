@@ -1,13 +1,12 @@
-import { Component, computed, input } from "@angular/core";
-import { MonthlyStats } from "../../../../../core/models/admin-dashboard.model";
-import { CurrencyPipe, DecimalPipe } from "@angular/common";
-
+import { Component, computed, input } from '@angular/core';
+import { MonthlyStats } from '../../../../../core/models/admin-dashboard.model';
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
     selector: 'app-monthly-bar-chart',
     imports: [CurrencyPipe],
     template: `
-    <div class="card p-6">
+        <div class="card p-6">
             <div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <h3 class="text-base font-bold text-text-primary">Monthly Performance</h3>
                 <div class="flex items-center gap-4 text-xs text-text-secondary">
@@ -27,11 +26,16 @@ import { CurrencyPipe, DecimalPipe } from "@angular/common";
                     No monthly data yet.
                 </div>
             } @else {
-                <div class="flex items-end gap-2 overflow-x-auto pb-2 sm:gap-3" style="min-height: 220px;">
+                <div
+                    class="flex items-end gap-2 overflow-x-auto pb-2 sm:gap-3"
+                    style="min-height: 220px;"
+                >
                     @for (item of chartData(); track item.month) {
                         <div class="flex min-w-12 flex-1 flex-col items-center gap-1.5">
                             <div class="relative w-full" style="height: 180px;">
-                                <div class="absolute bottom-0 left-0 right-0 flex justify-center gap-1">
+                                <div
+                                    class="absolute bottom-0 left-0 right-0 flex justify-center gap-1"
+                                >
                                     <div
                                         class="w-[40%] rounded-t-md bg-primary/80 transition-all duration-700 ease-out hover:bg-primary"
                                         [style.height.px]="item.revenueHeight"
@@ -52,11 +56,13 @@ import { CurrencyPipe, DecimalPipe } from "@angular/common";
                     }
                 </div>
 
-                <div class="mt-6 grid grid-cols-2 gap-4 border-t border-divider pt-4 sm:grid-cols-3">
+                <div
+                    class="mt-6 grid grid-cols-2 gap-4 border-t border-divider pt-4 sm:grid-cols-3"
+                >
                     <div>
                         <p class="text-xs text-text-disabled">Total Revenue</p>
                         <p class="text-lg font-bold text-text-primary">
-                            {{ totalRevenue() | currency: 'EUR' : 'symbol' : '1.0-0' }} 
+                            {{ totalRevenue() | currency: 'EUR' : 'symbol' : '1.0-0' }}
                         </p>
                     </div>
                     <div>
@@ -68,7 +74,7 @@ import { CurrencyPipe, DecimalPipe } from "@angular/common";
                     <div class="hidden sm:block">
                         <p class="text-xs text-text-disabled">Avg/Month</p>
                         <p class="text-lg font-bold text-text-primary">
-                            {{ avgRevenue() | currency: 'EUR' : 'symbol' : '1.0-0'}}
+                            {{ avgRevenue() | currency: 'EUR' : 'symbol' : '1.0-0' }}
                         </p>
                     </div>
                 </div>
@@ -109,7 +115,20 @@ export class MonthlyBarChart {
 
     private formatMonth(month: string): string {
         const [year, m] = month.split('-');
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const months = [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec',
+        ];
         return months[parseInt(m, 10) - 1] || m;
     }
 }

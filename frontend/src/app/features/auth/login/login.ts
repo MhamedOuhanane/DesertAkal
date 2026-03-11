@@ -8,16 +8,18 @@ import { ScreenService } from '../../../core/services/screen-service';
 import { toast } from 'ngx-sonner';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { OauthLogin } from '../../../shared/components/oauth-login/oauth-login';
+import { TextInput } from '../../../shared/components/text-input/text-input';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [ReactiveFormsModule, RouterLink, BrandLogo, OauthLogin],
+    imports: [ReactiveFormsModule, RouterLink, BrandLogo, OauthLogin, TextInput],
     templateUrl: './login.html',
 })
 export class Login {
     private fb = inject(FormBuilder);
     protected readonly authStore = inject(AuthStore);
+    protected screenService = inject(ScreenService);
 
     isLoading = this.authStore.loading;
 
