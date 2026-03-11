@@ -14,7 +14,7 @@ export const ADMIN_ROUTES: Routes = [
             {
                 path: 'tours',
                 loadComponent: () =>
-                    import('./tours-management/tours-management').then((m) => m.ToursManagement),
+                    import('./tours/tour-list/tour-list').then((m) => m.TourList),
                 data: { breadcrumb: 'Tours Management' },
             },
         ],

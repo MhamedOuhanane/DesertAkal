@@ -8,7 +8,7 @@ export interface Tour {
     readonly durationDays: number;
     readonly rating: number;
     readonly reviewCount: number;
-    readonly cityTours: CityTour;
+    readonly cityTours: CityTour[];
 }
 
 export interface TourFind {
