@@ -14,16 +14,16 @@ export const AUTH_ROUTES: Routes = [
                 path: 'register',
                 loadComponent: () => import('./register/register').then((m) => m.Register),
             },
-            // {
-            //     path: 'verify-email',
-            //     loadComponent: () =>
-            //         import('./verify-email/verify-email').then((m) => m.VerifyEmail),
-            // },
-            // {
-            //     path: 'forgot-password',
-            //     loadComponent: () =>
-            //         import('./forgot-password/forgot-password').then((m) => m.ForgotPassword),
-            // },
+            {
+                path: 'verify-email',
+                loadComponent: () =>
+                    import('./verify-email/verify-email').then((m) => m.VerifyEmail),
+            },
+            {
+                path: 'confirm-email',
+                loadComponent: () =>
+                    import('./confirm-email/confirm-email').then((m) => m.ConfirmEmail),
+            },
             {
                 path: '',
                 redirectTo: 'login',

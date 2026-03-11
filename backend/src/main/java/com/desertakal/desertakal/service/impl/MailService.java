@@ -24,7 +24,7 @@ public class MailService {
 
     @Async
     public void sendVerificationEmail(String to, String token) {
-        String verificationUrl = brand.getApiUrl() + "/api/auth/verify-email?token=" + token;
+        String verificationUrl = brand.getFrontendUrl() + "/auth/confirm-email?token=" + token;
 
         String html = buildEmail(
                 "Verify Your Email",

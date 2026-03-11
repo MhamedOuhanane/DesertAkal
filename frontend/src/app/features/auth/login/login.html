@@ -177,7 +177,7 @@
             <app-oauth-login />
 
             <div class="mt-7 text-center">
-                <p class="text-sm text-text-secondary">
+                <div class="mt-7 text-center space-y-3"> <p class="text-sm text-text-secondary">
                     Don't have an account?
                     <a
                         routerLink="/auth/register"
@@ -186,6 +186,17 @@
                         Sign up
                     </a>
                 </p>
+
+                <p class="text-sm text-text-secondary">
+                    Didn't get the email? 
+                    <a 
+                        routerLink="/auth/verify-email" 
+                        class="font-bold text-primary hover:text-primary-hover transition-colors"
+                    >
+                        Verify your account
+                    </a>
+                </p>
+            </div>
             </div>
         </div>
 
