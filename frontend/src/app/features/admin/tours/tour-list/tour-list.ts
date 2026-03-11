@@ -7,11 +7,12 @@ import { Pagination } from '../../../../core/models/response.models';
 import { toast } from 'ngx-sonner';
 import { firstValueFrom } from 'rxjs';
 import { TourService } from '../../../../core/services/tour-service';
+import { PaginationComponent } from "../../../../shared/components/pagination/pagination";
 
 @Component({
     selector: 'app-tour-list',
     standalone: true,
-    imports: [RouterLink, FormsModule, DecimalPipe],
+    imports: [RouterLink, FormsModule, DecimalPipe, PaginationComponent],
     templateUrl: './tour-list.html',
 })
 export class TourList implements OnInit {
@@ -48,7 +49,6 @@ export class TourList implements OnInit {
             };
             const res = await firstValueFrom(this.tourService.findAll(filters));
             if (res.data) {
-                console.log(res.data);
                 this.tours.set(res.data.content);
                 this.pagination.set(res.data);
             }
@@ -70,11 +70,6 @@ export class TourList implements OnInit {
         this.loadTours();
     }
 
-    goToPage(page: number): void {
-        this.currentPage = page;
-        this.loadTours();
-    }
-
     viewTour(uuid: string): void {
         this.router.navigate(['/dashboard/tours', uuid]);
     }
@@ -82,9 +77,9 @@ export class TourList implements OnInit {
     editTour(uuid: string): void {
         this.router.navigate(['/dashboard/tours', uuid, 'edit']);
     }
-
-    confirmDelete(tour: Tour): void {
-        this.tourToDelete.set(tour);
-        this.showDeleteDialog.set(true);
+    
+    onPageChange(page: number): void {
+        this.currentPage = page;
+        this.loadTours();
     }
 }

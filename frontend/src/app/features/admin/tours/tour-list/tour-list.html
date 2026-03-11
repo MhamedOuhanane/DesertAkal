@@ -180,5 +180,12 @@
                 </tbody>
             </table>
         </div>
+
+        @if (pagination()) {
+            <app-pagination 
+                [pagination]="pagination()!" 
+                (pageChange)="onPageChange($event)"
+            />
+        }
     </div>
 }
