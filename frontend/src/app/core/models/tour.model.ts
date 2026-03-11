@@ -1,4 +1,5 @@
 import { CityTour, CityTourCreate } from './city-tour.model';
+import { PageAble } from './response.models';
 
 export interface Tour {
     readonly uuid: string;
@@ -33,4 +34,11 @@ export interface TourUpdate {
     title?: string;
     description?: string;
     cityTours?: CityTourCreate[];
+}
+
+export interface TourFilters extends PageAble {
+    search?: string;
+    city?: string;
+    durationStr?: string;
+    minRating?: number;
 }

@@ -15,3 +15,10 @@ export interface ApiResponse<T> {
     path: string;
     data: T | null;
 }
+
+export interface PageAble {
+    page?: number;
+    size?: number;
+    sortBy?: string;
+    order?: string;
+}

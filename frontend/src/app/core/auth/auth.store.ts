@@ -96,14 +96,16 @@ export const AuthStore = signalStore(
 
                 const isSecure = environment.secureCookie;
 
-                const tokenExpires = new Date();
-                tokenExpires.setMinutes(tokenExpires.getMinutes() + 15);
-                cookieService.set('auth_token', token, tokenExpires, '/', '', isSecure, 'Strict');
+                // const tokenExpires = new Date();
+                // tokenExpires.setMinutes(tokenExpires.getMinutes() + 15);
+                
+                const longTerm = 30;
+                cookieService.set('auth_token', token, longTerm, '/', '', isSecure, 'Strict');
 
                 cookieService.set(
                     'user_data',
                     JSON.stringify(user),
-                    30,
+                    longTerm,
                     '/',
                     '',
                     isSecure,
