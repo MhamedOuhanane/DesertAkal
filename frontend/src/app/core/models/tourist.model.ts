@@ -1,4 +1,4 @@
-import { UserFind, UserUpdate } from "./user.models";
+import { UserFind, UserUpdate } from './user.models';
 
 export interface Tourist extends UserFind {
     readonly avatarUrl: string;

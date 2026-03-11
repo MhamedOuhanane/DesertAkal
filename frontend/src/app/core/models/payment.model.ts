@@ -1,7 +1,7 @@
-import { PaymentMethod } from "../enums/payment-method.enum";
-import { PaymentStatus } from "../enums/payment-status.enum";
-import { PaymentType } from "../enums/payment-type.enum";
-import { Reservation } from "./reservation.model";
+import { PaymentMethod } from '../enums/payment-method.enum';
+import { PaymentStatus } from '../enums/payment-status.enum';
+import { PaymentType } from '../enums/payment-type.enum';
+import { Reservation } from './reservation.model';
 
 export interface Payment {
     readonly uuid: string;

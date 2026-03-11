@@ -1,4 +1,4 @@
-import { CityFind } from "./city.model";
+import { CityFind } from './city.model';
 
 export interface CityTour {
     readonly orderIndex: number;

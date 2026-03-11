@@ -1,13 +1,14 @@
 import { Routes } from '@angular/router';
+import { homeGuard } from './core/guards/home-guard';
 import { authGuard } from './core/auth/auth-guard';
 import { roleGuard } from './core/guards/role-guard';
+import { guestGuard } from './core/guards/guest-guard';
 
 export const routes: Routes = [
     {
         path: '',
+        canActivate: [homeGuard],
         loadComponent: () => import('./layouts/main-layout/main-layout').then((m) => m.MainLayout),
-        canActivate: [roleGuard],
-        data: { roles: ['VISITOR', 'TOURIST'] },
         children: [
             {
                 path: '',
@@ -21,17 +22,28 @@ export const routes: Routes = [
     },
 
     {
+        path: 'auth',
+        canActivate: [guestGuard],
+        loadChildren: () => import('./features/auth/auth.routes').then((r) => r.AUTH_ROUTES),
+    },
+
+    {
         path: 'dashboard',
-        // canActivate: [authGuard, roleGuard],
-        // data: { roles: ['ADMIN'] },
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['ADMIN'] },
         loadChildren: () => import('./features/admin/admin.routes').then((r) => r.ADMIN_ROUTES),
     },
 
     {
         path: 'guide',
-        // canActivate: [authGuard, roleGuard],
+        canActivate: [authGuard, roleGuard],
         data: { roles: ['GUIDE'] },
         loadChildren: () => import('./features/guide/guide.routes').then((r) => r.GUIDE_ROUTES),
+    },
+
+    { 
+        path: 'oauth2/redirect', 
+        loadComponent: () => import('./shared/components/oauth2-redirect/oauth2-redirect').then(m => m.OAuth2RedirectComponent), 
     },
 
     {

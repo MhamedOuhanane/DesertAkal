@@ -4,4 +4,3 @@ export interface Notification {
     readonly date: string | Date;
     readonly seen: boolean;
 }
-

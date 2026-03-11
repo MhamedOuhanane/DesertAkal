@@ -6,7 +6,7 @@ import { RouterLink } from '@angular/router';
     imports: [RouterLink],
     template: `
         <a [routerLink]="link()" class="flex items-center gap-2.5">
-            <img src="favicon.svg" alt="DesertAkal" class="h-16 w-auto" />
+            <img src="favicon.svg" alt="DesertAkal" [class]="classLogo()" />
             @if (isExpanded()) {
                 <span class="text-xl font-bold tracking-tight text-logo-blue">
                     Desert<span class="text-primary">Akal</span>
@@ -18,5 +18,6 @@ import { RouterLink } from '@angular/router';
 })
 export class BrandLogo {
     readonly link = input<string>('/');
+    readonly classLogo = input<string>('h-16 w-auto');
     readonly isExpanded = input<boolean>(true);
 }

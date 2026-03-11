@@ -6,10 +6,12 @@ import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenDTO;
 import com.desertakal.desertakal.model.dto.refreshToken.RefreshTokenRequestDTO;
 import com.desertakal.desertakal.model.entity.*;
+import com.desertakal.desertakal.model.enums.FileType;
 import com.desertakal.desertakal.model.enums.OauthProvider;
 import com.desertakal.desertakal.repository.RoleRepository;
 import com.desertakal.desertakal.repository.UserOAuthRepository;
 import com.desertakal.desertakal.repository.UserRepository;
+import com.desertakal.desertakal.service.interfaces.FileStorageService;
 import com.desertakal.desertakal.service.interfaces.RefreshTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -46,11 +48,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
     private final JwtService jwtService;
-    private final ObjectMapper mapper;
     private final CookieConfig cookieConfig;
+    private final FileStorageService fileStorageService;
 
-    @Value("${app.oauth2.redirect-uri}")
-    private String redirectUri;
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(
@@ -134,9 +136,14 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
-                        .queryParam("token", accessToken)
-                        .build().toUriString();
+        String targetUrl = UriComponentsBuilder.fromUriString(frontendUrl + "/oauth2/redirect")
+                .queryParam("token", accessToken)
+                .queryParam("userUuid", user.getUuid().toString())
+                .queryParam("username", user.getUsername())
+                .queryParam("fullName", user.getFirstName() + " " + user.getLastName())
+                .queryParam("photo", fileStorageService.getPublicUrl(user.getPhoto(), FileType.PROFILE))
+                .queryParam("role", user.getRole().getName())
+                .build().toUriString();
 
         log.info("OAuth2 Success: Redirecting user {} to frontend", user.getEmail());
 

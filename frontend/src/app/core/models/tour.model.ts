@@ -1,4 +1,4 @@
-import { CityTour, CityTourCreate } from "./city-tour.model";
+import { CityTour, CityTourCreate } from './city-tour.model';
 
 export interface Tour {
     readonly uuid: string;

@@ -1,4 +1,4 @@
-import { ReactionType } from "../enums/reaction.enum";
+import { ReactionType } from '../enums/reaction.enum';
 
 export type Action = 'ADDED' | 'CHANGED' | 'REMOVED';
 

@@ -25,5 +25,5 @@ public class RoleCreateDTO {
     private String name;
 
     @NotEmpty(message = "At least one permission is required")
-    List<UUID> permissionUuids;
+    private List<UUID> permissionUuids;
 }

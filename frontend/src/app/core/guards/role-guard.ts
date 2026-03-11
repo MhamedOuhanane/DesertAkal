@@ -11,7 +11,9 @@ export const roleGuard: CanActivateFn = (route, state) => {
     const userRole = authStore.userRole();
 
     if (expectedRoles && !expectedRoles.includes('VISITOR') && !authStore.isAuthenticated()) {
-        return router.createUrlTree(['/login']);
+        return router.createUrlTree(['/auth/login'], {
+            queryParams: { returnUrl: state.url },
+        });
     }
 
     if (expectedRoles && expectedRoles.includes(userRole!)) {

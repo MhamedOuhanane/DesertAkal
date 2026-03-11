@@ -1,6 +1,6 @@
 import { Directive, effect, inject, input, TemplateRef, ViewContainerRef } from '@angular/core';
 import { AuthStore } from '../../core/auth/auth.store';
-import { UserRole } from '../../core/models/user.models';
+import { RoleEnum } from '../../core/enums/role.enum';
 
 @Directive({
     selector: '[appHasRole]',
@@ -10,7 +10,7 @@ export class HasRole {
     private readonly templateRef = inject(TemplateRef);
     private readonly viewContainer = inject(ViewContainerRef);
 
-    appHasRole = input.required<UserRole | UserRole[]>();
+    appHasRole = input.required<RoleEnum | RoleEnum[]>();
 
     private isRendered = false;
 
@@ -30,7 +30,7 @@ export class HasRole {
         });
     }
 
-    private normalizeRoles(roles: UserRole | UserRole[]): UserRole[] {
+    private normalizeRoles(roles: RoleEnum | RoleEnum[]): RoleEnum[] {
         return Array.isArray(roles) ? roles : [roles];
     }
 }

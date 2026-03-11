@@ -26,5 +26,8 @@ public interface TourRepository extends JpaRepository<@NonNull Tour, @NonNull UU
     @Query("SELECT t FROM Tour t JOIN t.reservations r WHERE r.guide = :guide")
     Page<@NonNull Tour> findAllByGuide(@Param("guide") Guide guide, Pageable pageable);
 
+    @Query("SELECT AVG(t.rating) FROM Tour t")
+    Double getAverageRating();
+
     boolean existsByTitle(String title);
 }

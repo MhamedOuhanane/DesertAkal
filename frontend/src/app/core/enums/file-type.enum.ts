@@ -3,5 +3,5 @@ export enum FileType {
     PROFILE = 'PROFILE',
     TOUR = 'TOUR',
     CITY = 'CITY',
-    ARTICLE = 'ARTICLE'
+    ARTICLE = 'ARTICLE',
 }
