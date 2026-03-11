@@ -16,7 +16,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
     const isAuthPath = req.url.includes('/auth');
     const isLogoutPath = req.url.includes('/auth/logout');
     const isLoginPath = req.url.includes('/auth/login');
-    
+
     let headers = req.headers;
 
     if (isRefreshPath) {
@@ -40,12 +40,15 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
                             authStore.setRefreshToken(response.data.accessToken);
 
                             const retryReq = req.clone({
-                                headers: req.headers.set('Authorization', `Bearer ${response.data.accessToken}`),
-                                withCredentials: true
+                                headers: req.headers.set(
+                                    'Authorization',
+                                    `Bearer ${response.data.accessToken}`,
+                                ),
+                                withCredentials: true,
                             });
                             return next(retryReq);
                         }
-                        
+
                         return throwError(() => error);
                     }),
                     catchError((refreshError) => {
@@ -54,7 +57,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
                             description: 'Please log in again to continue.',
                         });
                         return throwError(() => refreshError);
-                    })
+                    }),
                 );
             }
 

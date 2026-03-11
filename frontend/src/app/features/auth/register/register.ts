@@ -15,7 +15,7 @@ import { AuthService } from '../../../core/auth/auth-service';
 import { toast } from 'ngx-sonner';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
-import { OauthLogin } from "../../../shared/components/oauth-login/oauth-login";
+import { OauthLogin } from '../../../shared/components/oauth-login/oauth-login';
 
 @Component({
     selector: 'app-register',

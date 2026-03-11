@@ -7,7 +7,7 @@ import { BrandLogo } from '../../../shared/components/brand-logo/brand-logo';
 import { ScreenService } from '../../../core/services/screen-service';
 import { toast } from 'ngx-sonner';
 import { AuthStore } from '../../../core/auth/auth.store';
-import { OauthLogin } from "../../../shared/components/oauth-login/oauth-login";
+import { OauthLogin } from '../../../shared/components/oauth-login/oauth-login';
 
 @Component({
     selector: 'app-login',

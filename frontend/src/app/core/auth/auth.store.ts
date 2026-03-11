@@ -126,7 +126,15 @@ export const AuthStore = signalStore(
 
                 const currentUser = store.user();
                 if (currentUser) {
-                    cookieService.set('user_data', JSON.stringify(currentUser), 30, '/', '', isSecure, 'Strict',);
+                    cookieService.set(
+                        'user_data',
+                        JSON.stringify(currentUser),
+                        30,
+                        '/',
+                        '',
+                        isSecure,
+                        'Strict',
+                    );
                 }
 
                 patchState(store, { token: newToken });
@@ -145,15 +153,23 @@ export const AuthStore = signalStore(
                     username: data.username,
                     fullName: data.fullName,
                     role: data.role,
-                    photo: data.photo
+                    photo: data.photo,
                 };
-                
-                cookieService.set('user_data', JSON.stringify(user), 30, '/', '', isSecure, 'Strict',);
 
-                patchState(store, { 
-                    user: user, 
-                    token: data.token, 
-                    loading: false
+                cookieService.set(
+                    'user_data',
+                    JSON.stringify(user),
+                    30,
+                    '/',
+                    '',
+                    isSecure,
+                    'Strict',
+                );
+
+                patchState(store, {
+                    user: user,
+                    token: data.token,
+                    loading: false,
                 });
             },
 
@@ -164,7 +180,7 @@ export const AuthStore = signalStore(
 
                 try {
                     const response = await firstValueFrom(authService.logout());
-                    toast.success(response.message);    
+                    toast.success(response.message);
 
                     cookieService.delete('auth_token', '/');
                     cookieService.delete('user_data', '/');

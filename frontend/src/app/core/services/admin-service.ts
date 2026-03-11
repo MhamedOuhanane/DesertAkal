@@ -6,11 +6,11 @@ import { ApiResponse } from '../models/response.models';
 import { AdminDashboard } from '../models/admin-dashboard.model';
 
 @Injectable({
-  providedIn: 'root',
+    providedIn: 'root',
 })
 export class AdminService {
     private http = inject(HttpClient);
-    private apiUrl = `${environment.apiUrl}/admin`
+    private apiUrl = `${environment.apiUrl}/admin`;
 
     getDashboardStats(): Observable<ApiResponse<AdminDashboard>> {
         return this.http.get<ApiResponse<AdminDashboard>>(`${this.apiUrl}/dashboard/stats`);

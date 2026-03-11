@@ -6,17 +6,19 @@ import { AuthStore } from '../../../core/auth/auth.store';
 import { isPlatformBrowser } from '@angular/common';
 
 @Component({
-  selector: 'app-oauth2-redirect',
-  standalone: true,
-  template: `
-    <div class="flex h-screen flex-col items-center justify-center bg-main-bg">
-      <div class="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-      <p class="mt-4 text-text-secondary animate-pulse">Completing secure login...</p>
-    </div>
-  `
+    selector: 'app-oauth2-redirect',
+    standalone: true,
+    template: `
+        <div class="flex h-screen flex-col items-center justify-center bg-main-bg">
+            <div
+                class="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"
+            ></div>
+            <p class="mt-4 text-text-secondary animate-pulse">Completing secure login...</p>
+        </div>
+    `,
 })
 export class OAuth2RedirectComponent implements OnInit {
-  private route = inject(ActivatedRoute);
+    private route = inject(ActivatedRoute);
     private router = inject(Router);
     private authStore = inject(AuthStore);
     private platformId = inject(PLATFORM_ID);

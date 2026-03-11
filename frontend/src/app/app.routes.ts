@@ -41,9 +41,12 @@ export const routes: Routes = [
         loadChildren: () => import('./features/guide/guide.routes').then((r) => r.GUIDE_ROUTES),
     },
 
-    { 
-        path: 'oauth2/redirect', 
-        loadComponent: () => import('./shared/components/oauth2-redirect/oauth2-redirect').then(m => m.OAuth2RedirectComponent), 
+    {
+        path: 'oauth2/redirect',
+        loadComponent: () =>
+            import('./shared/components/oauth2-redirect/oauth2-redirect').then(
+                (m) => m.OAuth2RedirectComponent,
+            ),
     },
 
     {
