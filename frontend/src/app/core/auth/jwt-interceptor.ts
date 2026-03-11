@@ -30,6 +30,10 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
         withCredentials: isLoginPath || isLogoutPath || isRefreshPath,
     });
 
+    if (req.url.includes('/auth/refresh') || req.url.includes('/auth/login')) {
+        return next(req);
+    }
+
     return next(authReq).pipe(
         catchError((error: HttpErrorResponse) => {
             const isAuthEndpoint = !isAuthPath || !isRefreshPath;

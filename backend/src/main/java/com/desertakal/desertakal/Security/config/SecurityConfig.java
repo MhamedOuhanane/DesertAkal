@@ -4,6 +4,7 @@ import com.desertakal.desertakal.Security.handler.CustomAccessDeniedHandler;
 import com.desertakal.desertakal.Security.handler.JwtAuthenticationEntryPoint;
 import com.desertakal.desertakal.Security.handler.OAuth2SuccessHandler;
 import com.desertakal.desertakal.Security.jwt.JwtAuthenticationFilter;
+import com.desertakal.desertakal.config.brand.BrandInfo;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
@@ -28,14 +30,17 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final CorsConfigurationSource corsConfigurationSource;
+    private final BrandInfo brandInfo;
+    private final DeviceIdOAuth2Filter deviceIdOAuth2Filter;
 
     @Bean
     public SecurityFilterChain filterChain(@NonNull HttpSecurity http) {
         http
+                .addFilterAfter(deviceIdOAuth2Filter, LogoutFilter.class)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
-                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -65,9 +70,10 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth -> oauth
                         .successHandler(oAuth2SuccessHandler)
+                        .failureUrl(brandInfo.getFrontendUrl() + "/auth/login?error=oauth2_cancelled")
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        
+
         return http.build();
     }
 }

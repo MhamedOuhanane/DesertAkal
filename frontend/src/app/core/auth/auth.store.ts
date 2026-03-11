@@ -75,8 +75,6 @@ export const AuthStore = signalStore(
 
                         patchState(store, { loading: false });
 
-                        await router.navigate(['/']);
-
                         return true;
                     }
 
@@ -119,17 +117,18 @@ export const AuthStore = signalStore(
                 if (!isPlatformBrowser(platformId)) return;
 
                 const isSecure = environment.secureCookie;
-                const expires = new Date();
-                expires.setMinutes(expires.getMinutes() + 15);
+                // const expires = new Date();
+                // expires.setMinutes(expires.getMinutes() + 15);
+                const longTerm = 30;
 
-                cookieService.set('auth_token', newToken, expires, '/', '', isSecure, 'Strict');
+                cookieService.set('auth_token', newToken, longTerm, '/', '', isSecure, 'Strict');
 
                 const currentUser = store.user();
                 if (currentUser) {
                     cookieService.set(
                         'user_data',
                         JSON.stringify(currentUser),
-                        30,
+                        longTerm,
                         '/',
                         '',
                         isSecure,
@@ -144,10 +143,11 @@ export const AuthStore = signalStore(
                 patchState(store, { loading: true });
 
                 const isSecure = environment.secureCookie;
-                const expires = new Date();
-                expires.setMinutes(expires.getMinutes() + 15);
+                // const expires = new Date();
+                // expires.setMinutes(expires.getMinutes() + 15);
+                const longTerm = 30;
 
-                cookieService.set('auth_token', data.token, expires, '/', '', isSecure, 'Strict');
+                cookieService.set('auth_token', data.token, longTerm, '/', '', isSecure, 'Strict');
                 const user: UserAuth = {
                     uuid: data.userUuid,
                     username: data.username,
@@ -159,7 +159,7 @@ export const AuthStore = signalStore(
                 cookieService.set(
                     'user_data',
                     JSON.stringify(user),
-                    30,
+                    longTerm,
                     '/',
                     '',
                     isSecure,
@@ -230,18 +230,20 @@ export const AuthStore = signalStore(
             } else if (!savedToken && savedUserJson) {
                 try {
                     patchState(store, { loading: true });
-
+                    
                     const response = await firstValueFrom(authService.refresh());
-
+                    console.log(response);
+                    
+                    
                     if (response.status === 200 && response.data) {
                         const user = JSON.parse(savedUserJson) as UserAuth;
                         store.setRefreshToken(response.data.accessToken);
                         patchState(store, { user, loading: false });
                     }
                 } catch (error: any) {
+                    const msg = error?.error?.message || 'Session expired, please login again';
+                    toast.error(msg);
                     if (error.status === 401 || error.status === 403) {
-                        const msg = error?.error?.message || 'Session expired, please login again';
-                        toast.error(msg);
                         store.clearAuth();
                     }
                     patchState(store, { loading: false });
