@@ -10,7 +10,7 @@ import { ApiResponse, Pagination } from '../models/response.models';
 })
 export class TourService {
     private readonly http = inject(HttpClient);
-    private readonly apiUrl = environment.apiUrl;
+    private readonly apiUrl = `${environment.apiUrl}/tours`;
 
     findAll(filters: TourFilters ): Observable<ApiResponse<Pagination<Tour>>> {
         let params = new HttpParams;
@@ -18,10 +18,10 @@ export class TourService {
         if (filters.city) params = params.set("city", filters.city); 
         if (filters.durationStr) params = params.set("durationStr", filters.durationStr); 
         if (filters.minRating) params = params.set("minRating", filters.minRating.toString()); 
-        params = params.set('page', (filters.page ?? 0).toString());
-        params = params.set('size', (filters.size ?? 10).toString());
-        params = params.set('sortBy', filters.sortBy ?? 'createdAt');
-        params = params.set('order', filters.order ?? 'desc');
+        params = params.set('page', (filters.page ?? 0).toString())
+            .set('size', (filters.size ?? 10).toString())
+            .set('sortBy', filters.sortBy ?? 'createdAt')
+            .set('order', filters.order ?? 'desc');
 
         return this.http.get<ApiResponse<Pagination<Tour>>>(this.apiUrl, { params });
     }
