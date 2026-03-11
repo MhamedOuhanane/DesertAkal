@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../../environments/environment.development';
+import { DeviceService } from '../../../core/services/device-service';
 
 @Component({
     selector: 'app-oauth-login',
@@ -60,7 +61,10 @@ import { environment } from '../../../../environments/environment.development';
     `,
 })
 export class OauthLogin {
+    private readonly deviceService = inject(DeviceService);
+    
     loginWith(provider: string): void {
-        window.location.href = `${environment.backUrl}/oauth2/authorization/${provider}`;
+        const deviceId = this.deviceService.getDeviceId();
+        window.location.href = `${environment.backUrl}/oauth2/authorization/${provider}?device_id=${deviceId}`;
     }
 }

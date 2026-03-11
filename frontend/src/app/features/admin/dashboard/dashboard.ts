@@ -16,14 +16,12 @@ import { MatIcon } from '@angular/material/icon';
     standalone: true,
     imports: [
         DecimalPipe,
-        RouterLink,
         StatCard,
         StatusDonutChart,
         MonthlyBarChart,
         RecentActivity,
         DecimalPipe,
         StatCard,
-        MatIcon,
     ],
     templateUrl: './dashboard.html',
 })
@@ -62,8 +60,8 @@ export class Dashboard implements OnInit {
     get formattedRevenue(): string {
         const r = this.data()?.totalRevenue ?? 0;
         if (r >= 1_000_000) return `€${(r / 1_000_000).toFixed(1)}M`;
-        if (r >= 1_000) return `$${(r / 1_000).toFixed(1)}K`;
-        return `$${r.toFixed(0)}`;
+        if (r >= 1_000) return `€${(r / 1_000).toFixed(1)}K`;
+        return `€${r.toFixed(0)}`;
     }
 
     get formattedRating(): string {

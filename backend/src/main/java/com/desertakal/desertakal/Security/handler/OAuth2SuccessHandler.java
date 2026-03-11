@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.Security.handler;
 
+import com.desertakal.desertakal.Security.config.DeviceIdOAuth2Filter;
 import com.desertakal.desertakal.Security.jwt.JwtService;
 import com.desertakal.desertakal.config.CookieConfig;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -111,7 +113,22 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         String userAgent = request.getHeader("User-Agent");
         String ipAddress = request.getRemoteAddr();
-        String deviceId = request.getHeader("X-Device-ID") != null ? request.getHeader("X-Device-ID") : "OAuth2-Session";
+        HttpSession session = request.getSession(false);
+        String deviceId = null;
+
+        if (session != null) {
+            deviceId = (String) session.getAttribute(DeviceIdOAuth2Filter.DEVICE_ID_SESSION_KEY);
+            log.info("Retrieved device_id from session: {}", deviceId);
+            session.removeAttribute(DeviceIdOAuth2Filter.DEVICE_ID_SESSION_KEY);
+        }
+
+        if (deviceId == null || deviceId.isEmpty()) {
+            deviceId = request.getHeader("X-Device-ID");
+        }
+
+        if (deviceId == null || deviceId.isEmpty()) {
+            deviceId = "OAUTH-" + Math.abs(request.getHeader("User-Agent").hashCode());
+        }
 
         String accessToken = jwtService.generateAccessToken(user);
         RefreshTokenDTO refreshToken = refreshTokenService.create(

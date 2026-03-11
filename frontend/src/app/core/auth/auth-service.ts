@@ -1,9 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpBackend, HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { LoginRequest, LoginResponse, Register } from '../auth/auth.models';
 import { Observable } from 'rxjs';
-import { UserAuth } from '../models/user.models';
 import { ApiResponse } from '../models/response.models';
 import { DeviceService } from '../services/device-service';
 import { ActiveSession } from '../models/refresh-token.model';
@@ -13,8 +12,11 @@ import { ActiveSession } from '../models/refresh-token.model';
 })
 export class AuthService {
     private http = inject(HttpClient);
+    private httpBackend = inject(HttpBackend);
     private deviceService = inject(DeviceService);
     private apiUrl = `${environment.apiUrl}/auth`;
+
+    private httpWithoutInterceptors = new HttpClient(this.httpBackend);
 
     register(credentials: Register): Observable<ApiResponse<null>> {
         return this.http.post<ApiResponse<null>>(`${this.apiUrl}/register`, credentials);
@@ -29,7 +31,14 @@ export class AuthService {
     }
 
     refresh(): Observable<ApiResponse<LoginResponse>> {
-        return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrl}/refresh`, {});
+        return this.httpWithoutInterceptors.post<ApiResponse<LoginResponse>>(
+            `${this.apiUrl}/refresh`, 
+            {}, 
+            { 
+                headers: { 'X-Device-ID': this.deviceService.getDeviceId() },
+                withCredentials: true 
+            }
+        );
     }
 
     resendVerificationEmail(email: string): Observable<ApiResponse<null>> {
