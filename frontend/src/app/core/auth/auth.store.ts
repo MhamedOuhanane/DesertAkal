@@ -126,7 +126,15 @@ export const AuthStore = signalStore(
 
                 const currentUser = store.user();
                 if (currentUser) {
-                    cookieService.set('user_data', JSON.stringify(currentUser), 30, '/', '', isSecure, 'Strict',);
+                    cookieService.set(
+                        'user_data',
+                        JSON.stringify(currentUser),
+                        30,
+                        '/',
+                        '',
+                        isSecure,
+                        'Strict',
+                    );
                 }
 
                 patchState(store, { token: newToken });
@@ -145,15 +153,23 @@ export const AuthStore = signalStore(
                     username: data.username,
                     fullName: data.fullName,
                     role: data.role,
-                    photo: data.photo
+                    photo: data.photo,
                 };
-                
-                cookieService.set('user_data', JSON.stringify(user), 30, '/', '', isSecure, 'Strict',);
 
-                patchState(store, { 
-                    user: user, 
-                    token: data.token, 
-                    loading: false
+                cookieService.set(
+                    'user_data',
+                    JSON.stringify(user),
+                    30,
+                    '/',
+                    '',
+                    isSecure,
+                    'Strict',
+                );
+
+                patchState(store, {
+                    user: user,
+                    token: data.token,
+                    loading: false,
                 });
             },
 
@@ -164,7 +180,7 @@ export const AuthStore = signalStore(
 
                 try {
                     const response = await firstValueFrom(authService.logout());
-                    toast.success(response.message);    
+                    toast.success(response.message);
 
                     cookieService.delete('auth_token', '/');
                     cookieService.delete('user_data', '/');
@@ -175,6 +191,17 @@ export const AuthStore = signalStore(
                 }
             },
 
+            clearAuth() {
+                if (!isPlatformBrowser(platformId)) return;
+
+                cookieService.delete('auth_token', '/');
+                cookieService.delete('user_data', '/');
+
+                patchState(store, initialState);
+
+                router.navigate(['/auth/login']);
+            },
+
             setLoading(value: boolean) {
                 patchState(store, { loading: value });
             },
@@ -182,7 +209,12 @@ export const AuthStore = signalStore(
     ),
 
     withHooks({
-        onInit(store, platformId = inject(PLATFORM_ID), cookieService = inject(CookieService)) {
+        async onInit(
+            store,
+            platformId = inject(PLATFORM_ID),
+            cookieService = inject(CookieService),
+            authService = inject(AuthService),
+        ) {
             if (!isPlatformBrowser(platformId)) return;
 
             const savedToken = cookieService.get('auth_token');
@@ -193,9 +225,26 @@ export const AuthStore = signalStore(
                     const user = JSON.parse(savedUserJson) as UserAuth;
                     patchState(store, { token: savedToken, user });
                 } catch {
-                    cookieService.delete('auth_token', '/');
-                    cookieService.delete('user_data', '/');
-                    patchState(store, initialState);
+                    store.clearAuth();
+                }
+            } else if (!savedToken && savedUserJson) {
+                try {
+                    patchState(store, { loading: true });
+
+                    const response = await firstValueFrom(authService.refresh());
+
+                    if (response.status === 200 && response.data) {
+                        const user = JSON.parse(savedUserJson) as UserAuth;
+                        store.setRefreshToken(response.data.accessToken);
+                        patchState(store, { user, loading: false });
+                    }
+                } catch (error: any) {
+                    if (error.status === 401 || error.status === 403) {
+                        const msg = error?.error?.message || 'Session expired, please login again';
+                        toast.error(msg);
+                        store.clearAuth();
+                    }
+                    patchState(store, { loading: false });
                 }
             }
         },

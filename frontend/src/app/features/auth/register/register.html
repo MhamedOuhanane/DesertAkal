@@ -76,7 +76,7 @@
                     <app-text-input
                         formControlName="firstName"
                         label="First Name"
-                        placeholder="Karim"
+                        placeholder="First Name"
                         id="reg-firstname"
                         matIcon="person"
                         autocomplete="given-name"
@@ -85,7 +85,7 @@
                     <app-text-input
                         formControlName="lastName"
                         label="Last Name"
-                        placeholder="Bennani"
+                        placeholder="Last Name"
                         id="reg-lastname"
                         matIcon="person"
                         autocomplete="family-name"
@@ -95,7 +95,7 @@
                 <app-text-input
                     formControlName="username"
                     label="Username"
-                    placeholder="karim.bennani"
+                    placeholder="Username"
                     id="reg-username"
                     svgIcon="@"
                     autocomplete="username"
@@ -133,7 +133,6 @@
                     />
                 </div>
 
-                <!-- Terms -->
                 <div class="flex items-start gap-3 pb-2">
                     <input
                         id="reg-terms"
@@ -159,16 +158,15 @@
                     </label>
                 </div>
                 @if (registerForm.get('terms')?.invalid && registerForm.get('terms')?.touched) {
-                    <p class="!-mt-1 text-xs font-medium text-error">
+                    <p class="-mt-1! text-xs font-medium text-error">
                         You must accept the terms and conditions.
                     </p>
                 }
 
-                <!-- Submit -->
                 <button
                     type="submit"
                     [disabled]="isLoading()"
-                    class="btn-primary !mt-4 w-full justify-center py-3 text-[15px]"
+                    class="btn-primary mt-4! w-full justify-center py-3 text-[15px]"
                     [class.opacity-60]="isLoading()"
                     [class.pointer-events-none]="isLoading()"
                 >

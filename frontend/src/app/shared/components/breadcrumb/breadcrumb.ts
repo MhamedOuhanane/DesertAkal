@@ -35,8 +35,6 @@ export class Breadcrumb {
     ): BreadcrumbItem[] {
         const children = route.children;
 
-        console.log(route);
-
         if (!route.children || route.children.length === 0) {
             return crumbs;
         }
@@ -67,7 +65,6 @@ export class Breadcrumb {
 
             return this.buildBreadcrumbs(child, url, crumbs);
         }
-        console.log(crumbs);
 
         return crumbs;
     }

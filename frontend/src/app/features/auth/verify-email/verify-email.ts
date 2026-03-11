@@ -5,7 +5,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/auth/auth-service';
 import { toast } from 'ngx-sonner';
 import { firstValueFrom } from 'rxjs';
-import { BrandLogo } from "../../../shared/components/brand-logo/brand-logo";
+import { BrandLogo } from '../../../shared/components/brand-logo/brand-logo';
 
 @Component({
     selector: 'app-verify-email',
@@ -42,9 +42,7 @@ export class VerifyEmail implements OnInit {
         if (!isPlatformBrowser(this.platformId)) return;
 
         const paramEmail =
-            this.route.snapshot.queryParamMap.get('email') ||
-            history.state?.email ||
-            null;
+            this.route.snapshot.queryParamMap.get('email') || history.state?.email || null;
 
         if (paramEmail) {
             this.email.set(paramEmail);

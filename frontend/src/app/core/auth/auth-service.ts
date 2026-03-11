@@ -28,8 +28,8 @@ export class AuthService {
         return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrl}/login`, loginBody);
     }
 
-    refresh(): Observable<ApiResponse<UserAuth>> {
-        return this.http.post<ApiResponse<UserAuth>>(`${this.apiUrl}/refresh`, {});
+    refresh(): Observable<ApiResponse<LoginResponse>> {
+        return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrl}/refresh`, {});
     }
 
     resendVerificationEmail(email: string): Observable<ApiResponse<null>> {

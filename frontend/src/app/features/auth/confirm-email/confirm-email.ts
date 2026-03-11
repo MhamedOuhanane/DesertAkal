@@ -3,7 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth-service';
 import { firstValueFrom } from 'rxjs';
-import { BrandLogo } from "../../../shared/components/brand-logo/brand-logo";
+import { BrandLogo } from '../../../shared/components/brand-logo/brand-logo';
 
 type ConfirmState = 'loading' | 'success' | 'error';
 
@@ -53,8 +53,7 @@ export class ConfirmEmail implements OnInit {
         } catch (error: any) {
             this.state.set('error');
             this.errorMessage.set(
-                error?.error?.message ||
-                    'This verification link is invalid or has expired.',
+                error?.error?.message || 'This verification link is invalid or has expired.',
             );
         }
     }
