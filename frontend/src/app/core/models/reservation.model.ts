@@ -1,6 +1,7 @@
 import { ResourceStatus } from '@angular/core';
 import { ReservationStatus } from '../enums/reservation-status.enum';
 import { Payment } from './payment.model';
+import { PageAble } from './response.models';
 
 export interface Reservation {
     readonly uuid: string;
@@ -19,6 +20,14 @@ export interface Reservation {
     readonly touristUuid: string;
     readonly touristName: string;
     readonly touristPhoto: string;
+}
+
+export interface ReservationFilters extends PageAble{
+    tour?: string;
+    tourist?: string;
+    status?: string;
+    startDate?: string;
+    endDate?: string;
 }
 
 export interface ReservationFind extends Reservation {
