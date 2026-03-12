@@ -26,17 +26,24 @@ export const ADMIN_ROUTES: Routes = [
                             import('./tours/tour-form/tour-form').then((m) => m.TourForm),
                         data: { breadcrumb: 'Create' },
                     },
-                    // {
-                    //     path: ':uuid',
-                    //     loadComponent: () =>
-                    //         import('./tours/tour-detail/tour-detail').then((m) => m.TourDetail),
-                    //     data: { breadcrumb: 'Details' },
-                    // },
                     {
-                        path: ':uuid/edit',
-                        loadComponent: () =>
-                            import('./tours/tour-form/tour-form').then((m) => m.TourForm),
-                        data: { breadcrumb: 'Edit' },
+                        path: ':uuid',
+                        children: [
+                            {
+                                path: '',
+                                loadComponent: () =>
+                                    import('./tours/tour-detail/tour-detail').then(
+                                        (m) => m.TourDetail,
+                                    ),
+                                data: { breadcrumb: 'Details' },
+                            },
+                            {
+                                path: 'edit',
+                                loadComponent: () =>
+                                    import('./tours/tour-form/tour-form').then((m) => m.TourForm),
+                                data: { breadcrumb: 'Edit' },
+                            },
+                        ],
                     },
                 ],
             },
