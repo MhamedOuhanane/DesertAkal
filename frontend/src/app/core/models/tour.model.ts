@@ -1,4 +1,5 @@
-import { CityTour, CityTourCreate } from './city-tour.model';
+import { CityTour, CityTourCreate, CityTourFind } from './city-tour.model';
+import { PageAble } from './response.models';
 
 export interface Tour {
     readonly uuid: string;
@@ -7,7 +8,7 @@ export interface Tour {
     readonly durationDays: number;
     readonly rating: number;
     readonly reviewCount: number;
-    readonly cityTours: CityTour;
+    readonly cityTours: CityTour[];
 }
 
 export interface TourFind {
@@ -18,7 +19,7 @@ export interface TourFind {
     readonly durationDays: number;
     readonly rating: number;
     readonly reviewCount: number;
-    readonly cityTours: CityTour;
+    readonly cityTours: CityTourFind[];
     readonly createdAt: string | Date;
     readonly updatedAt: string | Date;
 }
@@ -33,4 +34,11 @@ export interface TourUpdate {
     title?: string;
     description?: string;
     cityTours?: CityTourCreate[];
+}
+
+export interface TourFilters extends PageAble {
+    search?: string;
+    city?: string;
+    durationStr?: string;
+    minRating?: number;
 }

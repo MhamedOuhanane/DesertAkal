@@ -13,9 +13,39 @@ export const ADMIN_ROUTES: Routes = [
             },
             {
                 path: 'tours',
-                loadComponent: () =>
-                    import('./tours-management/tours-management').then((m) => m.ToursManagement),
-                data: { breadcrumb: 'Tours Management' },
+                data: { breadcrumb: 'Tours' },
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () =>
+                            import('./tours/tour-list/tour-list').then((m) => m.TourList),
+                    },
+                    {
+                        path: 'create',
+                        loadComponent: () =>
+                            import('./tours/tour-form/tour-form').then((m) => m.TourForm),
+                        data: { breadcrumb: 'Create' },
+                    },
+                    {
+                        path: ':uuid',
+                        children: [
+                            {
+                                path: '',
+                                loadComponent: () =>
+                                    import('./tours/tour-detail/tour-detail').then(
+                                        (m) => m.TourDetail,
+                                    ),
+                                data: { breadcrumb: 'Details' },
+                            },
+                            {
+                                path: 'edit',
+                                loadComponent: () =>
+                                    import('./tours/tour-form/tour-form').then((m) => m.TourForm),
+                                data: { breadcrumb: 'Edit' },
+                            },
+                        ],
+                    },
+                ],
             },
         ],
     },

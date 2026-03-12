@@ -36,7 +36,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
 
     return next(authReq).pipe(
         catchError((error: HttpErrorResponse) => {
-            const isAuthEndpoint = !isAuthPath || !isRefreshPath;
+            const isAuthEndpoint = isAuthPath || isRefreshPath;
             if (error.status === 401 && !isAuthEndpoint) {
                 return authService.refresh().pipe(
                     switchMap((response) => {

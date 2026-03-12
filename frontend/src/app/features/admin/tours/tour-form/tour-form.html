@@ -1,0 +1,372 @@
+<div class="mb-6 flex items-center gap-3">
+    <a
+        routerLink="/dashboard/tours"
+        class="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition-all hover:border-primary/40 hover:text-primary"
+    >
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+            />
+        </svg>
+    </a>
+    <div>
+        <h1 class="text-2xl font-bold text-text-primary">
+            {{ isEditMode() ? 'Edit Tour' : 'Create Tour' }}
+        </h1>
+        <p class="mt-0.5 text-sm text-text-secondary">
+            {{
+                isEditMode()
+                    ? 'Update tour details and itinerary.'
+                    : 'Set up a new desert experience.'
+            }}
+        </p>
+    </div>
+</div>
+
+@if (isLoadingData()) {
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div class="space-y-6 lg:col-span-2">
+            <div class="card animate-pulse p-6">
+                <div class="space-y-4">
+                    <div class="h-4 w-32 rounded bg-border/50"></div>
+                    <div class="h-10 w-full rounded bg-border/30"></div>
+                    <div class="h-4 w-32 rounded bg-border/50"></div>
+                    <div class="h-32 w-full rounded bg-border/30"></div>
+                </div>
+            </div>
+            <div class="card animate-pulse p-6">
+                <div class="h-40 w-full rounded-xl bg-border/30"></div>
+            </div>
+        </div>
+        <div class="card animate-pulse p-6">
+            <div class="h-4 w-32 rounded bg-border/50"></div>
+            <div class="mt-4 space-y-3">
+                <div class="h-16 w-full rounded-xl bg-border/30"></div>
+                <div class="h-16 w-full rounded-xl bg-border/30"></div>
+            </div>
+        </div>
+    </div>
+} @else {
+    <form [formGroup]="tourForm" (ngSubmit)="onSubmit()">
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div class="space-y-6 lg:col-span-2">
+                <div class="card p-6">
+                    <h2 class="mb-5 text-base font-bold text-text-primary">Basic Information</h2>
+
+                    <div class="mb-5 space-y-1.5">
+                        <label
+                            for="tour-title"
+                            class="block text-sm font-medium text-text-secondary"
+                        >
+                            Title
+                        </label>
+                        <input
+                            id="tour-title"
+                            type="text"
+                            formControlName="title"
+                            placeholder="e.g. Sahara Desert 3-Day Adventure"
+                            class="input w-full"
+                            [class.!border-error]="
+                                tourForm.get('title')?.invalid && tourForm.get('title')?.touched
+                            "
+                        />
+                        @if (tourForm.get('title')?.invalid && tourForm.get('title')?.touched) {
+                            <p class="text-xs font-medium text-error">
+                                Title is required (4–100 chars).
+                            </p>
+                        }
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label
+                            for="tour-desc"
+                            class="block text-sm font-medium text-text-secondary"
+                        >
+                            Description
+                        </label>
+                        <textarea
+                            id="tour-desc"
+                            formControlName="description"
+                            rows="6"
+                            placeholder="Describe the tour experience..."
+                            class="input w-full resize-y"
+                            [class.!border-error]="
+                                tourForm.get('description')?.invalid &&
+                                tourForm.get('description')?.touched
+                            "
+                        ></textarea>
+                        <div class="flex justify-between">
+                            @if (
+                                tourForm.get('description')?.invalid &&
+                                tourForm.get('description')?.touched
+                            ) {
+                                <p class="text-xs font-medium text-error">
+                                    Description is required.
+                                </p>
+                            } @else {
+                                <span></span>
+                            }
+                            <span class="text-xs text-text-disabled">
+                                {{ tourForm.get('description')?.value?.length || 0 }}/5000
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <h2 class="mb-5 text-base font-bold text-text-primary">Cover Image</h2>
+
+                    <div class="flex flex-col gap-5 sm:flex-row sm:items-start">
+                        @if (imagePreview()) {
+                            <img
+                                [src]="imagePreview()"
+                                alt="Preview"
+                                class="h-40 w-60 shrink-0 rounded-xl border border-border object-cover"
+                            />
+                        } @else {
+                            <div
+                                class="flex h-40 w-60 shrink-0 items-center justify-center rounded-xl border-2 border-dashed border-border bg-main-bg"
+                            >
+                                <svg
+                                    class="h-10 w-10 text-text-disabled"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="1"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                                    />
+                                </svg>
+                            </div>
+                        }
+
+                        <div>
+                            <label
+                                class="btn-secondary inline-flex cursor-pointer items-center gap-2 text-sm"
+                            >
+                                <svg
+                                    class="h-4 w-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+                                    />
+                                </svg>
+                                {{ isEditMode() ? 'Change Image' : 'Upload Image' }}
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    class="hidden"
+                                    (change)="onImageSelected($event)"
+                                />
+                            </label>
+                            <p class="mt-2 text-xs text-text-disabled">
+                                JPG, PNG or WebP. Max 5MB.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-rows-10 md:h-176.75 gap-4">
+                <div class="card row-span-9 flex flex-col overflow-hidden p-6">
+                    <div class="mb-5 flex items-center justify-between">
+                        <div>
+                            <h2 class="text-base font-bold text-text-primary">Itinerary</h2>
+                            <p class="mt-0.5 text-xs text-text-secondary">
+                                Total:
+                                <strong class="text-primary">{{ totalDays }} days</strong>
+                                across
+                                <strong>{{ cityToursArray.length }}</strong>
+                                cities
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            (click)="addCityTour()"
+                            class="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-secondary transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+                            title="Add city"
+                        >
+                            <svg
+                                class="h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M12 4.5v15m7.5-7.5h-15"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="min-h-0 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                        @if (cityToursArray.length === 0) {
+                            <div
+                                class="rounded-xl border-2 border-dashed border-border p-8 text-center"
+                            >
+                                <svg
+                                    class="mx-auto mb-2 h-8 w-8 text-text-disabled"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="1"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
+                                    />
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
+                                    />
+                                </svg>
+                                <p class="text-sm text-text-disabled">No cities added yet.</p>
+                                <button
+                                    type="button"
+                                    (click)="addCityTour()"
+                                    class="mt-3 text-xs font-semibold text-primary hover:text-primary-hover"
+                                >
+                                    + Add first city
+                                </button>
+                            </div>
+                        } @else {
+                            <div class="space-y-3" formArrayName="cityTours">
+                                @for (
+                                    ctrl of cityToursArray.controls;
+                                    track $index;
+                                    let i = $index
+                                ) {
+                                    <div
+                                        class="rounded-xl border border-border bg-main-bg/50 p-3.5"
+                                        [formGroupName]="i"
+                                    >
+                                        <div class="mb-2.5 flex items-center justify-between">
+                                            <div class="flex items-center gap-2">
+                                                <span
+                                                    class="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary"
+                                                >
+                                                    {{ i + 1 }}
+                                                </span>
+                                                <span
+                                                    class="text-xs font-semibold text-text-tertiary"
+                                                    >Stop {{ i + 1 }}</span
+                                                >
+                                            </div>
+                                            <button
+                                                type="button"
+                                                (click)="removeCityTour(i)"
+                                                class="flex h-6 w-6 items-center justify-center rounded-md text-text-disabled transition-colors hover:bg-error/10 hover:text-error"
+                                                title="Remove"
+                                            >
+                                                <svg
+                                                    class="h-3.5 w-3.5"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        d="M6 18L18 6M6 6l12 12"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <select
+                                            formControlName="cityUuid"
+                                            class="input mb-2.5 w-full text-sm"
+                                            [class.!border-error]="
+                                                ctrl.get('cityUuid')?.invalid &&
+                                                ctrl.get('cityUuid')?.touched
+                                            "
+                                        >
+                                            <option value="">Select a city...</option>
+                                            @for (city of cities(); track city.uuid) {
+                                                <option [value]="city.uuid">
+                                                    {{ city.name }}
+                                                </option>
+                                            }
+                                        </select>
+
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs text-text-tertiary">Days:</span>
+                                            <input
+                                                type="number"
+                                                formControlName="daysCount"
+                                                class="input w-20 text-center text-sm"
+                                                min="1"
+                                                [class.!border-error]="
+                                                    ctrl.get('daysCount')?.invalid &&
+                                                    ctrl.get('daysCount')?.touched
+                                                "
+                                            />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="mt-4 rounded-xl bg-primary/5 p-3 text-center">
+                        <p class="text-xs text-text-secondary">
+                            Total duration:
+                            <strong class="text-primary"
+                                >{{ totalDays }} day{{ totalDays !== 1 ? 's' : '' }}</strong
+                            >
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row-span-1 flex items-center justify-end gap-3">
+                    <a routerLink="/dashboard/tours" class="btn-secondary px-6 py-2.5 text-sm"
+                        >Cancel</a
+                    >
+                    <button
+                        type="submit"
+                        [disabled]="isSaving()"
+                        class="btn-primary px-6 py-2.5 text-sm"
+                        [class.opacity-60]="isSaving()"
+                    >
+                        @if (isSaving()) {
+                            <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle
+                                    class="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    stroke-width="4"
+                                ></circle>
+                                <path
+                                    class="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                            </svg>
+                            <span>Saving…</span>
+                        } @else {
+                            <span>{{ isEditMode() ? 'Update Tour' : 'Create Tour' }}</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+}

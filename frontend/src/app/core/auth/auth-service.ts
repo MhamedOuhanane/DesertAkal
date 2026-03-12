@@ -32,12 +32,12 @@ export class AuthService {
 
     refresh(): Observable<ApiResponse<LoginResponse>> {
         return this.httpWithoutInterceptors.post<ApiResponse<LoginResponse>>(
-            `${this.apiUrl}/refresh`, 
-            {}, 
-            { 
+            `${this.apiUrl}/refresh`,
+            {},
+            {
                 headers: { 'X-Device-ID': this.deviceService.getDeviceId() },
-                withCredentials: true 
-            }
+                withCredentials: true,
+            },
         );
     }
 
