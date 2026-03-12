@@ -22,7 +22,7 @@ export interface Reservation {
     readonly touristPhoto: string;
 }
 
-export interface ReservationFilters extends PageAble{
+export interface ReservationFilters extends PageAble {
     tour?: string;
     tourist?: string;
     status?: string;

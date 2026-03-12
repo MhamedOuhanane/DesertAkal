@@ -1,0 +1,217 @@
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-text-primary">Guides</h1>
+        <p class="mt-1 text-sm text-text-tertiary">
+            {{ pagination()?.totalElements || 0 }} guide{{
+                pagination()?.totalElements !== 1 ? 's' : ''
+            }}
+            registered
+        </p>
+    </div>
+    <a
+        routerLink="/dashboard/guides/create"
+        class="btn-primary inline-flex items-center gap-2 self-start text-sm"
+    >
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"
+            />
+        </svg>
+        Add Guide
+    </a>
+</div>
+
+<div class="card mb-6 p-4">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="relative flex-1">
+            <svg
+                class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-tertiary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
+            </svg>
+            <input
+                type="text"
+                placeholder="Search by name..."
+                class="input pl-10"
+                [value]="query().search"
+                (input)="onSearch($any($event.target).value)"
+            />
+        </div>
+
+        <input
+            type="text"
+            placeholder="Filter by language..."
+            class="input"
+            [value]="query().language"
+            (input)="onLanguageFilter($any($event.target).value)"
+        />
+
+        <div class="flex items-center gap-2">
+            <select
+                class="input w-full sm:w-40"
+                [value]="query().sortBy"
+                (change)="onSort($any($event.target).value)"
+            >
+                <option value="lastLoginAt">Last Login</option>
+                <option value="createdAt">Created At</option>
+                <option value="firstName">Name</option>
+                <option value="rating">Rating</option>
+            </select>
+            <button
+                (click)="onSort(query().sortBy || 'lastLoginAt')"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition-colors hover:bg-main-bg"
+            >
+                <svg
+                    class="h-4 w-4 transition-transform"
+                    [class.rotate-180]="query().order === 'desc'"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M4.5 15.75l7.5-7.5 7.5 7.5"
+                    />
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+@if (isLoading()) {
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        @for (_ of [1, 2, 3, 4, 5, 6]; track $index) {
+            <div class="card animate-pulse p-5">
+                <div class="flex items-center gap-4">
+                    <div class="h-12 w-12 rounded-full bg-border/30"></div>
+                    <div class="flex-1 space-y-2">
+                        <div class="h-4 w-32 rounded bg-border/40"></div>
+                        <div class="h-3 w-48 rounded bg-border/30"></div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+} @else if (guide().length > 0) {
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        @for (item of guide(); track item.uuid) {
+            <div
+                class="card cursor-pointer p-5 transition-all hover:border-primary/30 hover:shadow-sm"
+                (click)="viewGuide(item.uuid)"
+            >
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-3">
+                        @if (item.photo) {
+                            <img
+                                [src]="item.photo"
+                                class="h-12 w-12 rounded-full object-cover ring-2 ring-border"
+                            />
+                        } @else {
+                            <div
+                                class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary"
+                            >
+                                {{ getInitials(item.firstName, item.lastName) }}
+                            </div>
+                        }
+                        <div class="min-w-0">
+                            <p class="truncate text-sm font-bold text-text-primary">
+                                {{ item.firstName }} {{ item.lastName }}
+                            </p>
+                            <p class="truncate text-xs text-text-tertiary">{{ item.email }}</p>
+                        </div>
+                    </div>
+                    <button
+                        (click)="editGuide(item.uuid); $event.stopPropagation()"
+                        class="text-text-tertiary hover:text-primary"
+                    >
+                        <svg
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"
+                            />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="mt-4 flex items-center gap-3">
+                    <div class="flex items-center gap-1">
+                        <svg class="h-4 w-4 text-warning" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                            />
+                        </svg>
+                        <span class="text-sm font-bold" [class]="getRatingColor(item.rating)">{{
+                            item.rating | number: '1.1-1'
+                        }}</span>
+                    </div>
+                    <span class="text-border">·</span>
+                    <div class="flex flex-wrap gap-1">
+                        @for (lang of item.languages; track lang.uuid; let i = $index) {
+                            @if (i < 3) {
+                                <span
+                                    class="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary"
+                                    >{{ lang.name }}</span
+                                >
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (pagination() && pagination()!.totalPages > 1) {
+        <app-pagination [pagination]="pagination()!" (pageChange)="onPageChange($event)" />
+    }
+} @else {
+    <div class="card flex flex-col items-center justify-center p-12 text-center">
+        <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+            <svg
+                class="h-8 w-8 text-primary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.5"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                />
+            </svg>
+        </div>
+        <h3 class="text-base font-semibold text-text-primary">No guides found</h3>
+        <p class="mt-1 text-sm text-text-tertiary">
+            @if (query().search || query().language) {
+                Try adjusting your filters.
+            } @else {
+                No registered guides found. Expand your directory by adding a new profile.
+            }
+        </p>
+        @if (!query().search && !query().language) {
+            <a
+                routerLink="/dashboard/guides/create"
+                class="btn-primary mt-4 inline-flex items-center gap-2 text-sm"
+            >
+                Add Guide
+            </a>
+        }
+    </div>
+}

@@ -4,7 +4,7 @@ import { PageAble } from './response.models';
 
 export type UserRole = RoleEnum;
 
-export interface UserFilters extends PageAble{
+export interface UserFilters extends PageAble {
     search?: string;
     status?: string;
     roleName?: string;

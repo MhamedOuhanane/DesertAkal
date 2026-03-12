@@ -8,7 +8,7 @@ export interface Guide extends User {
     readonly languages: Language[];
 }
 
-export interface GuideFilters extends PageAble{
+export interface GuideFilters extends PageAble {
     search?: string;
     language?: string;
 }

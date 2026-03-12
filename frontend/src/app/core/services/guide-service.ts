@@ -7,6 +7,7 @@ import { ApiResponse, PageAble, Pagination } from '../models/response.models';
 import { Tour } from '../models/tour.model';
 import { Reservation, ReservationFilters } from '../models/reservation.model';
 import { Review, ReviewFilters } from '../models/review.model';
+import { buildHttpParams } from '../utils/http-utils';
 
 @Injectable({ providedIn: 'root' })
 export class GuideService {
@@ -22,72 +23,36 @@ export class GuideService {
     }
 
     findAll(params: GuideFilters): Observable<ApiResponse<Pagination<Guide>>> {
-        let httpParams = new HttpParams();
-
-        if (params.search) httpParams = httpParams.set('search', params.search);
-        if (params.language) httpParams = httpParams.set('language', params.language);
-        httpParams = httpParams
-            .set('page', (params.page ?? 0).toString())
-            .set('size', (params.size ?? 10).toString())
-            .set('sortBy', params.sortBy ?? 'lastLoginAt')
-            .set('order', params.order ?? 'asc');
-
         return this.http.get<ApiResponse<Pagination<Guide>>>(this.baseUrl, {
-            params: httpParams,
+            params: buildHttpParams<GuideFilters>(params),
         });
     }
 
     update(uuid: string, dto: GuideUpdate): Observable<ApiResponse<GuideFind>> {
-        return this.http.patch<ApiResponse<GuideFind>>(
-            `${this.baseUrl}/${uuid}`,
-            dto
-        );
+        return this.http.patch<ApiResponse<GuideFind>>(`${this.baseUrl}/${uuid}`, dto);
     }
 
-    getTours(
-        uuid: string,
-        params: PageAble
-    ): Observable<ApiResponse<Pagination<Tour>>> {
-        let httpParams = new HttpParams();
-        if (params.page !== undefined) httpParams = httpParams.set('page', params.page);
-        if (params.size !== undefined) httpParams = httpParams.set('size', params.size);
-        if (params.sortBy) httpParams = httpParams.set('sortBy', params.sortBy);
-        if (params.order) httpParams = httpParams.set('order', params.order);
-
-        return this.http.get<ApiResponse<Pagination<Tour>>>(
-            `${this.baseUrl}/${uuid}/tours`,
-            { params: httpParams }
-        );
-    }
-
-    getReservations(uuid: string, params: ReservationFilters): Observable<ApiResponse<Pagination<Reservation>>> {
-        let httpParams = new HttpParams();
-        Object.entries(params).forEach(([key, value]) => {
-            if (value !== undefined && value !== null && value !== '') {
-                httpParams = httpParams.set(key, value);
-            }
+    getTours(uuid: string, params: PageAble): Observable<ApiResponse<Pagination<Tour>>> {
+        return this.http.get<ApiResponse<Pagination<Tour>>>(`${this.baseUrl}/${uuid}/tours`, {
+            params: buildHttpParams<PageAble>(params),
         });
+    }
 
+    getReservations(
+        uuid: string,
+        params: ReservationFilters,
+    ): Observable<ApiResponse<Pagination<Reservation>>> {
         return this.http.get<ApiResponse<Pagination<Reservation>>>(
             `${this.baseUrl}/${uuid}/reservations`,
-            { params: httpParams }
+            {
+                params: buildHttpParams<ReservationFilters>(params),
+            },
         );
     }
 
-    getReviews(
-        uuid: string,
-        params: ReviewFilters
-    ): Observable<ApiResponse<Pagination<Review>>> {
-        let httpParams = new HttpParams();
-        Object.entries(params).forEach(([key, value]) => {
-            if (value !== undefined && value !== null && value !== '') {
-                httpParams = httpParams.set(key, value);
-            }
+    getReviews(uuid: string, params: ReviewFilters): Observable<ApiResponse<Pagination<Review>>> {
+        return this.http.get<ApiResponse<Pagination<Review>>>(`${this.baseUrl}/${uuid}/reviews`, {
+            params: buildHttpParams<ReviewFilters>(params),
         });
-
-        return this.http.get<ApiResponse<Pagination<Review>>>(
-            `${this.baseUrl}/${uuid}/reviews`,
-            { params: httpParams }
-        );
     }
 }
