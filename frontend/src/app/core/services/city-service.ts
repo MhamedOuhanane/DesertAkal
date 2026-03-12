@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { Observable } from 'rxjs';
-import { ApiResponse } from '../models/response.models';
+import { ApiResponse, Pagination } from '../models/response.models';
 import { City, CityCreate, CityFilters, CityFind, CityUpdate } from '../models/city.model';
 
 @Injectable({
@@ -12,7 +12,7 @@ export class CityService {
     private readonly http = inject(HttpClient);
     private readonly apiUrl = `${environment.apiUrl}/cities`;
 
-    findAll(filters: CityFilters): Observable<ApiResponse<City>> {
+    findAll(filters: CityFilters): Observable<ApiResponse<Pagination<City>>> {
         let params = new HttpParams();
         if (filters.search) params = params.set('search', filters.search);
         params = params
@@ -21,7 +21,7 @@ export class CityService {
             .set('sortBy', filters.sortBy ?? 'name')
             .set('order', filters.order ?? 'asc');
 
-        return this.http.get<ApiResponse<City>>(this.apiUrl, { params });
+        return this.http.get<ApiResponse<Pagination<City>>>(this.apiUrl, { params });
     }
 
     find(uuid: string): Observable<ApiResponse<CityFind>> {
