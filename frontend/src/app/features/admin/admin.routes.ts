@@ -47,6 +47,45 @@ export const ADMIN_ROUTES: Routes = [
                     },
                 ],
             },
+
+            {
+                path: 'guides',
+                data: { breadcrumb: 'Guides' },
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () =>
+                            import('./guides/guide-list/guide-list').then((m) => m.GuideList),
+                    },
+                    // {
+                    //     path: 'create',
+                    //     loadComponent: () =>
+                    //         import('./guides/guide-form/guide-form').then((m) => m.GuideForm),
+                    //     data: { breadcrumb: 'Create' },
+                    // },
+                    // {
+                    //     path: ':uuid',
+                    //     children: [
+                    //         {
+                    //             path: '',
+                    //             loadComponent: () =>
+                    //                 import('./guides/guide-detail/guide-detail').then(
+                    //                     (m) => m.GuideDetail,
+                    //                 ),
+                    //             data: { breadcrumb: 'Details' },
+                    //         },
+                    //         {
+                    //             path: 'edit',
+                    //             loadComponent: () =>
+                    //                 import('./guides/guide-form/guide-form').then(
+                    //                     (m) => m.GuideForm,
+                    //                 ),
+                    //             data: { breadcrumb: 'Edit' },
+                    //         },
+                    //     ],
+                    // },
+                ],
+            },
         ],
     },
 ];
