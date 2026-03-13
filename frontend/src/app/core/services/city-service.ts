@@ -14,7 +14,9 @@ export class CityService {
     private readonly apiUrl = `${environment.apiUrl}/cities`;
 
     findAll(filters: CityFilters): Observable<ApiResponse<Pagination<City>>> {
-        return this.http.get<ApiResponse<Pagination<City>>>(this.apiUrl, { params: buildHttpParams(filters) });
+        return this.http.get<ApiResponse<Pagination<City>>>(this.apiUrl, {
+            params: buildHttpParams(filters),
+        });
     }
 
     find(uuid: string): Observable<ApiResponse<CityFind>> {
