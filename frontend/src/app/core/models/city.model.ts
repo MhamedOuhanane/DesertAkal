@@ -10,6 +10,7 @@ export interface City {
     readonly name: string;
     readonly map_lat: number;
     readonly map_lng: number;
+    readonly coverImage: string;
 }
 
 export interface CityFind extends City {

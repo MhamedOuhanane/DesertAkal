@@ -1,1 +1,176 @@
-<p>city-list works!</p>
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-text-primary">Cities</h1>
+        <p class="mt-1 text-sm text-text-tertiary">
+            {{ pagination()?.totalElements || 0 }} destination{{
+                (pagination()?.totalElements || 0) !== 1 ? 's' : ''
+            }}
+            registered
+        </p>
+    </div>
+    <a
+        routerLink="/dashboard/cities/create"
+        class="btn-primary inline-flex items-center gap-2 self-start text-sm"
+    >
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px">add_location_alt</mat-icon>
+        Add City
+    </a>
+</div>
+
+<div class="card mb-6 p-4">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="relative flex-1">
+            <mat-icon
+                class="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary"
+                style="font-size: 18px; width: 18px; height: 18px"
+                >search</mat-icon
+            >
+            <input
+                type="text"
+                placeholder="Search cities..."
+                class="input pl-10"
+                [value]="query().search"
+                (input)="onSearch($any($event.target).value)"
+            />
+        </div>
+
+        <div class="flex items-center gap-2">
+            <select
+                class="input w-full sm:w-40"
+                [value]="query().sortBy"
+                (change)="onSort($any($event.target).value)"
+            >
+                <option value="name">Name</option>
+                <option value="createdAt">Created</option>
+                <option value="updatedAt">Updated</option>
+            </select>
+            <button
+                (click)="onSort(query().sortBy!)"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition-colors hover:bg-main-bg"
+            >
+                <mat-icon
+                    class="transition-transform"
+                    [class.rotate-180]="query().order === 'desc'"
+                    style="font-size: 18px; width: 18px; height: 18px"
+                    >arrow_upward</mat-icon
+                >
+            </button>
+        </div>
+    </div>
+</div>
+
+@if (isLoading()) {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        @for (_ of [1, 2, 3, 4, 5, 6]; track $index) {
+            <div class="card animate-pulse overflow-hidden">
+                <div class="h-40 bg-border/20"></div>
+                <div class="space-y-2 p-4">
+                    <div class="h-4 w-32 rounded bg-border/40"></div>
+                    <div class="h-3 w-full rounded bg-border/20"></div>
+                    <div class="h-3 w-3/4 rounded bg-border/20"></div>
+                </div>
+            </div>
+        }
+    </div>
+} @else if (cities().length > 0) {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        @for (city of cities(); track city.uuid) {
+            <div
+                class="card group cursor-pointer overflow-hidden transition-all hover:border-primary/30 hover:shadow-md"
+                (click)="viewCity(city.uuid)"
+            >
+                <div class="relative h-40 overflow-hidden bg-main-bg">
+                    <img
+                        [src]="city.coverImage"
+                        [alt]="city.name"
+                        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        (error)="$any($event.target).src = 'assets/defaults/city-placeholder.jpg'"
+                    />
+
+                    <div
+                        class="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+                    >
+                        <button
+                            (click)="editCity(city.uuid, $event)"
+                            class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-text-secondary shadow-sm backdrop-blur-sm transition-colors hover:bg-white hover:text-primary"
+                            title="Edit"
+                        >
+                            <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                                >edit</mat-icon
+                            >
+                        </button>
+                        <button
+                            (click)="openDeleteDialog(city, $event)"
+                            class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-text-secondary shadow-sm backdrop-blur-sm transition-colors hover:bg-white hover:text-red-500"
+                            title="Delete"
+                        >
+                            <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                                >delete_outline</mat-icon
+                            >
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-4">
+                    <div class="mb-2 flex items-start justify-between">
+                        <h3 class="text-sm font-bold text-text-primary group-hover:text-primary">
+                            {{ city.name }}
+                        </h3>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1 text-[11px] text-text-tertiary">
+                            <mat-icon style="font-size: 13px; width: 13px; height: 13px"
+                                >location_on</mat-icon
+                            >
+                            {{ city.map_lat | number: '1.2-2' }},
+                            {{ city.map_lng | number: '1.2-2' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (pagination()) {
+        <div class="mt-6">
+            <app-pagination [pagination]="pagination()!" (pageChange)="goToPage($event)" />
+        </div>
+    }
+} @else {
+    <div class="card flex flex-col items-center justify-center p-12 text-center">
+        <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+            <mat-icon class="text-primary" style="font-size: 32px; width: 32px; height: 32px"
+                >location_city</mat-icon
+            >
+        </div>
+        <h3 class="text-base font-semibold text-text-primary">No cities found</h3>
+        <p class="mt-1 text-sm text-text-tertiary">
+            @if (query().search) {
+                Try adjusting your search.
+            } @else {
+                Start by adding your first destination.
+            }
+        </p>
+        @if (!query().search) {
+            <a
+                routerLink="/dashboard/cities/create"
+                class="btn-primary mt-4 inline-flex items-center gap-2 text-sm"
+            >
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                    >add_location_alt</mat-icon
+                >
+                Add City
+            </a>
+        }
+    </div>
+}
+
+@if (showDeleteDialog() && cityToDelete()) {
+    <app-delete-dialog
+        itemName="City"
+        [itemTitle]="cityToDelete()!.name"
+        [isDeleting]="isDeleting()"
+        (confirm)="confirmDelete()"
+        (cancel)="cancelDelete()"
+    />
+}

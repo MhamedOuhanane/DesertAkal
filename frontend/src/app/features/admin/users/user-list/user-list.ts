@@ -164,6 +164,8 @@ export class UserList {
             await this.loadUsers();
         } catch (err: any) {
             toast.error(err?.error?.message || 'Failed to delete user');
+            this.showDeleteDialog.set(false);
+            this.userToDelete.set(null);
         } finally {
             this.isDeleting.set(false);
         }

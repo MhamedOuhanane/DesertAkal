@@ -15,4 +15,5 @@ public class CityDTO {
     private String name;
     private BigDecimal map_lat;
     private BigDecimal map_lng;
+    private String coverImage;
 }

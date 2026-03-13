@@ -33,6 +33,7 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class CityServiceImpl implements CityService {
     private final CityRepository repository;
     private final CityMapper mapper;
@@ -40,6 +41,7 @@ public class CityServiceImpl implements CityService {
     private final TourRepository tourRepository;
 
     @Override
+    @Transactional
     public CityFindDTO create(@NonNull CityCreateDTO dto) {
         log.info("Starting creation of new City: '{}' ", dto.getName());
 
@@ -58,7 +60,6 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public CityFindDTO find(@NonNull UUID cityUuid) {
         log.info("Attempting to find City with UUID: {}", cityUuid);
 
