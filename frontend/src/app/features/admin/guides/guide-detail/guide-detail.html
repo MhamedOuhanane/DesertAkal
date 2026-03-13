@@ -1,0 +1,415 @@
+@if (isLoading()) {
+    <div class="space-y-6">
+        <div class="card animate-pulse p-6">
+            <div class="flex items-center gap-6">
+                <div class="h-20 w-20 rounded-full bg-border/30"></div>
+                <div class="flex-1 space-y-3">
+                    <div class="h-6 w-48 rounded bg-border/50"></div>
+                    <div class="h-4 w-64 rounded bg-border/30"></div>
+                    <div class="h-4 w-32 rounded bg-border/30"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+} @else if (guide()) {
+    <!-- Header -->
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-3">
+            <a
+                routerLink="/dashboard/guides"
+                class="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition-all hover:border-primary/40 hover:text-primary"
+            >
+                <svg
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+                    />
+                </svg>
+            </a>
+            <h1 class="text-2xl font-bold text-text-primary">Guide Details</h1>
+        </div>
+        <a
+            [routerLink]="['/dashboard/guides', guide()!.uuid, 'edit']"
+            class="btn-primary inline-flex items-center gap-2 self-start text-sm"
+        >
+            <svg
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                />
+            </svg>
+            Edit Guide
+        </a>
+    </div>
+
+    <div
+        class="grid grid-cols-1 gap-6 lg:grid-cols-3 h-[calc(100vh-190px)] overflow-y-auto pr-2 custom-scrollbar"
+    >
+        <!-- ═══ Left Column ═══ -->
+        <div class="space-y-6 lg:col-span-2">
+            <!-- Profile Card -->
+            <div class="card p-6">
+                <div class="flex flex-col gap-6 sm:flex-row sm:items-start">
+                    <!-- Avatar -->
+                    @if (guide()!.photo) {
+                        <img
+                            [src]="guide()!.photo"
+                            [alt]="guide()!.firstName + ' ' + guide()!.lastName"
+                            class="h-20 w-20 shrink-0 rounded-full object-cover ring-4 ring-primary/20"
+                        />
+                    } @else {
+                        <div
+                            class="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary ring-4 ring-primary/20"
+                        >
+                            {{ getInitials(guide()!.firstName, guide()!.lastName) }}
+                        </div>
+                    }
+
+                    <div class="flex-1 space-y-3">
+                        <div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h2 class="text-xl font-bold text-text-primary">
+                                    {{ guide()!.firstName }} {{ guide()!.lastName }}
+                                </h2>
+                                <span
+                                    class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                                    [class]="getStatusColor(guide()!.status)"
+                                >
+                                    {{ guide()!.status }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-text-tertiary">
+                                &#64;{{ guide()!.username }} · {{ guide()!.email }}
+                            </p>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="flex flex-wrap gap-4">
+                            <!-- Rating -->
+                            <div class="flex items-center gap-1.5">
+                                <div class="flex items-center">
+                                    @for (star of getRatingStars(guide()!.rating); track $index) {
+                                        <svg
+                                            class="h-4 w-4"
+                                            [class.text-warning]="$index < guide()!.rating"
+                                            [class.text-border]="$index >= guide()!.rating"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                        >
+                                            <path
+                                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                                            />
+                                        </svg>
+                                    }
+                                </div>
+                                <span class="text-sm font-bold text-text-primary">
+                                    {{ guide()!.rating | number: '1.1-1' }}
+                                </span>
+                                <span class="text-xs text-text-tertiary">
+                                    ({{ guide()!.reviewCount }} reviews)
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Languages -->
+                        <div class="flex flex-wrap gap-1.5">
+                            @for (lang of guide()!.languages; track lang.uuid) {
+                                <span
+                                    class="rounded-lg bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
+                                >
+                                    {{ lang.name }}
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="card overflow-hidden">
+                <div class="flex border-b border-border">
+                    <button
+                        (click)="switchTab('tours')"
+                        class="flex-1 px-4 py-3 text-sm font-medium transition-colors"
+                        [class.text-primary]="activeTab() === 'tours'"
+                        [class.border-b-2]="activeTab() === 'tours'"
+                        [class.border-primary]="activeTab() === 'tours'"
+                        [class.text-text-tertiary]="activeTab() !== 'tours'"
+                    >
+                        Tours ({{ toursTotalElements() }})
+                    </button>
+                    <button
+                        (click)="switchTab('reviews')"
+                        class="flex-1 px-4 py-3 text-sm font-medium transition-colors"
+                        [class.text-primary]="activeTab() === 'reviews'"
+                        [class.border-b-2]="activeTab() === 'reviews'"
+                        [class.border-primary]="activeTab() === 'reviews'"
+                        [class.text-text-tertiary]="activeTab() !== 'reviews'"
+                    >
+                        Reviews ({{ reviewsTotalElements() }})
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    <!-- Tours Tab -->
+                    @if (activeTab() === 'tours') {
+                        @if (toursLoading()) {
+                            <div class="animate-pulse space-y-3">
+                                @for (_ of [1, 2, 3]; track $index) {
+                                    <div class="h-16 w-full rounded-lg bg-border/20"></div>
+                                }
+                            </div>
+                        } @else if (tours().length > 0) {
+                            <div class="space-y-3">
+                                @for (tour of tours(); track tour.uuid) {
+                                    <a
+                                        [routerLink]="['/dashboard/tours', tour.uuid]"
+                                        class="flex items-center gap-4 rounded-xl border border-border p-4 transition-all hover:border-primary/30 hover:shadow-sm"
+                                    >
+                                        <img
+                                            [src]="tour.image"
+                                            [alt]="tour.title"
+                                            class="h-12 w-16 shrink-0 rounded-lg object-cover"
+                                            (error)="
+                                                $any($event.target).src =
+                                                    'assets/defaults/tour-placeholder.jpg'
+                                            "
+                                        />
+                                        <div class="min-w-0 flex-1">
+                                            <p
+                                                class="truncate text-sm font-semibold text-text-primary"
+                                            >
+                                                {{ tour.title }}
+                                            </p>
+                                            <p class="text-xs text-text-tertiary">
+                                                {{ tour.durationDays }} days ·
+                                                {{ tour.cityTours?.length || 0 }} cities
+                                            </p>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <svg
+                                                class="h-3.5 w-3.5 text-warning"
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                            >
+                                                <path
+                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                                                />
+                                            </svg>
+                                            <span class="text-xs font-bold text-text-primary">
+                                                {{ tour.rating | number: '1.1-1' }}
+                                            </span>
+                                        </div>
+                                    </a>
+                                }
+                            </div>
+                        } @else {
+                            <p class="py-8 text-center text-sm text-text-disabled">
+                                No tours assigned yet.
+                            </p>
+                        }
+                    }
+
+                    <!-- Reviews Tab -->
+                    @if (activeTab() === 'reviews') {
+                        @if (reviewsLoading()) {
+                            <div class="animate-pulse space-y-3">
+                                @for (_ of [1, 2, 3]; track $index) {
+                                    <div class="h-20 w-full rounded-lg bg-border/20"></div>
+                                }
+                            </div>
+                        } @else if (reviews().length > 0) {
+                            <div class="space-y-4">
+                                @for (review of reviews(); track review.uuid) {
+                                    <div class="rounded-xl border border-border p-4">
+                                        <div class="mb-2 flex items-center justify-between">
+                                            <div class="flex items-center gap-2">
+                                                <div
+                                                    class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary"
+                                                >
+                                                    {{ review.touristName?.charAt(0) || '?' }}
+                                                </div>
+                                                <span
+                                                    class="text-xs font-semibold text-text-primary"
+                                                >
+                                                    {{ review.touristName || 'Anonymous' }}
+                                                </span>
+                                            </div>
+                                            <div class="flex items-center gap-1">
+                                                @for (
+                                                    star of getRatingStars(review.rating);
+                                                    track $index
+                                                ) {
+                                                    <svg
+                                                        class="h-3 w-3"
+                                                        [class.text-warning]="
+                                                            $index < review.rating
+                                                        "
+                                                        [class.text-border]="
+                                                            $index >= review.rating
+                                                        "
+                                                        viewBox="0 0 20 20"
+                                                        fill="currentColor"
+                                                    >
+                                                        <path
+                                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                                                        />
+                                                    </svg>
+                                                }
+                                            </div>
+                                        </div>
+                                        <p class="text-sm leading-relaxed text-text-secondary">
+                                            {{ review.comment }}
+                                        </p>
+                                        <p class="mt-2 text-[10px] text-text-tertiary">
+                                            {{ review.createdAt | date: 'MMM d, y' }}
+                                        </p>
+                                    </div>
+                                }
+                            </div>
+                        } @else {
+                            <p class="py-8 text-center text-sm text-text-disabled">
+                                No reviews yet.
+                            </p>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ Right Column ═══ -->
+        <div class="space-y-6">
+            <!-- Info Card -->
+            <div class="card p-6">
+                <h2 class="mb-4 text-base font-bold text-text-primary">Information</h2>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Status</span>
+                        <span
+                            class="rounded-full px-2 py-0.5 text-[11px] font-semibold"
+                            [class]="getStatusColor(guide()!.status)"
+                        >
+                            {{ guide()!.status }}
+                        </span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Phone</span>
+                        <span class="text-sm font-semibold text-text-primary">{{
+                            guide()!.phone || '—'
+                        }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Experience</span>
+                        <span class="badge badge-primary"
+                            >{{ guide()!.experienceYears }} years</span
+                        >
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Rating</span>
+                        <div class="flex items-center gap-1">
+                            <svg
+                                class="h-4 w-4 text-warning"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                                />
+                            </svg>
+                            <span class="text-sm font-bold text-text-primary">{{
+                                guide()!.rating | number: '1.1-1'
+                            }}</span>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Reviews</span>
+                        <span class="text-sm font-semibold text-text-primary">{{
+                            guide()!.reviewCount
+                        }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Tours</span>
+                        <span class="text-sm font-semibold text-text-primary">{{
+                            toursTotalElements()
+                        }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Last Login</span>
+                        <span class="text-xs text-text-tertiary">
+                            {{ guide()!.lastLoginAt | date: 'MMM d, y HH:mm' }}
+                        </span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Created</span>
+                        <span class="text-xs text-text-tertiary">{{
+                            guide()!.createdAt | date: 'MMM d, y'
+                        }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Updated</span>
+                        <span class="text-xs text-text-tertiary">{{
+                            guide()!.updatedAt | date: 'MMM d, y'
+                        }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Languages Card -->
+            <div class="card p-6">
+                <h2 class="mb-4 text-base font-bold text-text-primary">Languages</h2>
+                <div class="space-y-2">
+                    @for (lang of guide()!.languages; track lang.uuid) {
+                        <div class="flex items-center gap-3 rounded-lg bg-main-bg/50 p-3">
+                            <div
+                                class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary"
+                            >
+                                {{ lang.name.charAt(0) }}
+                            </div>
+                            <span class="text-sm font-medium text-text-primary">{{
+                                lang.name
+                            }}</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- OAuth Providers -->
+            @if (guide()!.oauthProviders && guide()!.oauthProviders.length > 0) {
+                <div class="card p-6">
+                    <h2 class="mb-4 text-base font-bold text-text-primary">Connected Accounts</h2>
+                    <div class="space-y-2">
+                        @for (provider of guide()!.oauthProviders; track provider) {
+                            <div class="flex items-center gap-3 rounded-lg bg-main-bg/50 p-3">
+                                <span class="text-sm font-medium text-text-primary capitalize">{{
+                                    provider
+                                }}</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
