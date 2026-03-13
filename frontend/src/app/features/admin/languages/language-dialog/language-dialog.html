@@ -1,0 +1,104 @@
+<div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+    (click)="cancel.emit()"
+>
+    <div
+        class="w-full max-w-md rounded-2xl border border-border bg-surface shadow-2xl"
+        (click)="$event.stopPropagation()"
+    >
+        <div class="flex items-center gap-3 border-b border-border px-6 py-4">
+            <div
+                class="flex h-10 w-10 items-center justify-center rounded-xl transition-colors"
+                [class.bg-primary/10]="!language()"
+                [class.bg-warning/10]="language()"
+            >
+                <mat-icon
+                    style="font-size: 20px; width: 20px; height: 20px"
+                    [class.text-primary]="!language()"
+                    [class.text-warning]="language()"
+                >
+                    {{ language() ? 'edit' : 'add_circle' }}
+                </mat-icon>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-text-primary">
+                    {{ language() ? 'Edit Language' : 'Add Language' }}
+                </h3>
+                <p class="text-[11px] text-text-tertiary">
+                    {{ language() ? 'Update language details' : 'Add a new language for guides' }}
+                </p>
+            </div>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="px-6 py-5">
+            <div class="space-y-4">
+                <app-text-input
+                    formControlName="name"
+                    label="Language Name"
+                    placeholder="e.g. French"
+                    id="lang-name"
+                    matIcon="translate"
+                />
+                <app-text-input
+                    formControlName="code"
+                    label="Language Code"
+                    placeholder="e.g. fr"
+                    id="lang-code"
+                    matIcon="code"
+                />
+            </div>
+
+            @if (form.get('name')?.value || form.get('code')?.value) {
+                <div
+                    class="mt-4 flex items-center gap-3 rounded-xl bg-main-bg p-3 border border-border/50"
+                >
+                    <div
+                        class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-sm font-bold text-primary uppercase"
+                    >
+                        {{ form.get('code')?.value || '??' }}
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-text-primary">
+                            {{ form.get('name')?.value || 'Language Name' }}
+                        </p>
+                        <p class="text-[10px] text-text-tertiary">
+                            Code: {{ form.get('code')?.value || '—' }}
+                        </p>
+                    </div>
+                </div>
+            }
+        </form>
+
+        <div class="flex items-center gap-3 border-t border-border px-6 py-4">
+            <button
+                type="button"
+                [disabled]="isSubmitting()"
+                (click)="cancel.emit()"
+                class="flex-1 flex items-center justify-center gap-2 rounded-xl border border-border py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-main-bg disabled:opacity-50"
+            >
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                [disabled]="isSubmitting() || form.invalid"
+                (click)="onSubmit()"
+                class="btn-primary flex-1 flex items-center justify-center gap-2 py-2.5 text-sm disabled:opacity-50"
+            >
+                @if (isSubmitting()) {
+                    <mat-icon
+                        class="animate-spin"
+                        style="font-size: 16px; width: 16px; height: 16px"
+                        >autorenew</mat-icon
+                    >
+                    <span>{{ language() ? 'Updating...' : 'Creating...' }}</span>
+                } @else {
+                    <mat-icon style="font-size: 16px; width: 16px; height: 16px">{{
+                        language() ? 'save' : 'add'
+                    }}</mat-icon>
+                    <span>{{ language() ? 'Update' : 'Create' }}</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>
