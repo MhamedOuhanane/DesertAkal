@@ -1,6 +1,10 @@
 import { Image } from './image.model';
 import { PageAble } from './response.models';
 
+export interface CityFilters extends PageAble {
+    search?: string;
+}
+
 export interface City {
     readonly uuid: string;
     readonly name: string;
@@ -27,8 +31,4 @@ export interface CityUpdate {
     map_lat?: number;
     map_lng?: number;
     description?: string;
-}
-
-export interface CityFilters extends PageAble {
-    search?: string;
 }
