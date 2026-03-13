@@ -31,10 +31,7 @@ export class LanguageService {
     }
 
     update(uuid: string, dto: LanguageUpdate): Observable<ApiResponse<Language>> {
-        return this.http.patch<ApiResponse<Language>>(
-            `${this.baseUrl}/${uuid}`,
-            dto
-        );
+        return this.http.patch<ApiResponse<Language>>(`${this.baseUrl}/${uuid}`, dto);
     }
 
     delete(uuid: string): Observable<ApiResponse<void>> {

@@ -139,6 +139,19 @@ export const ADMIN_ROUTES: Routes = [
                     },
                 ],
             },
+            {
+                path: 'languages',
+                data: { breadcrumb: 'Languages' },
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () =>
+                            import('./languages/language-list/language-list').then(
+                                (m) => m.LanguageList,
+                            ),
+                    },
+                ],
+            },
         ],
     },
 ];

@@ -140,6 +140,12 @@ export const NAV_CONFIG = {
                     roles: ['ADMIN'],
                 },
                 {
+                    label: 'Languages',
+                    path: '/dashboard/languages',
+                    icon: 'translate',
+                    roles: ['ADMIN'],
+                },
+                {
                     label: 'Tours Management',
                     icon: 'explore',
                     path: '/dashboard/tours',
