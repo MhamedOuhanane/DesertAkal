@@ -18,10 +18,6 @@ import java.util.UUID;
 public class UserFindDTO extends UserDTO {
 
     protected String phone;
-
-    protected UserStatus status;
-
-    protected LocalDateTime lastLoginAt;
     protected LocalDateTime createdAt;
     protected LocalDateTime updatedAt;
 

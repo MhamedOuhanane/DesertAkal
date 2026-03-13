@@ -273,6 +273,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void delete(@NonNull UUID userUuid) {
         log.info("Starting deletion process for user with UUID: {}", userUuid);
 

@@ -1,3 +1,5 @@
+import { PageAble } from './response.models';
+
 export interface Comment {
     readonly uuid: string;
     readonly content: string;

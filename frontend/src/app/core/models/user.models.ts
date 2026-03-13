@@ -25,6 +25,8 @@ export interface User {
     readonly photo: string;
     readonly username: string;
     readonly email: string;
+    readonly status: string;
+    readonly lastLoginAt: string | Date;
     readonly role: RoleEnum;
 }
 

@@ -24,5 +24,7 @@ public class UserDTO {
     protected String photo;
     protected String username;
     protected String email;
+    protected UserStatus status;
+    protected LocalDateTime lastLoginAt;
     protected String role;
 }

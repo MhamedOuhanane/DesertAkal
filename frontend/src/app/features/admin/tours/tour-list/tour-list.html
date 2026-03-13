@@ -302,6 +302,7 @@
 @if (showDeleteDialog() && tourToDelete()) {
     <app-delete-dialog
         itemName="tour"
+        [isDeleting]="!!isDeleting()"
         [itemTitle]="tourToDelete()!.title"
         (confirm)="deleteTour()"
         (cancel)="cancelDelete()"

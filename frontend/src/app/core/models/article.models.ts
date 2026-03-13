@@ -1,3 +1,5 @@
+import { PageAble } from './response.models';
+
 export interface Article {
     readonly uuid: string;
     readonly content: string;
@@ -9,6 +11,10 @@ export interface Article {
     readonly userUuid: string;
     readonly userName: string;
     readonly userPhoto: string;
+}
+
+export interface ArticleFilters extends PageAble {
+    search?: string;
 }
 
 export interface ArticleCreate {
