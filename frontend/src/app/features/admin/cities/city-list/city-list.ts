@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
@@ -15,7 +15,7 @@ import { CityService } from '../../../../core/services/city-service';
 
 @Component({
     selector: 'app-city-list',
-    imports: [FormsModule, DecimalPipe, MatIcon, PaginationComponent, DeleteDialog],
+    imports: [FormsModule, DecimalPipe, MatIcon, PaginationComponent, DeleteDialog, RouterLink],
     templateUrl: './city-list.html',
 })
 export class CityList {

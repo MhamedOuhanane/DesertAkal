@@ -1,1 +1,432 @@
-<p>city-form works!</p>
+@if (isLoading()) {
+    <div class="card animate-pulse p-8">
+        <div class="space-y-6">
+            <div class="h-6 w-48 rounded bg-border/50"></div>
+            @for (_ of [1, 2, 3]; track $index) {
+                <div class="space-y-2">
+                    <div class="h-4 w-24 rounded bg-border/30"></div>
+                    <div class="h-10 w-full rounded bg-border/20"></div>
+                </div>
+            }
+        </div>
+    </div>
+} @else {
+    <div class="mb-6 flex items-center gap-3">
+        <a
+            routerLink="/dashboard/cities"
+            class="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition-all hover:border-primary/40 hover:text-primary"
+        >
+            <mat-icon style="font-size: 18px; width: 18px; height: 18px">arrow_back</mat-icon>
+        </a>
+        <div>
+            <h1 class="text-2xl font-bold text-text-primary">
+                {{ isEditMode() ? 'Edit City' : 'Create City' }}
+            </h1>
+            <p class="text-xs text-text-tertiary">
+                {{ isEditMode() ? 'Update city information and images' : 'Add a new destination' }}
+            </p>
+        </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div
+            class="custom-scrollbar grid h-[calc(100vh-220px)] grid-cols-1 gap-6 overflow-y-auto pr-1 lg:grid-cols-3"
+        >
+            <div class="space-y-6 lg:col-span-2">
+                <div class="card p-6">
+                    <div class="mb-5 flex items-center gap-2">
+                        <div
+                            class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10"
+                        >
+                            <mat-icon
+                                class="text-primary"
+                                style="font-size: 18px; width: 18px; height: 18px"
+                                >location_city</mat-icon
+                            >
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-bold text-text-primary">City Information</h2>
+                            <p class="text-[11px] text-text-tertiary">
+                                Basic details about the destination
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+                        <div class="sm:col-span-2">
+                            <app-text-input
+                                formControlName="name"
+                                label="City Name"
+                                placeholder="Marrakech"
+                                id="name"
+                                matIcon="location_city"
+                            />
+                        </div>
+                        <app-text-input
+                            formControlName="map_lat"
+                            label="Latitude"
+                            placeholder="31.6295"
+                            type="number"
+                            id="map_lat"
+                            matIcon="my_location"
+                        />
+                        <app-text-input
+                            formControlName="map_lng"
+                            label="Longitude"
+                            placeholder="-7.9811"
+                            type="number"
+                            id="map_lng"
+                            matIcon="explore"
+                        />
+                    </div>
+
+                    <div class="mt-1">
+                        <label
+                            for="description"
+                            class="mb-1.5 block text-sm font-medium text-text-primary"
+                            >Description</label
+                        >
+                        <textarea
+                            id="description"
+                            formControlName="description"
+                            rows="5"
+                            class="input w-full resize-none"
+                            placeholder="Describe the city..."
+                            [class.!border-error]="
+                                form.get('description')?.touched && form.get('description')?.invalid
+                            "
+                        ></textarea>
+                        <div class="mt-1 flex items-center justify-between">
+                            <div class="min-h-5">
+                                @if (
+                                    form.get('description')?.touched &&
+                                    form.get('description')?.invalid
+                                ) {
+                                    <p class="text-xs text-error">Description is required</p>
+                                }
+                            </div>
+                            <span
+                                class="text-[10px]"
+                                [class.text-error]="descriptionLength > 5000"
+                                [class.text-text-tertiary]="descriptionLength <= 5000"
+                                >{{ descriptionLength }} / 5000</span
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <div class="mb-5 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="flex h-8 w-8 items-center justify-center rounded-lg bg-success/10"
+                            >
+                                <mat-icon
+                                    class="text-success"
+                                    style="font-size: 18px; width: 18px; height: 18px"
+                                    >photo_library</mat-icon
+                                >
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-bold text-text-primary">Images</h2>
+                                <p class="text-[11px] text-text-tertiary">
+                                    Upload photos of the city (max 5MB each)
+                                </p>
+                            </div>
+                        </div>
+                        @if (isEditMode() && imagesToDelete().length > 0) {
+                            <button
+                                type="button"
+                                (click)="deleteSelectedImages()"
+                                [disabled]="isDeletingImages()"
+                                class="flex items-center gap-1 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-500/20 disabled:opacity-50"
+                            >
+                                <mat-icon
+                                    [class.animate-spin]="isDeletingImages()"
+                                    style="font-size: 14px; width: 14px; height: 14px"
+                                    >{{ isDeletingImages() ? 'autorenew' : 'delete' }}</mat-icon
+                                >
+                                Delete {{ imagesToDelete().length }} image{{
+                                    imagesToDelete().length > 1 ? 's' : ''
+                                }}
+                            </button>
+                        }
+                    </div>
+
+                    @if (isEditMode() && existingImages.length > 0) {
+                        <div class="mb-4">
+                            <p
+                                class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-tertiary"
+                            >
+                                Current Images ({{ existingImages.length }})
+                            </p>
+                            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                                @for (img of existingImages; track img.uuid) {
+                                    <div
+                                        class="group/img relative overflow-hidden rounded-xl border-2 transition-all"
+                                        [class.border-red-500]="isMarkedForDeletion(img.uuid)"
+                                        [class.opacity-50]="isMarkedForDeletion(img.uuid)"
+                                        [class.border-primary]="
+                                            img.isCover && !isMarkedForDeletion(img.uuid)
+                                        "
+                                        [class.border-border]="
+                                            !img.isCover && !isMarkedForDeletion(img.uuid)
+                                        "
+                                    >
+                                        <img
+                                            [src]="img.image"
+                                            class="h-28 w-full object-cover"
+                                            (error)="
+                                                $any($event.target).src =
+                                                    'assets/defaults/city-placeholder.jpg'
+                                            "
+                                        />
+                                        @if (img.isCover) {
+                                            <span
+                                                class="absolute left-1.5 top-1.5 flex items-center gap-0.5 rounded bg-primary/90 px-1.5 py-0.5 text-[9px] font-bold text-white"
+                                                ><mat-icon
+                                                    style="
+                                                        font-size: 10px;
+                                                        width: 10px;
+                                                        height: 10px;
+                                                    "
+                                                    >star</mat-icon
+                                                >
+                                                COVER</span
+                                            >
+                                        }
+                                        <div
+                                            class="absolute inset-x-0 bottom-0 flex items-center justify-between bg-linear-to-t from-black/70 to-transparent p-1.5 opacity-0 transition-opacity group-hover/img:opacity-100"
+                                        >
+                                            @if (!img.isCover) {
+                                                <button
+                                                    type="button"
+                                                    (click)="setCover(img.uuid)"
+                                                    [disabled]="isSettingCover()"
+                                                    class="flex items-center gap-0.5 rounded bg-white/20 px-1.5 py-0.5 text-[9px] font-medium text-white backdrop-blur-sm hover:bg-white/40 disabled:opacity-50"
+                                                >
+                                                    <mat-icon
+                                                        style="
+                                                            font-size: 11px;
+                                                            width: 11px;
+                                                            height: 11px;
+                                                        "
+                                                        >star_outline</mat-icon
+                                                    >
+                                                    Cover
+                                                </button>
+                                            } @else {
+                                                <span></span>
+                                            }
+                                            <button
+                                                type="button"
+                                                (click)="toggleImageToDelete(img.uuid)"
+                                                class="flex h-6 w-6 items-center justify-center rounded-full transition-colors"
+                                                [class.bg-red-500]="isMarkedForDeletion(img.uuid)"
+                                                [class.bg-white/20]="!isMarkedForDeletion(img.uuid)"
+                                            >
+                                                <mat-icon
+                                                    style="
+                                                        font-size: 14px;
+                                                        width: 14px;
+                                                        height: 14px;
+                                                    "
+                                                    >{{
+                                                        isMarkedForDeletion(img.uuid)
+                                                            ? 'undo'
+                                                            : 'delete_outline'
+                                                    }}</mat-icon
+                                                >
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (newImagePreviews().length > 0) {
+                        <div class="mb-4">
+                            <p
+                                class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-tertiary"
+                            >
+                                New Images ({{ newImagePreviews().length }})
+                            </p>
+                            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                                @for (preview of newImagePreviews(); track $index) {
+                                    <div
+                                        class="group/new relative overflow-hidden rounded-xl border-2 border-dashed border-success/50"
+                                    >
+                                        <img [src]="preview" class="h-28 w-full object-cover" />
+                                        <span
+                                            class="absolute left-1.5 top-1.5 rounded bg-success/90 px-1.5 py-0.5 text-[9px] font-bold text-white"
+                                            >NEW</span
+                                        >
+                                        <button
+                                            type="button"
+                                            (click)="removeNewImage($index)"
+                                            class="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity hover:bg-red-600 group-hover/new:opacity-100"
+                                        >
+                                            <mat-icon
+                                                style="font-size: 14px; width: 14px; height: 14px"
+                                                >close</mat-icon
+                                            >
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                            @if (isEditMode()) {
+                                <button
+                                    type="button"
+                                    (click)="uploadImages()"
+                                    [disabled]="isUploadingImages()"
+                                    class="btn-primary mt-3 flex items-center gap-2 text-xs"
+                                >
+                                    <mat-icon
+                                        [class.animate-spin]="isUploadingImages()"
+                                        style="font-size: 14px; width: 14px; height: 14px"
+                                        >{{
+                                            isUploadingImages() ? 'autorenew' : 'cloud_upload'
+                                        }}</mat-icon
+                                    >
+                                    {{
+                                        isUploadingImages()
+                                            ? 'Uploading...'
+                                            : 'Upload ' + newImageFiles().length + ' images'
+                                    }}
+                                </button>
+                            }
+                        </div>
+                    }
+
+                    <div
+                        class="mb-4 flex items-start gap-2 rounded-lg bg-primary/5 p-3 border border-primary/10"
+                    >
+                        <mat-icon
+                            class="text-primary"
+                            style="font-size: 16px; width: 16px; height: 16px"
+                            >info</mat-icon
+                        >
+                        <p class="text-[11px] leading-relaxed text-text-secondary">
+                            <strong>Note:</strong> The first image uploaded will be set as the
+                            <strong>Cover Image</strong> by default. You can change this later using
+                            the star icon.
+                        </p>
+                    </div>
+
+                    <label
+                        class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border py-8 transition-colors hover:border-primary/40 hover:bg-primary/5"
+                    >
+                        <mat-icon
+                            class="mb-2 text-text-disabled"
+                            style="font-size: 32px; width: 32px; height: 32px"
+                            >add_photo_alternate</mat-icon
+                        >
+                        <p class="text-sm font-medium text-text-secondary">
+                            Click to select images
+                        </p>
+                        <p class="mt-1 text-[11px] text-text-tertiary">
+                            JPG, PNG, WebP up to 5MB each
+                        </p>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            class="hidden"
+                            (change)="onFilesSelected($event)"
+                        />
+                    </label>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center gap-2">
+                        <mat-icon
+                            class="text-text-tertiary"
+                            style="font-size: 18px; width: 18px; height: 18px"
+                            >summarize</mat-icon
+                        >
+                        <h2 class="text-sm font-bold text-text-primary">Summary</h2>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-1.5 text-xs text-text-tertiary"
+                                ><mat-icon style="font-size: 14px; width: 14px; height: 14px">{{
+                                    isEditMode() ? 'edit' : 'add_circle'
+                                }}</mat-icon
+                                >Mode</span
+                            ><span
+                                class="rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                                [class.bg-primary/10]="!isEditMode()"
+                                [class.bg-warning/10]="isEditMode()"
+                                >{{ isEditMode() ? 'Editing' : 'Creating' }}</span
+                            >
+                        </div>
+                        <div class="divider"></div>
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-1.5 text-xs text-text-tertiary"
+                                ><mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                                    >location_city</mat-icon
+                                >Name</span
+                            ><span
+                                class="max-w-35 truncate text-xs font-medium text-text-primary"
+                                >{{ form.get('name')?.value || '—' }}</span
+                            >
+                        </div>
+                        <div class="divider"></div>
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-1.5 text-xs text-text-tertiary"
+                                ><mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                                    >photo_library</mat-icon
+                                >Images</span
+                            ><span class="text-xs font-medium text-text-primary"
+                                >{{ existingImages.length }} ext. +
+                                {{ newImageFiles().length }} new</span
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <div class="space-y-3">
+                        <button
+                            type="submit"
+                            [disabled]="isSubmitting()"
+                            class="btn-primary flex w-full items-center justify-center gap-2 py-2.5 text-sm"
+                        >
+                            <mat-icon
+                                [class.animate-spin]="isSubmitting()"
+                                style="font-size: 18px; width: 18px; height: 18px"
+                                >{{
+                                    isSubmitting()
+                                        ? 'autorenew'
+                                        : isEditMode()
+                                          ? 'save'
+                                          : 'add_location_alt'
+                                }}</mat-icon
+                            >
+                            {{
+                                isSubmitting()
+                                    ? isEditMode()
+                                        ? 'Updating...'
+                                        : 'Creating...'
+                                    : isEditMode()
+                                      ? 'Update City'
+                                      : 'Create City'
+                            }}
+                        </button>
+                        <a
+                            routerLink="/dashboard/cities"
+                            class="flex w-full items-center justify-center gap-2 rounded-lg border border-border py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-main-bg"
+                            ><mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                                >arrow_back</mat-icon
+                            >
+                            Cancel</a
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+}

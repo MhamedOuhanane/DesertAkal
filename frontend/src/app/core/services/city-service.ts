@@ -35,11 +35,11 @@ export class CityService {
         return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${uuid}`);
     }
 
-    addImages(uuid: string, images: File[]): Observable<ApiResponse<City>> {
+    addImages(uuid: string, images: File[]): Observable<ApiResponse<CityFind>> {
         const formData = new FormData();
         images.forEach((image) => formData.append('images', image));
 
-        return this.http.post<ApiResponse<City>>(`${this.apiUrl}/${uuid}/images`, formData);
+        return this.http.post<ApiResponse<CityFind>>(`${this.apiUrl}/${uuid}/images`, formData);
     }
 
     deleteImages(uuid: string, imageUuids: string[]): Observable<ApiResponse<void>> {
