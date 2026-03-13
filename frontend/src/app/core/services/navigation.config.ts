@@ -128,6 +128,18 @@ export const NAV_CONFIG = {
                     badge: '24',
                 },
                 {
+                    label: 'Guides',
+                    path: '/dashboard/guides',
+                    icon: 'directions_walk',
+                    roles: ['ADMIN'],
+                },
+                {
+                    label: 'Cities',
+                    path: '/dashboard/cities',
+                    icon: 'location_city',
+                    roles: ['ADMIN'],
+                },
+                {
                     label: 'Tours Management',
                     icon: 'explore',
                     path: '/dashboard/tours',

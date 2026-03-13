@@ -1,7 +1,14 @@
 import { RoleEnum } from '../enums/role.enum';
 import { UserStatus } from '../enums/user-status.enum';
+import { PageAble } from './response.models';
 
 export type UserRole = RoleEnum;
+
+export interface UserFilters extends PageAble {
+    search?: string;
+    status?: string;
+    roleName?: string;
+}
 
 export interface UserAuth {
     uuid: string;

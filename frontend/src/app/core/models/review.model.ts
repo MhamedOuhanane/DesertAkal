@@ -1,4 +1,5 @@
 import { ReviewableType } from '../enums/reviewable-type.enum';
+import { PageAble } from './response.models';
 
 export interface Review {
     readonly uuid: string;
@@ -12,6 +13,11 @@ export interface Review {
     readonly createdAt: string | Date;
     readonly updatedAt: string | Date;
     readonly reviewableName: string;
+}
+
+export interface ReviewFilters extends PageAble {
+    type?: string;
+    minRating?: number;
 }
 
 export interface ReviewCreate {
