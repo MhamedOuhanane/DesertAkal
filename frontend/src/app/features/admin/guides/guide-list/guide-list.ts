@@ -42,12 +42,9 @@ export class GuideList {
                 this.patchQuery({ search: value, page: 0 });
             });
 
-        effect(
-            () => {
-                this.loadGuides();
-            },
-            { allowSignalWrites: true },
-        );
+        effect(() => {
+            this.loadGuides();
+        });
     }
 
     private patchQuery(patch: Partial<GuideFilters>) {

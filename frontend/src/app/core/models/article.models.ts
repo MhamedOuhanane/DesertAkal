@@ -1,4 +1,4 @@
-import { PageAble } from "./response.models";
+import { PageAble } from './response.models';
 
 export interface Article {
     readonly uuid: string;

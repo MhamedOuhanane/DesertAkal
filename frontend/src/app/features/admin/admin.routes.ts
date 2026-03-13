@@ -93,20 +93,16 @@ export const ADMIN_ROUTES: Routes = [
                     {
                         path: '',
                         loadComponent: () =>
-                            import('./users/user-list/user-list').then(
-                                (m) => m.UserList
-                            ),
+                            import('./users/user-list/user-list').then((m) => m.UserList),
                     },
                     {
                         path: ':uuid',
                         loadComponent: () =>
-                            import('./users/user-detail/user-detail').then(
-                                (m) => m.UserDetail
-                            ),
+                            import('./users/user-detail/user-detail').then((m) => m.UserDetail),
                         data: { breadcrumb: 'Details' },
                     },
-                ]
-            }
+                ],
+            },
         ],
     },
 ];

@@ -24,29 +24,17 @@ export class UserService {
     }
 
     update(uuid: string, dto: UserUpdate): Observable<ApiResponse<UserFind>> {
-        return this.http.patch<ApiResponse<UserFind>>(
-            `${this.baseUrl}/${uuid}`,
-            dto
-        );
+        return this.http.patch<ApiResponse<UserFind>>(`${this.baseUrl}/${uuid}`, dto);
     }
 
-    updateStatus(
-        uuid: string,
-        status: string
-    ): Observable<ApiResponse<UserFind>> {
-        return this.http.patch<ApiResponse<UserFind>>(
-            `${this.baseUrl}/${uuid}/status`,
-            { status }
-        );
+    updateStatus(uuid: string, status: string): Observable<ApiResponse<UserFind>> {
+        return this.http.patch<ApiResponse<UserFind>>(`${this.baseUrl}/${uuid}/status`, { status });
     }
 
     updatePhoto(uuid: string, photo: File): Observable<ApiResponse<UserFind>> {
         const formData = new FormData();
         formData.append('photo', photo);
-        return this.http.patch<ApiResponse<UserFind>>(
-            `${this.baseUrl}/${uuid}/photo`,
-            formData
-        );
+        return this.http.patch<ApiResponse<UserFind>>(`${this.baseUrl}/${uuid}/photo`, formData);
     }
 
     delete(uuid: string): Observable<ApiResponse<void>> {
@@ -55,21 +43,16 @@ export class UserService {
 
     getArticles(
         uuid: string,
-        params: ArticleFilters
+        params: ArticleFilters,
     ): Observable<ApiResponse<Pagination<Article>>> {
-        return this.http.get<ApiResponse<Pagination<Article>>>(
-            `${this.baseUrl}/${uuid}/articles`,
-            { params: buildHttpParams(params) }
-        );
+        return this.http.get<ApiResponse<Pagination<Article>>>(`${this.baseUrl}/${uuid}/articles`, {
+            params: buildHttpParams(params),
+        });
     }
 
-    getComments(
-        uuid: string,
-        params: PageAble
-    ): Observable<ApiResponse<Pagination<Comment>>> {
-        return this.http.get<ApiResponse<Pagination<Comment>>>(
-            `${this.baseUrl}/${uuid}/comments`,
-            { params: buildHttpParams(params) }
-        );
+    getComments(uuid: string, params: PageAble): Observable<ApiResponse<Pagination<Comment>>> {
+        return this.http.get<ApiResponse<Pagination<Comment>>>(`${this.baseUrl}/${uuid}/comments`, {
+            params: buildHttpParams(params),
+        });
     }
 }
