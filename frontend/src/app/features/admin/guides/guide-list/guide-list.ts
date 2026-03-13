@@ -13,7 +13,7 @@ import { PaginationComponent } from '../../../../shared/components/pagination/pa
 
 @Component({
     selector: 'app-guide-list',
-    imports: [RouterLink, FormsModule, DatePipe, DecimalPipe, PaginationComponent],
+    imports: [RouterLink, FormsModule, DecimalPipe, PaginationComponent],
     templateUrl: './guide-list.html',
 })
 export class GuideList {
