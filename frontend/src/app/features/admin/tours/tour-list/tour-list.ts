@@ -101,6 +101,7 @@ export class TourList implements OnInit {
             toast.success(`"${tour.title}" deleted successfully.`);
         } catch (err: any) {
             toast.error(err?.error?.message || 'Failed to delete tour.');
+            this.showDeleteDialog.set(false);
         } finally {
             this.isDeleting.set(null);
             this.tourToDelete.set(null);

@@ -1,0 +1,244 @@
+@if (isLoading()) {
+    <div class="space-y-6">
+        <div class="card animate-pulse overflow-hidden">
+            <div class="h-64 bg-border/20"></div>
+            <div class="space-y-3 p-6">
+                <div class="h-6 w-48 rounded bg-border/50"></div>
+                <div class="h-4 w-full rounded bg-border/30"></div>
+            </div>
+        </div>
+    </div>
+} @else if (city()) {
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-3">
+            <a
+                routerLink="/dashboard/cities"
+                class="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition-all hover:border-primary/40 hover:text-primary"
+            >
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px">arrow_back</mat-icon>
+            </a>
+            <div>
+                <h1 class="text-2xl font-bold text-text-primary">{{ city()!.name }}</h1>
+                <p class="flex items-center gap-1 text-xs text-text-tertiary">
+                    <mat-icon style="font-size: 12px; width: 12px; height: 12px"
+                        >location_on</mat-icon
+                    >
+                    {{ city()!.map_lat | number: '1.4-4' }}, {{ city()!.map_lng | number: '1.4-4' }}
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 self-start">
+            <a
+                [routerLink]="['/dashboard/cities', city()!.uuid, 'edit']"
+                class="btn-primary inline-flex items-center gap-2 text-sm"
+            >
+                <mat-icon style="font-size: 16px; width: 16px; height: 16px">edit</mat-icon> Edit
+            </a>
+
+            <button
+                (click)="openDeleteDialog()"
+                class="btn-primary bg-none! bg-red-500! shadow-red-500/20! inline-flex items-center gap-2 text-sm"
+            >
+                <mat-icon style="font-size: 16px; width: 16px; height: 16px">delete</mat-icon>
+                Delete
+            </button>
+        </div>
+    </div>
+
+    <div
+        class="custom-scrollbar grid h-[calc(100vh-190px)] grid-cols-1 gap-6 overflow-y-auto pr-2 lg:grid-cols-3"
+    >
+        <div class="space-y-6 lg:col-span-2">
+            <div class="card overflow-hidden">
+                <img
+                    [src]="getCoverImage()"
+                    [alt]="city()!.name"
+                    class="h-64 w-full object-cover sm:h-80"
+                    (error)="$any($event.target).src = 'assets/defaults/city-placeholder.jpg'"
+                />
+            </div>
+            <div class="card p-6">
+                <div class="mb-3 flex items-center gap-2">
+                    <mat-icon
+                        class="text-text-tertiary"
+                        style="font-size: 18px; width: 18px; height: 18px"
+                        >description</mat-icon
+                    >
+                    <h2 class="text-base font-bold text-text-primary">Description</h2>
+                </div>
+                <p class="whitespace-pre-line text-sm leading-relaxed text-text-secondary">
+                    {{ city()!.description }}
+                </p>
+            </div>
+
+            @if (city()!.images && city()!.images.length > 0) {
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center gap-2">
+                        <mat-icon
+                            class="text-text-tertiary"
+                            style="font-size: 18px; width: 18px; height: 18px"
+                            >photo_library</mat-icon
+                        >
+                        <h2 class="text-base font-bold text-text-primary">
+                            Gallery ({{ city()!.images.length }})
+                        </h2>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                        @for (img of city()!.images; track img.uuid) {
+                            <div
+                                class="group relative cursor-pointer overflow-hidden rounded-xl border-2 transition-all hover:shadow-md"
+                                [class.border-primary]="img.isCover"
+                                [class.border-border]="!img.isCover"
+                                (click)="openLightbox(img)"
+                            >
+                                <img
+                                    [src]="img.image"
+                                    class="h-28 w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                    (error)="
+                                        $any($event.target).src =
+                                            'assets/defaults/city-placeholder.jpg'
+                                    "
+                                />
+                                @if (img.isCover) {
+                                    <span
+                                        class="absolute left-1.5 top-1.5 flex items-center gap-0.5 rounded bg-primary/90 px-1.5 py-0.5 text-[9px] font-bold text-white"
+                                        ><mat-icon
+                                            style="font-size: 10px; width: 10px; height: 10px"
+                                            >star</mat-icon
+                                        >
+                                        COVER</span
+                                    >
+                                }
+                                <div
+                                    class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/20"
+                                >
+                                    <mat-icon
+                                        class="text-white opacity-0 transition-opacity group-hover:opacity-100"
+                                        style="font-size: 24px; width: 24px; height: 24px"
+                                        >zoom_in</mat-icon
+                                    >
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="space-y-6">
+            <div class="card p-6">
+                <div class="mb-4 flex items-center gap-2">
+                    <mat-icon
+                        class="text-text-tertiary"
+                        style="font-size: 18px; width: 18px; height: 18px"
+                        >info</mat-icon
+                    >
+                    <h2 class="text-sm font-bold text-text-primary">Details</h2>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Latitude</span
+                        ><span class="text-sm font-semibold text-text-primary">{{
+                            city()!.map_lat | number: '1.4-4'
+                        }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Longitude</span
+                        ><span class="text-sm font-semibold text-text-primary">{{
+                            city()!.map_lng | number: '1.4-4'
+                        }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Photos</span
+                        ><span class="text-sm font-semibold text-text-primary">{{
+                            city()!.images.length || 0
+                        }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Created</span
+                        ><span class="text-xs text-text-tertiary">{{
+                            city()!.createdAt | date: 'MMM d, y'
+                        }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card overflow-hidden">
+                <div class="flex items-center gap-2 border-b border-border px-4 py-3">
+                    <mat-icon
+                        class="text-text-tertiary"
+                        style="font-size: 16px; width: 16px; height: 16px"
+                        >map</mat-icon
+                    ><span class="text-xs font-bold text-text-primary">Location</span>
+                </div>
+                <a
+                    [href]="
+                        'https://www.google.com/maps?q=' + city()!.map_lat + ',' + city()!.map_lng
+                    "
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="flex items-center gap-2 p-4 transition-colors hover:bg-main-bg"
+                >
+                    <mat-icon
+                        class="text-primary"
+                        style="font-size: 18px; width: 18px; height: 18px"
+                        >open_in_new</mat-icon
+                    ><span class="text-xs font-medium text-primary">View on Google Maps</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (showLightbox() && selectedImage()) {
+        <div
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+            (click)="closeLightbox()"
+        >
+            <button
+                class="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm hover:bg-white/20"
+                (click)="closeLightbox()"
+            >
+                <mat-icon>close</mat-icon>
+            </button>
+            @if (city()!.images.length > 1) {
+                <button
+                    class="absolute left-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm hover:bg-white/20"
+                    (click)="navigateImage(-1); $event.stopPropagation()"
+                >
+                    <mat-icon>chevron_left</mat-icon>
+                </button>
+                <button
+                    class="absolute right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm hover:bg-white/20"
+                    (click)="navigateImage(1); $event.stopPropagation()"
+                >
+                    <mat-icon>chevron_right</mat-icon>
+                </button>
+            }
+            <img
+                [src]="selectedImage()!.image"
+                class="max-h-[85vh] max-w-[90vw] rounded-xl object-contain shadow-2xl"
+                (click)="$event.stopPropagation()"
+            />
+            @if (selectedImage()!.isCover) {
+                <div
+                    class="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-primary/90 px-4 py-1.5 text-xs font-bold text-white backdrop-blur-sm"
+                >
+                    ★ Cover Image
+                </div>
+            }
+        </div>
+    }
+
+    @if (showDeleteDialog()) {
+        <app-delete-dialog
+            itemName="City"
+            [itemTitle]="city()!.name"
+            [isDeleting]="isDeleting()"
+            (confirm)="confirmDelete()"
+            (cancel)="showDeleteDialog.set(false)"
+        />
+    }
+}

@@ -103,6 +103,42 @@ export const ADMIN_ROUTES: Routes = [
                     },
                 ],
             },
+            {
+                path: 'cities',
+                data: { breadcrumb: 'Cities' },
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () =>
+                            import('./cities/city-list/city-list').then((m) => m.CityList),
+                    },
+                    {
+                        path: 'create',
+                        loadComponent: () =>
+                            import('./cities/city-form/city-form').then((m) => m.CityForm),
+                        data: { breadcrumb: 'Create' },
+                    },
+                    {
+                        path: ':uuid',
+                        children: [
+                            {
+                                path: '',
+                                loadComponent: () =>
+                                    import('./cities/city-detail/city-detail').then(
+                                        (m) => m.CityDetail,
+                                    ),
+                                data: { breadcrumb: 'Details' },
+                            },
+                            {
+                                path: 'edit',
+                                loadComponent: () =>
+                                    import('./cities/city-form/city-form').then((m) => m.CityForm),
+                                data: { breadcrumb: 'Edit' },
+                            },
+                        ],
+                    },
+                ],
+            },
         ],
     },
 ];

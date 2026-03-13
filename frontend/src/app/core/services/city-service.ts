@@ -4,6 +4,7 @@ import { environment } from '../../../environments/environment.development';
 import { Observable } from 'rxjs';
 import { ApiResponse, Pagination } from '../models/response.models';
 import { City, CityCreate, CityFilters, CityFind, CityUpdate } from '../models/city.model';
+import { buildHttpParams } from '../utils/http-utils';
 
 @Injectable({
     providedIn: 'root',
@@ -13,15 +14,9 @@ export class CityService {
     private readonly apiUrl = `${environment.apiUrl}/cities`;
 
     findAll(filters: CityFilters): Observable<ApiResponse<Pagination<City>>> {
-        let params = new HttpParams();
-        if (filters.search) params = params.set('search', filters.search);
-        params = params
-            .set('page', (filters.page ?? 0).toString())
-            .set('size', (filters.size ?? 10).toString())
-            .set('sortBy', filters.sortBy ?? 'name')
-            .set('order', filters.order ?? 'asc');
-
-        return this.http.get<ApiResponse<Pagination<City>>>(this.apiUrl, { params });
+        return this.http.get<ApiResponse<Pagination<City>>>(this.apiUrl, {
+            params: buildHttpParams(filters),
+        });
     }
 
     find(uuid: string): Observable<ApiResponse<CityFind>> {
@@ -40,11 +35,11 @@ export class CityService {
         return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${uuid}`);
     }
 
-    addImages(uuid: string, images: File[]): Observable<ApiResponse<City>> {
+    addImages(uuid: string, images: File[]): Observable<ApiResponse<CityFind>> {
         const formData = new FormData();
         images.forEach((image) => formData.append('images', image));
 
-        return this.http.post<ApiResponse<City>>(`${this.apiUrl}/${uuid}/images`, formData);
+        return this.http.post<ApiResponse<CityFind>>(`${this.apiUrl}/${uuid}/images`, formData);
     }
 
     deleteImages(uuid: string, imageUuids: string[]): Observable<ApiResponse<void>> {
