@@ -13,7 +13,7 @@ import { CityService } from '../../../../core/services/city-service';
 @Component({
     selector: 'app-city-form',
     standalone: true,
-    imports: [ReactiveFormsModule, RouterLink, MatIcon, TextInput, DecimalPipe],
+    imports: [ReactiveFormsModule, RouterLink, MatIcon, TextInput],
     templateUrl: './city-form.html',
 })
 export class CityForm implements OnInit {
