@@ -1,5 +1,5 @@
-import { Permission } from "./permission.model";
-import { PageAble } from "./response.models";
+import { Permission } from './permission.model';
+import { PageAble } from './response.models';
 
 export interface Role {
     readonly uuid: string;

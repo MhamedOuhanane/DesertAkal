@@ -3,13 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse, Pagination } from '../models/response.models';
-import {
-    Role,
-    RoleFind,
-    RoleCreate,
-    RoleUpdate,
-    RoleFilters,
-} from '../models/role.model';
+import { Role, RoleFind, RoleCreate, RoleUpdate, RoleFilters } from '../models/role.model';
 import { buildHttpParams } from '../utils/http-utils';
 
 @Injectable({ providedIn: 'root' })
@@ -32,10 +26,7 @@ export class RoleService {
     }
 
     update(uuid: string, dto: RoleUpdate): Observable<ApiResponse<RoleFind>> {
-        return this.http.patch<ApiResponse<RoleFind>>(
-            `${this.baseUrl}/${uuid}`,
-            dto
-        );
+        return this.http.patch<ApiResponse<RoleFind>>(`${this.baseUrl}/${uuid}`, dto);
     }
 
     delete(uuid: string): Observable<ApiResponse<void>> {
@@ -43,11 +34,10 @@ export class RoleService {
     }
 
     getPermissions(
-        params: { search?: string; roleName: string } & RoleFilters
+        params: { search?: string; roleName: string } & RoleFilters,
     ): Observable<ApiResponse<Pagination<any>>> {
-        return this.http.get<ApiResponse<Pagination<any>>>(
-            `${this.baseUrl}/permissions`,
-            { params: buildHttpParams(params) }
-        );
+        return this.http.get<ApiResponse<Pagination<any>>>(`${this.baseUrl}/permissions`, {
+            params: buildHttpParams(params),
+        });
     }
 }

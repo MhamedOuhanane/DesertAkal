@@ -1,10 +1,5 @@
 import { Component, inject, input, output, signal, OnInit } from '@angular/core';
-import {
-    FormBuilder,
-    FormGroup,
-    ReactiveFormsModule,
-    Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { TextInput } from '../../../../shared/components/text-input/text-input';
 import { Permission } from '../../../../core/models/permission.model';

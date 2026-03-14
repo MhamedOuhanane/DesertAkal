@@ -159,9 +159,9 @@ export const ADMIN_ROUTES: Routes = [
                     {
                         path: '',
                         loadComponent: () =>
-                            import(
-                                './roles-permissions/roles-permissions'
-                            ).then((m) => m.RolesPermissions),
+                            import('./roles-permissions/roles-permissions').then(
+                                (m) => m.RolesPermissions,
+                            ),
                     },
                 ],
             },
