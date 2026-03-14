@@ -1,1 +1,305 @@
-<p>roles-permissions works!</p>
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-text-primary">Roles & Permissions</h1>
+    <p class="mt-1 text-sm text-text-tertiary">Manage access control for the application</p>
+</div>
+
+<div class="mb-6 flex items-center gap-1 rounded-xl bg-main-bg p-1">
+    <button
+        (click)="activeTab.set('roles')"
+        class="flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium transition-all"
+        [class.bg-surface]="activeTab() === 'roles'"
+        [class.text-text-primary]="activeTab() === 'roles'"
+        [class.shadow-sm]="activeTab() === 'roles'"
+        [class.text-text-tertiary]="activeTab() !== 'roles'"
+    >
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px">admin_panel_settings</mat-icon>
+        Roles ({{ rolePagination()?.totalElements || 0 }})
+    </button>
+    <button
+        (click)="activeTab.set('permissions')"
+        class="flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium transition-all"
+        [class.bg-surface]="activeTab() === 'permissions'"
+        [class.text-text-primary]="activeTab() === 'permissions'"
+        [class.shadow-sm]="activeTab() === 'permissions'"
+        [class.text-text-tertiary]="activeTab() !== 'permissions'"
+    >
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px">shield</mat-icon> Permissions
+        ({{ permPagination()?.totalElements || 0 }})
+    </button>
+</div>
+
+@if (activeTab() === 'roles') {
+    <div class="card mb-6 p-4">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="relative flex-1">
+                <mat-icon
+                    class="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary"
+                    style="font-size: 18px; width: 18px; height: 18px"
+                    >search</mat-icon
+                >
+                <input
+                    type="text"
+                    placeholder="Search roles..."
+                    class="input pl-10"
+                    [value]="roleQuery().search"
+                    (input)="onRoleSearch($any($event.target).value)"
+                />
+            </div>
+            <button
+                (click)="openCreateRole()"
+                class="btn-primary inline-flex items-center gap-2 text-sm"
+            >
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px">add</mat-icon> Add Role
+            </button>
+        </div>
+    </div>
+
+    @if (rolesLoading()) {
+        <div class="space-y-3">
+            @for (_ of [1, 2, 3]; track $index) {
+                <div class="card animate-pulse p-5">
+                    <div class="flex items-center gap-4">
+                        <div class="h-10 w-10 rounded-xl bg-border/30"></div>
+                        <div class="flex-1 space-y-2">
+                            <div class="h-4 w-32 rounded bg-border/40"></div>
+                            <div class="h-3 w-48 rounded bg-border/20"></div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    } @else if (roles().length > 0) {
+        <div class="space-y-3">
+            @for (role of roles(); track role.uuid) {
+                <div
+                    class="card cursor-pointer p-5 transition-all hover:border-primary/30 hover:shadow-sm"
+                    (click)="openEditRole(role)"
+                >
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-500/10"
+                            >
+                                <mat-icon
+                                    class="text-purple-600"
+                                    style="font-size: 20px; width: 20px; height: 20px"
+                                    >admin_panel_settings</mat-icon
+                                >
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-text-primary">{{ role.name }}</p>
+                                <p class="text-xs text-text-tertiary">Click to view permissions</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button
+                                (click)="openEditRole(role); $event.stopPropagation()"
+                                class="flex h-8 w-8 items-center justify-center rounded-lg text-text-tertiary hover:bg-primary/10 hover:text-primary"
+                            >
+                                <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                                    >edit</mat-icon
+                                >
+                            </button>
+                            <button
+                                (click)="openRoleDeleteDialog(role, $event)"
+                                class="flex h-8 w-8 items-center justify-center rounded-lg text-text-tertiary hover:bg-red-500/10 hover:text-red-500"
+                            >
+                                <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                                    >delete_outline</mat-icon
+                                >
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        @if (rolePagination()) {
+            <div class="mt-6">
+                <app-pagination
+                    [pagination]="rolePagination()!"
+                    (pageChange)="roleGoToPage($event)"
+                />
+            </div>
+        }
+    } @else {
+        <div class="card flex flex-col items-center justify-center p-12 text-center">
+            <div
+                class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/10"
+            >
+                <mat-icon class="text-purple-600" style="font-size: 32px; width: 32px; height: 32px"
+                    >admin_panel_settings</mat-icon
+                >
+            </div>
+            <h3 class="text-base font-semibold text-text-primary">No roles found</h3>
+            <p class="mt-1 text-sm text-text-tertiary">
+                {{
+                    roleQuery().search ? 'Try adjusting your search.' : 'Start by creating a role.'
+                }}
+            </p>
+        </div>
+    }
+}
+
+@if (activeTab() === 'permissions') {
+    <div class="card mb-6 p-4">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="relative flex-1">
+                <mat-icon
+                    class="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary"
+                    style="font-size: 18px; width: 18px; height: 18px"
+                    >search</mat-icon
+                >
+                <input
+                    type="text"
+                    placeholder="Search permissions..."
+                    class="input pl-10"
+                    [value]="permQuery().search"
+                    (input)="onPermSearch($any($event.target).value)"
+                />
+            </div>
+            <button
+                (click)="openCreatePerm()"
+                class="btn-primary inline-flex items-center gap-2 text-sm"
+            >
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px">add</mat-icon> Add
+                Permission
+            </button>
+        </div>
+    </div>
+
+    @if (permsLoading()) {
+        <div class="card overflow-hidden animate-pulse">
+            @for (_ of [1, 2, 3, 4, 5]; track $index) {
+                <div class="flex items-center gap-4 border-b border-border p-4 last:border-0">
+                    <div class="h-8 w-8 rounded-lg bg-border/30"></div>
+                    <div class="h-4 w-40 rounded bg-border/40"></div>
+                    <div class="ml-auto h-6 w-16 rounded bg-border/20"></div>
+                </div>
+            }
+        </div>
+    } @else if (permissions().length > 0) {
+        <div class="card overflow-hidden">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-border bg-main-bg/50">
+                        <th
+                            class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary"
+                        >
+                            Permission
+                        </th>
+                        <th
+                            class="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-tertiary"
+                        >
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (perm of permissions(); track perm.uuid) {
+                        <tr
+                            class="cursor-pointer border-b border-border transition-colors last:border-0 hover:bg-main-bg/50"
+                            (click)="openEditPerm(perm)"
+                        >
+                            <td class="px-5 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-500/10"
+                                    >
+                                        <mat-icon
+                                            class="text-orange-500"
+                                            style="font-size: 16px; width: 16px; height: 16px"
+                                            >shield</mat-icon
+                                        >
+                                    </div>
+                                    <span
+                                        class="font-mono text-sm font-semibold text-text-primary"
+                                        >{{ perm.name }}</span
+                                    >
+                                </div>
+                            </td>
+                            <td class="px-5 py-4 text-right">
+                                <div class="flex items-center justify-end gap-1">
+                                    <button
+                                        (click)="openEditPerm(perm); $event.stopPropagation()"
+                                        class="flex h-8 w-8 items-center justify-center rounded-lg text-text-tertiary hover:bg-primary/10 hover:text-primary"
+                                    >
+                                        <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                                            >edit</mat-icon
+                                        >
+                                    </button>
+                                    <button
+                                        (click)="openPermDeleteDialog(perm, $event)"
+                                        class="flex h-8 w-8 items-center justify-center rounded-lg text-text-tertiary hover:bg-red-500/10 hover:text-red-500"
+                                    >
+                                        <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                                            >delete_outline</mat-icon
+                                        >
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (permPagination() && permPagination()!.totalPages > 1) {
+                <app-pagination
+                    [pagination]="permPagination()!"
+                    (pageChange)="permGoToPage($event)"
+                />
+            }
+        </div>
+    } @else {
+        <div class="card flex flex-col items-center justify-center p-12 text-center">
+            <div
+                class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-orange-500/10"
+            >
+                <mat-icon class="text-orange-500" style="font-size: 32px; width: 32px; height: 32px"
+                    >shield</mat-icon
+                >
+            </div>
+            <h3 class="text-base font-semibold text-text-primary">No permissions found</h3>
+            <p class="mt-1 text-sm text-text-tertiary">
+                {{
+                    permQuery().search
+                        ? 'Try adjusting your search.'
+                        : 'Create permissions before assigning them to roles.'
+                }}
+            </p>
+        </div>
+    }
+}
+
+@if (showRoleDialog()) {
+    <app-role-dialog
+        [role]="roleToEdit()"
+        [isSubmitting]="isRoleSubmitting()"
+        (save)="onRoleSave($event)"
+        (cancel)="closeRoleDialog()"
+    />
+}
+@if (showPermDialog()) {
+    <app-permission-dialog
+        [permission]="permToEdit()"
+        [isSubmitting]="isPermSubmitting()"
+        (save)="onPermSave($event)"
+        (cancel)="closePermDialog()"
+    />
+}
+@if (showRoleDeleteDialog() && roleToDelete()) {
+    <app-delete-dialog
+        itemName="Role"
+        [itemTitle]="roleToDelete()!.name"
+        [isDeleting]="isRoleDeleting()"
+        (confirm)="confirmRoleDelete()"
+        (cancel)="showRoleDeleteDialog.set(false); roleToDelete.set(null)"
+    />
+}
+@if (showPermDeleteDialog() && permToDelete()) {
+    <app-delete-dialog
+        itemName="Permission"
+        [itemTitle]="permToDelete()!.name"
+        [isDeleting]="isPermDeleting()"
+        (confirm)="confirmPermDelete()"
+        (cancel)="showPermDeleteDialog.set(false); permToDelete.set(null)"
+    />
+}
