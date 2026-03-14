@@ -165,6 +165,27 @@ export const ADMIN_ROUTES: Routes = [
                     },
                 ],
             },
+            {
+                path: 'articles',
+                data: { breadcrumb: 'Articles' },
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () =>
+                            import('./articles/article-list/article-list').then(
+                                (m) => m.ArticleList
+                            ),
+                    },
+                    {
+                        path: ':uuid',
+                        loadComponent: () =>
+                            import('./articles/article-detail/article-detail').then(
+                                (m) => m.ArticleDetail
+                            ),
+                        data: { breadcrumb: 'Details' },
+                    },
+                ],
+            },
         ],
     },
 ];

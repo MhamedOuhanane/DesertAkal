@@ -166,7 +166,7 @@ export const NAV_CONFIG = {
                 },
                 {
                     label: 'Article Validation',
-                    icon: 'fact_check',
+                    icon: 'article',
                     path: '/dashboard/articles',
                     roles: ['ADMIN'],
                 },
