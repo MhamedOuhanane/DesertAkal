@@ -146,6 +146,12 @@ export const NAV_CONFIG = {
                     roles: ['ADMIN'],
                 },
                 {
+                    label: 'Roles & Permissions',
+                    path: '/dashboard/roles',
+                    icon: 'admin_panel_settings',
+                    roles: ['ADMIN'],
+                },
+                {
                     label: 'Tours Management',
                     icon: 'explore',
                     path: '/dashboard/tours',
@@ -240,12 +246,6 @@ export const NAV_CONFIG = {
                     label: 'My Profile',
                     icon: 'person',
                     path: '/dashboard/profile',
-                    roles: ['ADMIN', 'GUIDE', 'TOURIST'],
-                },
-                {
-                    label: 'Settings',
-                    icon: 'settings',
-                    path: '/dashboard/settings',
                     roles: ['ADMIN', 'GUIDE', 'TOURIST'],
                 },
             ],

@@ -152,6 +152,19 @@ export const ADMIN_ROUTES: Routes = [
                     },
                 ],
             },
+            {
+                path: 'roles',
+                data: { breadcrumb: 'Roles & Permissions' },
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () =>
+                            import('./roles-permissions/roles-permissions').then(
+                                (m) => m.RolesPermissions,
+                            ),
+                    },
+                ],
+            },
         ],
     },
 ];
