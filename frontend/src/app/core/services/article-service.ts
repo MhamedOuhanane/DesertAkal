@@ -49,6 +49,10 @@ export class ArticleService {
         });
     }
 
+    find(uuid: string): Observable<ApiResponse<Article>> {
+        return this.http.get<ApiResponse<Article>>(`${this.baseUrl}/${uuid}`);
+    }
+
     delete(uuid: string): Observable<ApiResponse<void>> {
         return this.http.delete<ApiResponse<void>>(`${this.baseUrl}/${uuid}`);
     }
