@@ -1,0 +1,236 @@
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-text-primary">Languages</h1>
+        <p class="mt-1 text-sm text-text-tertiary">
+            {{ pagination()?.totalElements || 0 }} language{{
+                (pagination()?.totalElements || 0) !== 1 ? 's' : ''
+            }}
+            available
+        </p>
+    </div>
+    <button
+        (click)="openCreateDialog()"
+        class="btn-primary inline-flex items-center gap-2 self-start text-sm"
+    >
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px">add</mat-icon>
+        Add Language
+    </button>
+</div>
+
+<div class="card mb-6 p-4">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="relative flex-1">
+            <mat-icon
+                class="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary"
+                style="font-size: 18px; width: 18px; height: 18px"
+                >search</mat-icon
+            >
+            <input
+                type="text"
+                placeholder="Search languages..."
+                class="input pl-10"
+                [value]="query().search"
+                (input)="onSearch($any($event.target).value)"
+            />
+        </div>
+
+        <div class="flex items-center gap-2">
+            <select
+                class="input w-full sm:w-40"
+                [value]="query().sortBy"
+                (change)="onSort($any($event.target).value)"
+            >
+                <option value="name">Name</option>
+                <option value="code">Code</option>
+            </select>
+            <button
+                (click)="onSort(query().sortBy!)"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition-colors hover:bg-main-bg"
+            >
+                <mat-icon
+                    class="transition-transform"
+                    [class.rotate-180]="query().order === 'desc'"
+                    style="font-size: 18px; width: 18px; height: 18px"
+                    >arrow_upward</mat-icon
+                >
+            </button>
+        </div>
+    </div>
+</div>
+
+@if (isLoading()) {
+    <div class="card overflow-hidden">
+        <div class="animate-pulse">
+            <div class="border-b border-border bg-main-bg/50 p-4">
+                <div class="h-4 w-48 rounded bg-border/40"></div>
+            </div>
+            @for (_ of [1, 2, 3, 4, 5]; track $index) {
+                <div class="flex items-center gap-4 border-b border-border p-4">
+                    <div class="h-10 w-10 rounded-lg bg-border/30"></div>
+                    <div class="flex-1 space-y-2">
+                        <div class="h-4 w-32 rounded bg-border/40"></div>
+                        <div class="h-3 w-20 rounded bg-border/30"></div>
+                    </div>
+                    <div class="h-6 w-16 rounded bg-border/20"></div>
+                </div>
+            }
+        </div>
+    </div>
+} @else if (languages().length > 0) {
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-border bg-main-bg/50">
+                        <th
+                            class="cursor-pointer px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary transition-colors hover:text-text-primary"
+                            (click)="onSort('name')"
+                        >
+                            <div class="flex items-center gap-1.5">
+                                Language
+                                @if (getSortIcon('name')) {
+                                    <mat-icon style="font-size: 14px; width: 14px; height: 14px">{{
+                                        getSortIcon('name')
+                                    }}</mat-icon>
+                                }
+                            </div>
+                        </th>
+                        <th
+                            class="cursor-pointer px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary transition-colors hover:text-text-primary"
+                            (click)="onSort('code')"
+                        >
+                            <div class="flex items-center gap-1.5">
+                                Code
+                                @if (getSortIcon('code')) {
+                                    <mat-icon style="font-size: 14px; width: 14px; height: 14px">{{
+                                        getSortIcon('code')
+                                    }}</mat-icon>
+                                }
+                            </div>
+                        </th>
+                        <th
+                            class="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-tertiary"
+                        >
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (lang of languages(); track lang.uuid) {
+                        <tr
+                            class="cursor-pointer border-b border-border transition-colors last:border-0 hover:bg-main-bg/50"
+                            (click)="openEditDialog(lang)"
+                        >
+                            <td class="px-5 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-xs font-bold uppercase text-primary"
+                                    >
+                                        {{ lang.code }}
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-text-primary">
+                                            {{ lang.name }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-5 py-4">
+                                <span
+                                    class="inline-flex items-center gap-1 rounded-lg bg-main-bg px-2.5 py-1 text-xs font-mono font-medium text-text-secondary"
+                                >
+                                    <mat-icon style="font-size: 12px; width: 12px; height: 12px"
+                                        >code</mat-icon
+                                    >
+                                    {{ lang.code }}
+                                </span>
+                            </td>
+                            <td class="px-5 py-4 text-right">
+                                <div class="flex items-center justify-end gap-1">
+                                    <button
+                                        (click)="openEditDialog(lang); $event.stopPropagation()"
+                                        class="flex h-8 w-8 items-center justify-center rounded-lg text-text-tertiary transition-colors hover:bg-primary/10 hover:text-primary"
+                                        title="Edit"
+                                    >
+                                        <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                                            >edit</mat-icon
+                                        >
+                                    </button>
+                                    <button
+                                        (click)="openDeleteDialog(lang, $event)"
+                                        class="flex h-8 w-8 items-center justify-center rounded-lg text-text-tertiary transition-colors hover:bg-red-500/10 hover:text-red-500"
+                                        title="Delete"
+                                    >
+                                        <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                                            >delete_outline</mat-icon
+                                        >
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div
+            class="flex items-center justify-between border-t border-border bg-main-bg/30 px-5 py-3"
+        >
+            <p class="text-xs text-text-tertiary">
+                {{ languages().length }} of {{ pagination()?.totalElements || 0 }} languages
+            </p>
+            <div class="flex items-center gap-1.5 text-xs text-text-tertiary">
+                <mat-icon style="font-size: 14px; width: 14px; height: 14px">translate</mat-icon>
+                Sorted by {{ query().sortBy }} ({{ query().order }})
+            </div>
+        </div>
+
+        @if (pagination() && pagination()!.totalPages > 1) {
+            <app-pagination [pagination]="pagination()!" (pageChange)="goToPage($event)" />
+        }
+    </div>
+} @else {
+    <div class="card flex flex-col items-center justify-center p-12 text-center">
+        <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+            <mat-icon class="text-primary" style="font-size: 32px; width: 32px; height: 32px"
+                >translate</mat-icon
+            >
+        </div>
+        <h3 class="text-base font-semibold text-text-primary">No languages found</h3>
+        <p class="mt-1 text-sm text-text-tertiary">
+            @if (query().search) {
+                Try adjusting your search.
+            } @else {
+                Start by adding your first language.
+            }
+        </p>
+        @if (!query().search) {
+            <button
+                (click)="openCreateDialog()"
+                class="btn-primary mt-4 inline-flex items-center gap-2 text-sm"
+            >
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px">add</mat-icon>
+                Add Language
+            </button>
+        }
+    </div>
+}
+
+@if (showFormDialog()) {
+    <app-language-dialog
+        [language]="languageToEdit()"
+        [isSubmitting]="isSubmitting()"
+        (save)="onSave($event)"
+        (cancel)="closeFormDialog()"
+    />
+}
+
+@if (showDeleteDialog() && languageToDelete()) {
+    <app-delete-dialog
+        itemName="Language"
+        [itemTitle]="languageToDelete()!.name"
+        [isDeleting]="isDeleting()"
+        (confirm)="confirmDelete()"
+        (cancel)="cancelDelete()"
+    />
+}

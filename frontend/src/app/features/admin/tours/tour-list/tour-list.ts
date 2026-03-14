@@ -32,7 +32,7 @@ export class TourList implements OnInit {
     sortBy = 'createdAt';
     order = 'desc';
     currentPage = 0;
-    pageSize = 10;
+    pageSize = 8;
 
     async ngOnInit(): Promise<void> {
         await this.loadTours();

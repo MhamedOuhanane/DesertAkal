@@ -28,7 +28,7 @@ export class CityList {
 
     query = signal<CityFilters>({
         page: 0,
-        size: 9,
+        size: 6,
         sortBy: 'name',
         order: 'asc',
         search: '',
