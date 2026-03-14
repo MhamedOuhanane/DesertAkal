@@ -87,12 +87,12 @@ public class RoleServiceImpl implements RoleService {
         log.info("Request to update Role UUID: {} with data: {}", roleUuid, dto.getName());
 
         Role role = repository.findByUuid(roleUuid)
-            .orElseThrow(() -> {
-                log.warn("Update failed: Role not found for UUID: {}", roleUuid);
-                return new ResourceNotFoundException("Role", "identifier", roleUuid.toString());
-            });
+                .orElseThrow(() -> {
+                    log.warn("Update failed: Role not found for UUID: {}", roleUuid);
+                    return new ResourceNotFoundException("Role", "identifier", roleUuid.toString());
+                });
 
-        if (!dto.getName().equals(role.getName()) && repository.existsByName(dto.getName())) {
+        if (dto.getName() != null && !dto.getName().equals(role.getName()) && repository.existsByName(dto.getName())) {
             log.warn("Update failed: Role name '{}' already exists", dto.getName());
             throw new DuplicateResourceException("Role", "name", dto.getName());
         }

@@ -1,0 +1,90 @@
+<div
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+            (click)="cancel.emit()"
+        >
+            <div
+                class="w-full max-w-md rounded-2xl border border-border bg-surface shadow-2xl"
+                (click)="$event.stopPropagation()"
+            >
+                <div class="flex items-center gap-3 border-b border-border px-6 py-4">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-xl"
+                        [class.bg-primary/10]="!permission()"
+                        [class.bg-warning/10]="permission()"
+                    >
+                        <mat-icon
+                            style="font-size: 20px; width: 20px; height: 20px"
+                            [class.text-primary]="!permission()"
+                            [class.text-warning]="permission()"
+                        >
+                            {{ permission() ? 'edit' : 'add_circle' }}
+                        </mat-icon>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-text-primary">
+                            {{ permission() ? 'Edit Permission' : 'Add Permission' }}
+                        </h3>
+                        <p class="text-[11px] text-text-tertiary">
+                            Use UPPER_SNAKE_CASE format
+                        </p>
+                    </div>
+                </div>
+
+                <form [formGroup]="form" (ngSubmit)="onSubmit()" class="px-6 py-5">
+                    <app-text-input
+                        formControlName="name"
+                        label="Permission Name"
+                        placeholder="e.g. CREATE_TOUR"
+                        id="perm-name"
+                        matIcon="shield"
+                    />
+
+                    @if (form.get('name')?.value) {
+                        <div class="flex items-center gap-3 rounded-xl bg-main-bg p-3">
+                            <div
+                                class="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500/10"
+                            >
+                                <mat-icon
+                                    class="text-orange-500"
+                                    style="font-size: 16px; width: 16px; height: 16px"
+                                    >shield</mat-icon
+                                >
+                            </div>
+                            <span class="font-mono text-sm font-semibold text-text-primary">
+                                {{ form.get('name')?.value }}
+                            </span>
+                        </div>
+                    }
+                </form>
+
+                <div class="flex items-center gap-3 border-t border-border px-6 py-4">
+                    <button
+                        type="button"
+                        [disabled]="isSubmitting()"
+                        (click)="cancel.emit()"
+                        class="flex flex-1 items-center justify-center rounded-xl border border-border py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-main-bg disabled:opacity-50"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        [disabled]="isSubmitting() || form.invalid"
+                        (click)="onSubmit()"
+                        class="btn-primary flex flex-1 items-center justify-center gap-2 py-2.5 text-sm disabled:opacity-50"
+                    >
+                        @if (isSubmitting()) {
+                            <mat-icon
+                                class="animate-spin"
+                                style="font-size: 16px; width: 16px; height: 16px"
+                                >autorenew</mat-icon
+                            >
+                        } @else {
+                            <mat-icon style="font-size: 16px; width: 16px; height: 16px">
+                                {{ permission() ? 'save' : 'add' }}
+                            </mat-icon>
+                        }
+                        {{ permission() ? 'Update' : 'Create' }}
+                    </button>
+                </div>
+            </div>
+        </div>
