@@ -25,7 +25,7 @@ import { DashboardHeader } from '../../shared/components/dashboard-header/dashbo
             >
                 <app-dashboard-header (sidebarToggle)="toggleMobileSidebar()" />
 
-                <main class="flex-1 overflow-y-hidden p-6 md:py-2 md:px-4 ">
+                <main class="flex-1 p-6 md:py-2 md:px-4 mt-16 ">
                     <app-breadcrumb />
                     <router-outlet />
                 </main>

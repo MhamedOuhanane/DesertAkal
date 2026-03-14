@@ -1,4 +1,5 @@
 import { ReactionType } from '../enums/reaction.enum';
+import { PageAble } from './response.models';
 
 export type Action = 'ADDED' | 'CHANGED' | 'REMOVED';
 
@@ -11,6 +12,10 @@ export interface Reaction {
     readonly userUuid: string;
     readonly userName: string;
     readonly userPhoto: string;
+}
+
+export interface ReactionFilters extends PageAble {
+    type?: ReactionType;
 }
 
 export interface ReactionSummary {

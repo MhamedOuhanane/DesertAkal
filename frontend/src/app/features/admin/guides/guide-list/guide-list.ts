@@ -26,7 +26,7 @@ export class GuideList {
 
     query = signal<GuideFilters>({
         page: 0,
-        size: 10,
+        size: 9,
         sortBy: 'lastLoginAt',
         order: 'desc',
         search: '',

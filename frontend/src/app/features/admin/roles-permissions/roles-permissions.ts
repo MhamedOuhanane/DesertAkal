@@ -33,13 +33,12 @@ export class RolesPermissions {
 
     activeTab = signal<'roles' | 'permissions'>('roles');
 
-    // ══════ ROLES ══════
     rolePagination = signal<Pagination<Role> | null>(null);
     roles = computed<Role[]>(() => this.rolePagination()?.content || []);
     rolesLoading = signal(true);
     roleQuery = signal<RoleFilters>({
         page: 0,
-        size: 6,
+        size: 5,
         sortBy: 'name',
         order: 'asc',
         search: '',
@@ -53,7 +52,6 @@ export class RolesPermissions {
     roleToDelete = signal<Role | null>(null);
     isRoleDeleting = signal(false);
 
-    // ══════ PERMISSIONS ══════
     permPagination = signal<Pagination<Permission> | null>(null);
     permissions = computed<Permission[]>(() => this.permPagination()?.content || []);
     permsLoading = signal(true);
@@ -97,8 +95,6 @@ export class RolesPermissions {
             this.loadPermissions();
         });
     }
-
-    // ══════════ ROLES LOGIC ══════════
 
     async loadRoles(): Promise<void> {
         this.rolesLoading.set(true);
@@ -201,8 +197,6 @@ export class RolesPermissions {
             this.isRoleDeleting.set(false);
         }
     }
-
-    // ══════════ PERMISSIONS LOGIC ══════════
 
     async loadPermissions(): Promise<void> {
         this.permsLoading.set(true);
