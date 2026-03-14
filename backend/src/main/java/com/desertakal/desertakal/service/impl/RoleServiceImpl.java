@@ -126,7 +126,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public RoleFindDTO find(@NonNull UUID roleUuid) {
         log.info("Fetching details for Role UUID: '{}'", roleUuid.toString());
 
