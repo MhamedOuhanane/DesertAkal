@@ -1,6 +1,13 @@
+import { Permission } from "./permission.model";
+import { PageAble } from "./response.models";
+
 export interface Role {
     readonly uuid: string;
     readonly name: string;
+}
+
+export interface RoleFilters extends PageAble {
+    search?: string;
 }
 
 export interface RoleCreate {
@@ -9,7 +16,7 @@ export interface RoleCreate {
 }
 
 export interface RoleFind extends Role {
-    readonly permissionUuids: string[];
+    readonly permissions: Permission[];
 }
 
 export interface RoleUpdate {
