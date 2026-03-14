@@ -17,6 +17,10 @@ export interface ArticleFilters extends PageAble {
     search?: string;
 }
 
+export interface ArticleFilters extends PageAble {
+    search?: string;
+}
+
 export interface ArticleCreate {
     content: string;
 }

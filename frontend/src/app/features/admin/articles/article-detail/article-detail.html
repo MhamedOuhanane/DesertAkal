@@ -1,0 +1,342 @@
+@if (isLoading()) {
+    <div class="space-y-6">
+        <div class="card animate-pulse overflow-hidden">
+            <div class="h-64 bg-border/20"></div>
+            <div class="space-y-3 p-6">
+                <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded-full bg-border/30"></div>
+                    <div class="h-4 w-32 rounded bg-border/40"></div>
+                </div>
+                <div class="h-4 w-full rounded bg-border/30"></div>
+                <div class="h-4 w-3/4 rounded bg-border/30"></div>
+            </div>
+        </div>
+    </div>
+} @else if (article()) {
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-3">
+            <a
+                routerLink="/dashboard/articles"
+                class="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition-all hover:border-primary/40 hover:text-primary"
+            >
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px">arrow_back</mat-icon>
+            </a>
+            <div>
+                <h1 class="text-2xl font-bold text-text-primary">Article Details</h1>
+                <p class="text-xs text-text-tertiary">
+                    Published {{ article()!.createdAt | date: 'MMM d, y' }}
+                    by {{ article()!.userName }}
+                </p>
+            </div>
+        </div>
+        <button
+            (click)="openDeleteArticleDialog()"
+            class="inline-flex items-center gap-2 self-start rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-600"
+        >
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px">delete</mat-icon>
+            Delete Article
+        </button>
+    </div>
+
+    <div class="custom-scrollbar grid h-[calc(100vh-190px)] grid-cols-1 gap-6 overflow-y-auto pr-2 lg:grid-cols-3">
+
+        <div class="space-y-6 lg:col-span-2">
+
+            <div class="card overflow-hidden">
+                @if (article()!.coverImage) {
+                    <img
+                        [src]="article()!.coverImage"
+                        alt="Cover"
+                        class="h-56 w-full object-cover sm:h-72"
+                        (error)="$any($event.target).style.display = 'none'"
+                    />
+                }
+
+                <div class="p-6">
+                    <div class="mb-4 flex items-center gap-3">
+                        @if (article()!.userPhoto) {
+                            <img
+                                [src]="article()!.userPhoto"
+                                [alt]="article()!.userName"
+                                class="h-10 w-10 rounded-full object-cover ring-2 ring-border"
+                            />
+                        } @else {
+                            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary ring-2 ring-primary/20">
+                                {{ getInitials(article()!.userName) }}
+                            </div>
+                        }
+                        <div>
+                            <p class="text-sm font-bold text-text-primary">
+                                {{ article()!.userName }}
+                            </p>
+                            <p class="text-xs text-text-tertiary">
+                                {{ article()!.createdAt | date: 'MMMM d, y · HH:mm' }}
+                                @if (article()!.updatedAt !== article()!.createdAt) {
+                                    · Edited {{ article()!.updatedAt | date: 'MMM d' }}
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    <p class="whitespace-pre-line text-sm leading-relaxed text-text-secondary">
+                        {{ article()!.content }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="card overflow-hidden">
+                <div class="flex border-b border-border">
+                    <button
+                        (click)="switchTab('comments')"
+                        class="flex flex-1 items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors"
+                        [class.text-primary]="activeTab() === 'comments'"
+                        [class.border-b-2]="activeTab() === 'comments'"
+                        [class.border-primary]="activeTab() === 'comments'"
+                        [class.text-text-tertiary]="activeTab() !== 'comments'"
+                    >
+                        <mat-icon style="font-size: 16px; width: 16px; height: 16px">chat_bubble_outline</mat-icon>
+                        Comments ({{ commentsTotalElements() }})
+                    </button>
+                    <button
+                        (click)="switchTab('reactions')"
+                        class="flex flex-1 items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors"
+                        [class.text-primary]="activeTab() === 'reactions'"
+                        [class.border-b-2]="activeTab() === 'reactions'"
+                        [class.border-primary]="activeTab() === 'reactions'"
+                        [class.text-text-tertiary]="activeTab() !== 'reactions'"
+                    >
+                        <mat-icon style="font-size: 16px; width: 16px; height: 16px">favorite_border</mat-icon>
+                        Reactions ({{ reactionsTotalElements() }})
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    @if (activeTab() === 'comments') {
+                        @if (commentsLoading()) {
+                            <div class="animate-pulse space-y-3">
+                                @for (_ of [1, 2, 3]; track $index) {
+                                    <div class="h-20 rounded-lg bg-border/20"></div>
+                                }
+                            </div>
+                        } @else if (comments().length > 0) {
+                            <div class="space-y-3">
+                                @for (comment of comments(); track comment.uuid) {
+                                    <div class="group rounded-xl border border-border p-4 transition-all hover:border-border">
+                                        <div class="mb-2 flex items-start justify-between">
+                                            <div class="flex items-center gap-2">
+                                                @if (comment.userPhoto) {
+                                                    <img
+                                                        [src]="comment.userPhoto"
+                                                        [alt]="comment.userName"
+                                                        class="h-7 w-7 rounded-full object-cover"
+                                                    />
+                                                } @else {
+                                                    <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-[9px] font-bold text-primary">
+                                                        {{ getInitials(comment.userName) }}
+                                                    </div>
+                                                }
+                                                <div>
+                                                    <span class="text-xs font-semibold text-text-primary">
+                                                        {{ comment.userName }}
+                                                    </span>
+                                                    <span class="ml-2 text-[10px] text-text-tertiary">
+                                                        {{ comment.createdAt | date: 'MMM d, HH:mm' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                (click)="openDeleteCommentDialog(comment)"
+                                                class="flex h-7 w-7 items-center justify-center rounded-lg text-text-tertiary opacity-0 transition-all hover:bg-red-500/10 hover:text-red-500 group-hover:opacity-100"
+                                                title="Delete comment"
+                                            >
+                                                <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                                                    >delete_outline</mat-icon
+                                                >
+                                            </button>
+                                        </div>
+                                        <p class="text-sm text-text-secondary">
+                                            {{ comment.content }}
+                                        </p>
+                                    </div>
+                                }
+                            </div>
+                        } @else {
+                            <p class="py-8 text-center text-sm text-text-disabled">
+                                No comments on this article.
+                            </p>
+                        }
+                    }
+
+                    @if (activeTab() === 'reactions') {
+                        @if (reactionsLoading()) {
+                            <div class="animate-pulse space-y-3">
+                                @for (_ of [1, 2, 3]; track $index) {
+                                    <div class="h-12 rounded-lg bg-border/20"></div>
+                                }
+                            </div>
+                        } @else if (reactions().length > 0) {
+                            <div class="space-y-2">
+                                @for (reaction of reactions(); track reaction.uuid) {
+                                    <div class="flex items-center gap-3 rounded-xl border border-border p-3">
+                                        <span class="text-lg">
+                                            {{ reaction.emoji }}
+                                        </span>
+                                        @if (reaction.userPhoto) {
+                                            <img
+                                                [src]="reaction.userPhoto"
+                                                [alt]="reaction.userName"
+                                                class="h-7 w-7 rounded-full object-cover"
+                                            />
+                                        } @else {
+                                            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-[9px] font-bold text-primary">
+                                                {{ getInitials(reaction.userName) }}
+                                            </div>
+                                        }
+                                        <div class="flex-1">
+                                            <p class="text-xs font-semibold text-text-primary">
+                                                {{ reaction.userName }}
+                                            </p>
+                                            <p class="text-[10px] text-text-tertiary">
+                                                {{ reaction.reaction }} · {{ reaction.createdAt | date: 'MMM d' }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        } @else {
+                            <p class="py-8 text-center text-sm text-text-disabled">
+                                No reactions on this article.
+                            </p>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="card p-6">
+                <div class="mb-4 flex items-center gap-2">
+                    <mat-icon class="text-text-tertiary" style="font-size: 18px; width: 18px; height: 18px"
+                        >analytics</mat-icon
+                    >
+                    <h2 class="text-sm font-bold text-text-primary">Stats</h2>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="rounded-xl bg-blue-500/5 p-4 text-center">
+                        <mat-icon class="text-blue-500" style="font-size: 24px; width: 24px; height: 24px"
+                            >chat_bubble_outline</mat-icon
+                        >
+                        <p class="mt-1 text-xl font-bold text-text-primary">
+                            {{ article()!.commentCount }}
+                        </p>
+                        <p class="text-[10px] text-text-tertiary">Comments</p>
+                    </div>
+                    <div class="rounded-xl bg-red-500/5 p-4 text-center">
+                        <mat-icon class="text-red-500" style="font-size: 24px; width: 24px; height: 24px"
+                            >favorite</mat-icon
+                        >
+                        <p class="mt-1 text-xl font-bold text-text-primary">
+                            {{ article()!.reactionCount }}
+                        </p>
+                        <p class="text-[10px] text-text-tertiary">Reactions</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <div class="mb-4 flex items-center gap-2">
+                    <mat-icon class="text-text-tertiary" style="font-size: 18px; width: 18px; height: 18px"
+                        >person</mat-icon
+                    >
+                    <h2 class="text-sm font-bold text-text-primary">Author</h2>
+                </div>
+                <div class="flex items-center gap-3">
+                    @if (article()!.userPhoto) {
+                        <img
+                            [src]="article()!.userPhoto"
+                            [alt]="article()!.userName"
+                            class="h-12 w-12 rounded-full object-cover ring-2 ring-border"
+                        />
+                    } @else {
+                        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary ring-2 ring-primary/20">
+                            {{ getInitials(article()!.userName) }}
+                        </div>
+                    }
+                    <div>
+                        <p class="text-sm font-bold text-text-primary">
+                            {{ article()!.userName }}
+                        </p>
+                        <a
+                            [routerLink]="['/dashboard/users', article()!.userUuid]"
+                            class="flex items-center gap-1 text-xs text-primary hover:underline"
+                        >
+                            <mat-icon style="font-size: 12px; width: 12px; height: 12px"
+                                >open_in_new</mat-icon
+                            >
+                            View profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <div class="mb-4 flex items-center gap-2">
+                    <mat-icon class="text-text-tertiary" style="font-size: 18px; width: 18px; height: 18px"
+                        >info</mat-icon
+                    >
+                    <h2 class="text-sm font-bold text-text-primary">Details</h2>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Created</span>
+                        <span class="text-xs text-text-tertiary">
+                            {{ article()!.createdAt | date: 'MMM d, y HH:mm' }}
+                        </span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Updated</span>
+                        <span class="text-xs text-text-tertiary">
+                            {{ article()!.updatedAt | date: 'MMM d, y HH:mm' }}
+                        </span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Content</span>
+                        <span class="text-xs text-text-tertiary">
+                            {{ article()!.content.length || 0 }} chars
+                        </span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Cover</span>
+                        <span class="text-xs text-text-tertiary">
+                            {{ article()!.coverImage ? 'Yes' : 'None' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (showDeleteArticleDialog()) {
+        <app-delete-dialog
+            itemName="Article"
+            [itemTitle]="article()!.content.substring(0, 40) + '...'"
+            [isDeleting]="isDeletingArticle()"
+            (confirm)="confirmDeleteArticle()"
+            (cancel)="showDeleteArticleDialog.set(false)"
+        />
+    }
+
+    @if (showDeleteCommentDialog() && commentToDelete()) {
+        <app-delete-dialog
+            itemName="Comment"
+            [itemTitle]="commentToDelete()!.content.substring(0, 40) + '...'"
+            [isDeleting]="isDeletingComment()"
+            (confirm)="confirmDeleteComment()"
+            (cancel)="showDeleteCommentDialog.set(false); commentToDelete.set(null)"
+        />
+    }
+}

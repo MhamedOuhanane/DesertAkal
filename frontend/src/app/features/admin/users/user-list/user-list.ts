@@ -37,7 +37,7 @@ export class UserList {
 
     query = signal<UserFilters>({
         page: 0,
-        size: 8,
+        size: 9,
         sortBy: 'lastLoginAt',
         order: 'desc',
         search: '',

@@ -28,7 +28,7 @@ export class LanguageList {
 
     query = signal<LanguageFilters>({
         page: 0,
-        size: 8,
+        size: 9,
         sortBy: 'name',
         order: 'asc',
         search: '',
