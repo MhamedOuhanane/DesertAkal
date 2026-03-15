@@ -16,7 +16,7 @@ export interface Review {
 }
 
 export interface ReviewFilters extends PageAble {
-    type?: string;
+    type?: ReviewableType;
     minRating?: number;
 }
 

@@ -14,32 +14,25 @@ export class ArticleService {
     private baseUrl = `${environment.apiUrl}/articles`;
 
     create(data: ArticleCreate, coverImage: File): Observable<ApiResponse<Article>> {
-        const formData = new FormData;
-        formData.append("article", new Blob([JSON.stringify(data)], { type: 'application.json'}));
-        formData.append("coverImage",coverImage);
+        const formData = new FormData();
+        formData.append('article', new Blob([JSON.stringify(data)], { type: 'application.json' }));
+        formData.append('coverImage', coverImage);
         return this.http.post<ApiResponse<Article>>(this.baseUrl, formData);
     }
 
-    update(
-        uuid: string, 
-        data: ArticleUpdate,
-        coverImage?: File
-    ): Observable<ApiResponse<Article>> {
+    update(uuid: string, data: ArticleUpdate, coverImage?: File): Observable<ApiResponse<Article>> {
         const formData = new FormData();
-        formData.append("article", new Blob([JSON.stringify(data)], { type: 'application/json' }));
-        
+        formData.append('article', new Blob([JSON.stringify(data)], { type: 'application/json' }));
+
         if (coverImage) {
-            formData.append("coverImage", coverImage);
+            formData.append('coverImage', coverImage);
         }
         return this.http.put<ApiResponse<Article>>(`${this.baseUrl}/${uuid}`, formData);
     }
 
-    updateImage(
-        uuid: string,
-        coverImage: File
-    ): Observable<ApiResponse<Article>> {
+    updateImage(uuid: string, coverImage: File): Observable<ApiResponse<Article>> {
         const formData = new FormData();
-        formData.append("coverImage", coverImage);
+        formData.append('coverImage', coverImage);
         return this.http.put<ApiResponse<Article>>(`${this.baseUrl}/${uuid}/image`, formData);
     }
 

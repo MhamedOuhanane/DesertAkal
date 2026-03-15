@@ -20,5 +20,7 @@ public interface ArticleService {
 
     PaginationDTO getAll(String owner, @NonNull Pageable pageable);
 
+    ArticleDTO get(@NonNull UUID articleUuid);
+
     PaginationDTO getByUser(UUID userUuid, @NonNull Pageable pageable);
 }

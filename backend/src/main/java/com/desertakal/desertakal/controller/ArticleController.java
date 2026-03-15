@@ -4,6 +4,7 @@ import com.desertakal.desertakal.Security.user.CustomUserDetails;
 import com.desertakal.desertakal.model.dto.article.ArticleCreateDTO;
 import com.desertakal.desertakal.model.dto.article.ArticleDTO;
 import com.desertakal.desertakal.model.dto.article.ArticleUpdateDTO;
+import com.desertakal.desertakal.model.dto.comment.CommentDTO;
 import com.desertakal.desertakal.model.dto.reaction.ReactionDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
@@ -93,6 +94,19 @@ public class ArticleController {
                 HttpStatus.OK,
                 request, result
         ));
+    }
+
+    @GetMapping("/{uuid}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<@NonNull StandardResponseDTO<ArticleDTO>> get(
+            @PathVariable UUID uuid,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to fetch article: {} | Path: {}", uuid, request.getServletPath());
+
+        ArticleDTO result = service.get(uuid);
+
+        return ResponseEntity.ok(buildResponse("Article retrieved successfully", HttpStatus.OK, request, result));
     }
 
     @PutMapping(value = "/{uuid}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

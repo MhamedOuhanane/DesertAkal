@@ -54,7 +54,7 @@ export class ArticleDetail implements OnInit {
     private async loadArticleFromList(uuid: string): Promise<void> {
         try {
             const res = await firstValueFrom(this.articleService.find(uuid));
-            
+
             await this.loadComments(uuid);
             await this.loadReactions(uuid);
 
@@ -82,12 +82,11 @@ export class ArticleDetail implements OnInit {
                 this.articleService.getComments(articleUuid, {
                     page: 0,
                     size: 500,
-                })
+                }),
             );
             this.comments.set((res.data?.content as Comment[]) || []);
             this.commentsTotalElements.set(res.data?.totalElements || 0);
         } catch {
-
         } finally {
             this.commentsLoading.set(false);
         }
@@ -103,12 +102,11 @@ export class ArticleDetail implements OnInit {
                 this.articleService.getReactions(articleUuid, {
                     page: 0,
                     size: 500,
-                })
+                }),
             );
             this.reactions.set((res.data?.content as Reaction[]) || []);
             this.reactionsTotalElements.set(res.data?.totalElements || 0);
         } catch {
-
         } finally {
             this.reactionsLoading.set(false);
         }
@@ -126,9 +124,7 @@ export class ArticleDetail implements OnInit {
         if (!this.article()) return;
         this.isDeletingArticle.set(true);
         try {
-            await firstValueFrom(
-                this.articleService.delete(this.article()!.uuid)
-            );
+            await firstValueFrom(this.articleService.delete(this.article()!.uuid));
             toast.success('Article deleted successfully');
             this.router.navigate(['/dashboard/articles']);
         } catch (err: any) {
@@ -163,11 +159,13 @@ export class ArticleDetail implements OnInit {
     }
 
     getInitials(name: string): string {
-        return name
-            ?.split(' ')
-            .map((w) => w.charAt(0))
-            .join('')
-            .toUpperCase()
-            .slice(0, 2) || '?';
+        return (
+            name
+                ?.split(' ')
+                .map((w) => w.charAt(0))
+                .join('')
+                .toUpperCase()
+                .slice(0, 2) || '?'
+        );
     }
 }

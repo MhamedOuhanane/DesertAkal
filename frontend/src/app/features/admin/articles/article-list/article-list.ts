@@ -56,9 +56,7 @@ export class ArticleList {
     async loadArticles(): Promise<void> {
         this.isLoading.set(true);
         try {
-            const res = await firstValueFrom(
-                this.articleService.findAll(this.query())
-            );
+            const res = await firstValueFrom(this.articleService.findAll(this.query()));
             if (res.data) this.pagination.set(res.data);
         } catch (err: any) {
             toast.error(err?.error?.message || 'Failed to load articles');
@@ -117,12 +115,14 @@ export class ArticleList {
     }
 
     getInitials(name: string): string {
-        return name
-            ?.split(' ')
-            .map((w) => w.charAt(0))
-            .join('')
-            .toUpperCase()
-            .slice(0, 2) || '?';
+        return (
+            name
+                ?.split(' ')
+                .map((w) => w.charAt(0))
+                .join('')
+                .toUpperCase()
+                .slice(0, 2) || '?'
+        );
     }
 
     truncate(text: string, max: number): string {
