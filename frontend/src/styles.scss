@@ -181,6 +181,18 @@ body {
 }
 
 /* ====================================
+   STAR RATING
+   ==================================== */
+
+.star-filled {
+    color: var(--warning-color) !important;
+}
+
+.star-empty {
+    color: var(--text-disabled-color) !important;
+}
+
+/* ====================================
    BUTTONS
    ==================================== */
 
