@@ -173,16 +173,27 @@ export const ADMIN_ROUTES: Routes = [
                         path: '',
                         loadComponent: () =>
                             import('./articles/article-list/article-list').then(
-                                (m) => m.ArticleList
+                                (m) => m.ArticleList,
                             ),
                     },
                     {
                         path: ':uuid',
                         loadComponent: () =>
                             import('./articles/article-detail/article-detail').then(
-                                (m) => m.ArticleDetail
+                                (m) => m.ArticleDetail,
                             ),
                         data: { breadcrumb: 'Details' },
+                    },
+                ],
+            },
+            {
+                path: 'reviews',
+                data: { breadcrumb: 'Reviews' },
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () =>
+                            import('./reviews/review-list/review-list').then((m) => m.ReviewList),
                     },
                 ],
             },

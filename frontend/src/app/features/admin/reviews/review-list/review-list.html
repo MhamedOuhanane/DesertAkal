@@ -1,0 +1,378 @@
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-text-primary">Review Moderation</h1>
+    <p class="mt-1 text-sm text-text-tertiary">
+        {{ pagination()?.totalElements || 0 }} review{{
+            (pagination()?.totalElements || 0) !== 1 ? 's' : ''
+        }}
+        total
+    </p>
+</div>
+
+<div class="card mb-6 p-4">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <select
+            class="input w-full sm:w-44"
+            [value]="query().type"
+            (change)="onTypeFilter($any($event.target).value)"
+        >
+            @for (t of types; track t.value) {
+                <option [value]="t.value">{{ t.label }}</option>
+            }
+        </select>
+
+        <select
+            class="input w-full sm:w-36"
+            [value]="query().minRating"
+            (change)="onMinRatingFilter($any($event.target).value)"
+        >
+            @for (r of ratingOptions; track r.value) {
+                <option [value]="r.value">{{ r.label }}</option>
+            }
+        </select>
+
+        <div class="flex-1"></div>
+
+        <div class="flex items-center gap-2">
+            <select
+                class="input w-full sm:w-40"
+                [value]="query().sortBy"
+                (change)="onSort($any($event.target).value)"
+            >
+                <option value="createdAt">Date</option>
+                <option value="rating">Rating</option>
+            </select>
+            <button
+                (click)="onSort(query().sortBy!)"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition-colors hover:bg-main-bg"
+            >
+                <mat-icon
+                    class="transition-transform"
+                    [class.rotate-180]="query().order === 'desc'"
+                    style="font-size: 18px; width: 18px; height: 18px"
+                    >arrow_upward</mat-icon
+                >
+            </button>
+        </div>
+    </div>
+</div>
+
+@if (isLoading()) {
+    <div class="space-y-3">
+        @for (_ of [1, 2, 3, 4, 5]; track $index) {
+            <div class="card animate-pulse p-5">
+                <div class="flex items-center gap-4">
+                    <div class="h-10 w-10 rounded-full bg-border/30"></div>
+                    <div class="flex-1 space-y-2">
+                        <div class="h-4 w-40 rounded bg-border/40"></div>
+                        <div class="h-3 w-full rounded bg-border/20"></div>
+                    </div>
+                    <div class="h-8 w-20 rounded bg-border/30"></div>
+                </div>
+            </div>
+        }
+    </div>
+} @else if (reviews().length > 0) {
+    <div class="space-y-2">
+        @for (review of reviews(); track review.uuid) {
+            <div
+                class="card overflow-hidden transition-all"
+                [class.border-primary/30]="expandedReview() === review.uuid"
+            >
+                <div
+                    class="flex cursor-pointer items-start gap-4 p-5 transition-colors hover:bg-main-bg/30"
+                    (click)="toggleExpand(review.uuid)"
+                >
+                    @if (review.touristPhoto) {
+                        <img
+                            [src]="review.touristPhoto"
+                            [alt]="review.touristName"
+                            class="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-border"
+                            (error)="$any($event.target).style.display = 'none'"
+                        />
+                    } @else {
+                        <div
+                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary ring-2 ring-primary/20"
+                        >
+                            {{ getInitials(review.touristName) }}
+                        </div>
+                    }
+
+                    <div class="min-w-0 flex-1">
+                        <div class="mb-1 flex flex-wrap items-center gap-2">
+                            <span class="text-sm font-bold text-text-primary">
+                                {{ review.touristName }}
+                            </span>
+
+                            <span
+                                class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                                [class]="getTypeBadge(review.reviewableType).bg"
+                            >
+                                <mat-icon style="font-size: 11px; width: 11px; height: 11px">{{
+                                    getTypeBadge(review.reviewableType).icon
+                                }}</mat-icon>
+                                {{ review.reviewableType }}
+                            </span>
+
+                            <span class="text-xs text-text-tertiary">
+                                on
+                                <span class="font-medium text-text-secondary">{{
+                                    review.reviewableName
+                                }}</span>
+                            </span>
+                        </div>
+
+                        <div class="mb-1 flex items-center gap-1">
+                            @for (state of getStarArray(review.rating); track $index) {
+                                <mat-icon
+                                    style="font-size: 14px; width: 14px; height: 14px"
+                                    [class.star-filled]="state !== 'empty'"
+                                    [class.star-empty]="state === 'empty'"
+                                >
+                                    @switch (state) {
+                                        @case ('full') {
+                                            star
+                                        }
+                                        @case ('half') {
+                                            star_half
+                                        }
+                                        @case ('empty') {
+                                            star_outline
+                                        }
+                                    }
+                                </mat-icon>
+                            }
+                            <span
+                                class="ml-1 text-xs font-bold"
+                                [class]="getRatingColor(review.rating)"
+                            >
+                                {{ review.rating | number: '1.1-1' }}
+                            </span>
+                        </div>
+
+                        <p
+                            class="text-sm text-text-secondary"
+                            [class.line-clamp-1]="expandedReview() !== review.uuid"
+                        >
+                            {{ review.comment }}
+                        </p>
+
+                        <p class="mt-1 text-[10px] text-text-tertiary">
+                            {{ review.createdAt | date: 'MMM d, y · HH:mm' }}
+                            @if (review.updatedAt !== review.createdAt) {
+                                · Edited
+                                {{ review.updatedAt | date: 'MMM d' }}
+                            }
+                        </p>
+                    </div>
+
+                    <div class="flex shrink-0 flex-col items-end gap-2">
+                        <div
+                            class="flex h-9 w-9 items-center justify-center rounded-xl text-sm font-bold"
+                            [class]="
+                                getRatingBg(review.rating) + ' ' + getRatingColor(review.rating)
+                            "
+                        >
+                            {{ review.rating | number: '1.1-1' }}
+                        </div>
+
+                        <div class="flex items-center gap-1">
+                            <button
+                                class="flex h-7 w-7 items-center justify-center rounded-lg text-text-tertiary transition-colors hover:bg-main-bg hover:text-text-primary"
+                                title="{{
+                                    expandedReview() === review.uuid ? 'Collapse' : 'Expand'
+                                }}"
+                            >
+                                <mat-icon
+                                    class="transition-transform duration-200"
+                                    [class.rotate-180]="expandedReview() === review.uuid"
+                                    style="font-size: 16px; width: 16px; height: 16px"
+                                    >expand_more</mat-icon
+                                >
+                            </button>
+
+                            <button
+                                (click)="openDeleteDialog(review, $event)"
+                                class="flex h-7 w-7 items-center justify-center rounded-lg text-text-tertiary transition-colors hover:bg-red-500/10 hover:text-red-500"
+                                title="Delete review"
+                            >
+                                <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                                    >delete_outline</mat-icon
+                                >
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                @if (expandedReview() === review.uuid) {
+                    <div class="border-t border-border bg-main-bg/30 px-5 py-4">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                            <div class="sm:col-span-2">
+                                <h4
+                                    class="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-text-tertiary"
+                                >
+                                    <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                                        >comment</mat-icon
+                                    >
+                                    Full Comment
+                                </h4>
+                                <p
+                                    class="whitespace-pre-line rounded-xl bg-surface p-4 text-sm leading-relaxed text-text-secondary"
+                                >
+                                    {{ review.comment }}
+                                </p>
+                            </div>
+
+                            <div class="space-y-3">
+                                <h4
+                                    class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-text-tertiary"
+                                >
+                                    <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                                        >info</mat-icon
+                                    >
+                                    Details
+                                </h4>
+
+                                <div class="space-y-2 rounded-xl bg-surface p-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[11px] text-text-tertiary">Tourist</span>
+                                        <a
+                                            [routerLink]="['/dashboard/users', review.touristUuid]"
+                                            class="flex items-center gap-1 text-[11px] font-medium text-primary hover:underline"
+                                            (click)="$event.stopPropagation()"
+                                        >
+                                            {{ review.touristName }}
+                                            <mat-icon
+                                                style="font-size: 10px; width: 10px; height: 10px"
+                                                >open_in_new</mat-icon
+                                            >
+                                        </a>
+                                    </div>
+
+                                    <div class="divider"></div>
+
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[11px] text-text-tertiary">{{
+                                            review.reviewableType
+                                        }}</span>
+                                        <span class="text-[11px] font-medium text-text-primary">
+                                            {{ review.reviewableName }}
+                                        </span>
+                                    </div>
+
+                                    <div class="divider"></div>
+
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[11px] text-text-tertiary">Rating</span>
+                                        <div class="mb-1 flex items-center gap-1">
+                                            @for (
+                                                state of getStarArray(review.rating);
+                                                track $index
+                                            ) {
+                                                <mat-icon
+                                                    style="
+                                                        font-size: 14px;
+                                                        width: 14px;
+                                                        height: 14px;
+                                                    "
+                                                    [class.star-filled]="state !== 'empty'"
+                                                    [class.star-empty]="state === 'empty'"
+                                                >
+                                                    @switch (state) {
+                                                        @case ('full') {
+                                                            star
+                                                        }
+                                                        @case ('half') {
+                                                            star_half
+                                                        }
+                                                        @case ('empty') {
+                                                            star_outline
+                                                        }
+                                                    }
+                                                </mat-icon>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div class="divider"></div>
+
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[11px] text-text-tertiary">Created</span>
+                                        <span class="text-[10px] text-text-tertiary">
+                                            {{ review.createdAt | date: 'MMM d, y HH:mm' }}
+                                        </span>
+                                    </div>
+
+                                    @if (review.updatedAt !== review.createdAt) {
+                                        <div class="divider"></div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-[11px] text-text-tertiary"
+                                                >Updated</span
+                                            >
+                                            <span class="text-[10px] text-text-tertiary">
+                                                {{ review.updatedAt | date: 'MMM d, y HH:mm' }}
+                                            </span>
+                                        </div>
+                                    }
+
+                                    <div class="divider"></div>
+
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[11px] text-text-tertiary">Length</span>
+                                        <span class="text-[10px] text-text-tertiary">
+                                            {{ review.comment.length || 0 }}
+                                            chars
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <button
+                                    (click)="openDeleteDialog(review, $event)"
+                                    class="flex w-full items-center justify-center gap-1.5 rounded-xl bg-red-500/10 py-2 text-xs font-medium text-red-600 transition-colors hover:bg-red-500/20"
+                                >
+                                    <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                                        >delete_outline</mat-icon
+                                    >
+                                    Delete this review
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    @if (pagination()) {
+        <div class="mt-3">
+            <app-pagination [pagination]="pagination()!" (pageChange)="goToPage($event)" />
+        </div>
+    }
+} @else {
+    <div class="card flex flex-col items-center justify-center p-12 text-center">
+        <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-warning/10">
+            <mat-icon class="text-warning" style="font-size: 32px; width: 32px; height: 32px"
+                >rate_review</mat-icon
+            >
+        </div>
+        <h3 class="text-base font-semibold text-text-primary">No reviews found</h3>
+        <p class="mt-1 text-sm text-text-tertiary">
+            @if (query().type || query().minRating) {
+                Try adjusting your filters.
+            } @else {
+                No reviews have been submitted yet.
+            }
+        </p>
+    </div>
+}
+
+@if (showDeleteDialog() && reviewToDelete()) {
+    <app-delete-dialog
+        itemName="Review"
+        [itemTitle]="
+            truncate(reviewToDelete()!.comment, 40) || 'Review by ' + reviewToDelete()!.touristName
+        "
+        [isDeleting]="isDeleting()"
+        (confirm)="confirmDelete()"
+        (cancel)="cancelDelete()"
+    />
+}

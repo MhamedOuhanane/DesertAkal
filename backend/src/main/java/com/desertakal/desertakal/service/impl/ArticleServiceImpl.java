@@ -129,6 +129,12 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public ArticleDTO get(@NonNull UUID articleUuid) {
+        log.info("Fetching article by uuid {}", articleUuid);
+        return mapper.toDto(findArticleWithUser(articleUuid));
+    }
+
+    @Override
     public PaginationDTO getByUser(@NonNull UUID userUuid, @NonNull Pageable pageable) {
         log.info("Fetching articles for user: {} [Page: {}, Size: {}]",
                 userUuid, pageable.getPageNumber(), pageable.getPageSize());

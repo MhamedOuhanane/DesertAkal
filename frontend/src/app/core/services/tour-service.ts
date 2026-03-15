@@ -14,7 +14,9 @@ export class TourService {
     private readonly apiUrl = `${environment.apiUrl}/tours`;
 
     findAll(filters: TourFilters): Observable<ApiResponse<Pagination<Tour>>> {
-        return this.http.get<ApiResponse<Pagination<Tour>>>(this.apiUrl, { params: buildHttpParams(filters) });
+        return this.http.get<ApiResponse<Pagination<Tour>>>(this.apiUrl, {
+            params: buildHttpParams(filters),
+        });
     }
 
     findOne(uuid: string): Observable<ApiResponse<TourFind>> {

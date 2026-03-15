@@ -170,6 +170,12 @@ export const NAV_CONFIG = {
                     path: '/dashboard/articles',
                     roles: ['ADMIN'],
                 },
+                {
+                    label: 'Reviews',
+                    path: '/dashboard/reviews',
+                    icon: 'rate_review',
+                    roles: ['ADMIN'],
+                },
             ],
         },
         {
