@@ -186,6 +186,17 @@ export const ADMIN_ROUTES: Routes = [
                     },
                 ],
             },
+            {
+                path: 'reviews',
+                data: { breadcrumb: 'Reviews' },
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () =>
+                            import('./reviews/review-list/review-list').then((m) => m.ReviewList),
+                    },
+                ],
+            },
         ],
     },
 ];
