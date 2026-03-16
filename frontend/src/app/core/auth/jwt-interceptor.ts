@@ -1,4 +1,10 @@
-import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
+import {
+    HttpErrorResponse,
+    HttpEvent,
+    HttpHandlerFn,
+    HttpInterceptorFn,
+    HttpRequest,
+} from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthStore } from './auth.store';
 import { DeviceService } from '../services/device-service';
@@ -7,9 +13,14 @@ import { toast } from 'ngx-sonner';
 import { AuthService } from './auth-service';
 
 let isRefreshing = false;
-const refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
+const refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(
+    null,
+);
 
-export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
+export const jwtInterceptor: HttpInterceptorFn = (
+    req: HttpRequest<unknown>,
+    next: HttpHandlerFn,
+): Observable<HttpEvent<unknown>> => {
     const authStore = inject(AuthStore);
     const deviceService = inject(DeviceService);
     const authService = inject(AuthService);
@@ -20,18 +31,18 @@ export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, nex
     const isRefreshPath = url.includes('/api/auth/refresh');
 
     let { headers } = req;
-    
+
     if (token) {
         headers = headers.set('Authorization', `Bearer ${token}`);
     }
-    
+
     if (isRefreshPath) {
         headers = headers.set('X-Device-ID', deviceService.getDeviceId());
     }
 
     const authReq = req.clone({
         headers,
-        withCredentials: true 
+        withCredentials: true,
     });
 
     return next(authReq).pipe(
@@ -40,15 +51,15 @@ export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, nex
                 return handle401Error(authService, authStore, authReq, next);
             }
             return throwError(() => error);
-        })
+        }),
     );
 };
 
 function handle401Error(
-    authService: AuthService, 
+    authService: AuthService,
     authStore: any,
-    request: HttpRequest<unknown>, 
-    next: HttpHandlerFn
+    request: HttpRequest<unknown>,
+    next: HttpHandlerFn,
 ): Observable<HttpEvent<unknown>> {
     if (!isRefreshing) {
         isRefreshing = true;
@@ -58,13 +69,15 @@ function handle401Error(
             switchMap((response: any) => {
                 isRefreshing = false;
                 const newToken = response.data.accessToken;
-                
-                authStore.setRefreshToken(newToken); 
+
+                authStore.setRefreshToken(newToken);
                 refreshTokenSubject.next(newToken);
-                
-                return next(request.clone({
-                    headers: request.headers.set('Authorization', `Bearer ${newToken}`)
-                }));
+
+                return next(
+                    request.clone({
+                        headers: request.headers.set('Authorization', `Bearer ${newToken}`),
+                    }),
+                );
             }),
             catchError((err) => {
                 isRefreshing = false;
@@ -73,15 +86,19 @@ function handle401Error(
                     description: 'Please log in again to continue.',
                 });
                 return throwError(() => err);
-            })
+            }),
         );
     } else {
         return refreshTokenSubject.pipe(
-            filter(token => token !== null),
+            filter((token) => token !== null),
             take(1),
-            switchMap((token) => next(request.clone({
-                headers: request.headers.set('Authorization', `Bearer ${token}`)
-            })))
+            switchMap((token) =>
+                next(
+                    request.clone({
+                        headers: request.headers.set('Authorization', `Bearer ${token}`),
+                    }),
+                ),
+            ),
         );
     }
 }

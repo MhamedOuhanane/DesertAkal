@@ -32,9 +32,13 @@ export class PaymentService {
     }
 
     capture(orderId: string): Observable<ApiResponse<PaymentFind>> {
-        return this.http.post<ApiResponse<PaymentFind>>(`${this.baseUrl}/capture`, {}, {
-            params: new HttpParams().set('orderId', orderId)
-        });
+        return this.http.post<ApiResponse<PaymentFind>>(
+            `${this.baseUrl}/capture`,
+            {},
+            {
+                params: new HttpParams().set('orderId', orderId),
+            },
+        );
     }
 
     cancel(uuid: string): Observable<ApiResponse<PaymentFind>> {
@@ -46,6 +50,9 @@ export class PaymentService {
     }
 
     partialRefund(uuid: string, dto: RefundRequest): Observable<ApiResponse<PaymentFind>> {
-        return this.http.post<ApiResponse<PaymentFind>>(`${this.baseUrl}/${uuid}/refund/partial`, dto);
+        return this.http.post<ApiResponse<PaymentFind>>(
+            `${this.baseUrl}/${uuid}/refund/partial`,
+            dto,
+        );
     }
 }

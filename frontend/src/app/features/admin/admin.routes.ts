@@ -219,18 +219,18 @@ export const ADMIN_ROUTES: Routes = [
                 ],
             },
             {
-    path: 'payments',
-    data: { breadcrumb: 'Payments' },
-    children: [
-        {
-            path: '',
-            loadComponent: () =>
-                import('./payments/payment-list/payment-list').then(
-                    (m) => m.PaymentList
-                ),
-        },
-    ],
-},
+                path: 'payments',
+                data: { breadcrumb: 'Payments' },
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () =>
+                            import('./payments/payment-list/payment-list').then(
+                                (m) => m.PaymentList,
+                            ),
+                    },
+                ],
+            },
         ],
     },
 ];

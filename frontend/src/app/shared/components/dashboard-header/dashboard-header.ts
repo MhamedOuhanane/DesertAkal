@@ -25,11 +25,10 @@ export class DashboardHeader {
     readonly navService = inject(NavigationService);
     private breakpointObserver = inject(BreakpointObserver);
 
-    
     readonly sidebarToggle = output<void>();
-    
+
     readonly showUserMenu = signal(false);
-    
+
     readonly userMenuLinks = signal<MenuItem[]>([
         {
             label: 'My Profile',
@@ -49,7 +48,7 @@ export class DashboardHeader {
         this.breakpointObserver.observe('(min-width: 768px)').pipe(map((result) => result.matches)),
         { initialValue: true },
     );
-    
+
     closeAll(): void {
         this.showUserMenu.set(false);
     }

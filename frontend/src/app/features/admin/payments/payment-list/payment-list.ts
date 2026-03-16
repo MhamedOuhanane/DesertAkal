@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-payment-list',
-  imports: [],
-  templateUrl: './payment-list.html',
-  styles: ``,
+    selector: 'app-payment-list',
+    imports: [],
+    templateUrl: './payment-list.html',
+    styles: ``,
 })
-export class PaymentList {
-
-}
+export class PaymentList {}

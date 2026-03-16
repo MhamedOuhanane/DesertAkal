@@ -1,0 +1,145 @@
+<div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+    (click)="cancel.emit()"
+>
+    <div
+        class="w-full max-w-md rounded-2xl border border-border bg-surface shadow-2xl"
+        (click)="$event.stopPropagation()"
+    >
+        <div class="flex items-center gap-3 border-b border-border px-6 py-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10">
+                <mat-icon class="text-blue-600" style="font-size: 20px; width: 20px; height: 20px"
+                    >undo</mat-icon
+                >
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-text-primary">Refund Payment</h3>
+                <p class="text-[11px] text-text-tertiary">
+                    Original amount:
+                    {{ payment()!.amount | currency: 'MAD ' : 'symbol' : '1.2-2' }}
+                </p>
+            </div>
+        </div>
+
+        <div class="px-6 py-5">
+            <div class="mb-5 flex gap-2">
+                <button
+                    type="button"
+                    (click)="refundType.set('full')"
+                    class="flex flex-1 items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium transition-all"
+                    [class.border-primary]="refundType() === 'full'"
+                    [class.bg-primary/10]="refundType() === 'full'"
+                    [class.text-primary]="refundType() === 'full'"
+                    [class.border-border]="refundType() !== 'full'"
+                    [class.text-text-secondary]="refundType() !== 'full'"
+                >
+                    <mat-icon style="font-size: 16px; width: 16px; height: 16px">replay</mat-icon>
+                    Full Refund
+                </button>
+                <button
+                    type="button"
+                    (click)="refundType.set('partial')"
+                    class="flex flex-1 items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium transition-all"
+                    [class.border-primary]="refundType() === 'partial'"
+                    [class.bg-primary/10]="refundType() === 'partial'"
+                    [class.text-primary]="refundType() === 'partial'"
+                    [class.border-border]="refundType() !== 'partial'"
+                    [class.text-text-secondary]="refundType() !== 'partial'"
+                >
+                    <mat-icon style="font-size: 16px; width: 16px; height: 16px">tune</mat-icon>
+                    Partial Refund
+                </button>
+            </div>
+
+            @if (refundType() === 'partial') {
+                <form [formGroup]="form">
+                    <label class="mb-1.5 block text-sm font-medium text-text-primary"
+                        >Refund Amount (MAD)</label
+                    >
+                    <input
+                        type="number"
+                        formControlName="amount"
+                        class="input w-full"
+                        placeholder="0.00"
+                        min="0.01"
+                        [max]="payment()!.amount"
+                        step="0.01"
+                        [class.!border-error]="
+                            form.get('amount')?.touched && form.get('amount')?.invalid
+                        "
+                    />
+                    <div class="mt-1 min-h-5">
+                        @if (form.get('amount')?.touched && form.get('amount')?.invalid) {
+                            <p class="text-xs text-error">
+                                @if (form.get('amount')?.hasError('required')) {
+                                    Amount is required
+                                } @else if (form.get('amount')?.hasError('min')) {
+                                    Minimum amount is 0.01
+                                } @else if (form.get('amount')?.hasError('max')) {
+                                    Cannot exceed original amount
+                                }
+                            </p>
+                        }
+                    </div>
+                </form>
+            }
+
+            <div class="rounded-xl bg-main-bg p-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-text-tertiary">Refund amount</span>
+                    <span class="text-sm font-bold text-text-primary">
+                        @if (refundType() === 'full') {
+                            {{ payment()!.amount | currency: 'MAD ' : 'symbol' : '1.2-2' }}
+                        } @else {
+                            {{
+                                form.get('amount')?.value || 0
+                                    | currency: 'MAD ' : 'symbol' : '1.2-2'
+                            }}
+                        }
+                    </span>
+                </div>
+            </div>
+
+            <div class="mt-4 flex items-start gap-2 rounded-lg bg-warning/5 p-3">
+                <mat-icon
+                    class="mt-0.5 shrink-0 text-warning"
+                    style="font-size: 14px; width: 14px; height: 14px"
+                    >warning</mat-icon
+                >
+                <p class="text-[11px] leading-relaxed text-warning">
+                    This action will process a refund via the original payment gateway. This cannot
+                    be undone.
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 border-t border-border px-6 py-4">
+            <button
+                type="button"
+                [disabled]="isSubmitting()"
+                (click)="cancel.emit()"
+                class="flex flex-1 items-center justify-center rounded-xl border border-border py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-main-bg disabled:opacity-50"
+            >
+                Cancel
+            </button>
+            <button
+                type="button"
+                [disabled]="isSubmitting() || !isValid()"
+                (click)="onSubmit()"
+                class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+            >
+                @if (isSubmitting()) {
+                    <mat-icon
+                        class="animate-spin"
+                        style="font-size: 16px; width: 16px; height: 16px"
+                        >autorenew</mat-icon
+                    >
+                    Processing...
+                } @else {
+                    <mat-icon style="font-size: 16px; width: 16px; height: 16px">undo</mat-icon>
+                    Refund
+                }
+            </button>
+        </div>
+    </div>
+</div>
