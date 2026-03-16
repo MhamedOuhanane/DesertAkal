@@ -34,7 +34,7 @@ export class ReviewList {
 
     query = signal<ReviewFilters>({
         page: 0,
-        size: 2,
+        size: 6,
         sortBy: 'createdAt',
         order: 'desc',
         type: undefined,
