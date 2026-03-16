@@ -43,7 +43,7 @@
 }
 
 @if (isLoading()) {
-    <div class="mb-4 md:mb-1.5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="mb-4 md:mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         @for (i of [1, 2, 3, 4]; track i) {
             <div class="card animate-pulse p-3">
                 <div class="flex items-start justify-between">
@@ -70,7 +70,7 @@
         </div>
     </div>
 } @else if (data()) {
-    <div class="mb-4 md:mb-1.5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="mb-4 md:mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <app-stat-card
             label="Total Users"
             [formattedValue]="(data()!.totalUsers | number) ?? '0'"
@@ -152,7 +152,7 @@
         </app-stat-card>
     </div>
 
-    <div class="mb-4 md:mb-1.5 grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <div class="mb-4 md:mb-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div class="lg:col-span-2">
             <app-monthly-bar-chart [data]="monthlyPerformance" />
         </div>

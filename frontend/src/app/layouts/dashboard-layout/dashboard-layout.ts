@@ -27,7 +27,11 @@ import { DashboardHeader } from '../../shared/components/dashboard-header/dashbo
 
                 <main class="flex-1 p-6 md:py-2 md:px-4 mt-16 ">
                     <app-breadcrumb />
-                    <router-outlet />
+                    <div
+                        class="md:h-[calc(100vh-120px)] md:overflow-y-auto md:pr-2 md:custom-scrollbar"
+                    >
+                        <router-outlet />
+                    </div>
                 </main>
             </div>
         </div>

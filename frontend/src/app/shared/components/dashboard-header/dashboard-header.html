@@ -12,7 +12,11 @@
             >
                 <mat-icon class="text-[22px]">menu</mat-icon>
             </button>
-            <app-brand-logo class="flex lg:hidden" [link]="navService.dashboardHome()" />
+            <app-brand-logo
+                class="flex lg:hidden"
+                [link]="navService.dashboardHome()"
+                [isExpanded]="isWeb()"
+            />
         </div>
 
         <div class="flex items-center gap-1 sm:gap-2">

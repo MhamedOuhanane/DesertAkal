@@ -13,7 +13,7 @@ interface DonutSegment {
     selector: 'app-status-donut-chart',
     imports: [DecimalPipe],
     template: `
-        <div class="card p-6">
+        <div class="card p-6 h-full">
             <h3 class="mb-6 text-base font-bold text-text-primary">Reservations by Status</h3>
 
             @if (total() === 0) {

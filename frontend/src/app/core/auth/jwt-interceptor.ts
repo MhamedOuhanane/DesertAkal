@@ -1,71 +1,104 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import {
+    HttpErrorResponse,
+    HttpEvent,
+    HttpHandlerFn,
+    HttpInterceptorFn,
+    HttpRequest,
+} from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthStore } from './auth.store';
 import { DeviceService } from '../services/device-service';
-import { catchError, switchMap, throwError } from 'rxjs';
+import { catchError, switchMap, throwError, BehaviorSubject, filter, take, Observable } from 'rxjs';
 import { toast } from 'ngx-sonner';
 import { AuthService } from './auth-service';
 
-export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
+let isRefreshing = false;
+const refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(
+    null,
+);
+
+export const jwtInterceptor: HttpInterceptorFn = (
+    req: HttpRequest<unknown>,
+    next: HttpHandlerFn,
+): Observable<HttpEvent<unknown>> => {
     const authStore = inject(AuthStore);
     const deviceService = inject(DeviceService);
     const authService = inject(AuthService);
 
     const token = authStore.token();
-    const isRefreshPath = req.url.includes('/auth/refresh');
-    const isAuthPath = req.url.includes('/auth');
-    const isLogoutPath = req.url.includes('/auth/logout');
-    const isLoginPath = req.url.includes('/auth/login');
+    const { url } = req;
+    const isAuthPath = url.includes('/api/auth');
+    const isRefreshPath = url.includes('/api/auth/refresh');
 
-    let headers = req.headers;
+    let { headers } = req;
+
+    if (token) {
+        headers = headers.set('Authorization', `Bearer ${token}`);
+    }
 
     if (isRefreshPath) {
         headers = headers.set('X-Device-ID', deviceService.getDeviceId());
-    } else if (token) {
-        headers = headers.set('Authorization', `Bearer ${token}`);
     }
 
     const authReq = req.clone({
         headers,
-        withCredentials: isLoginPath || isLogoutPath || isRefreshPath,
+        withCredentials: true,
     });
 
-    if (req.url.includes('/auth/refresh') || req.url.includes('/auth/login')) {
-        return next(req);
-    }
-
     return next(authReq).pipe(
-        catchError((error: HttpErrorResponse) => {
-            const isAuthEndpoint = isAuthPath || isRefreshPath;
-            if (error.status === 401 && !isAuthEndpoint) {
-                return authService.refresh().pipe(
-                    switchMap((response) => {
-                        if (response.status === 200 && response.data) {
-                            authStore.setRefreshToken(response.data.accessToken);
-
-                            const retryReq = req.clone({
-                                headers: req.headers.set(
-                                    'Authorization',
-                                    `Bearer ${response.data.accessToken}`,
-                                ),
-                                withCredentials: true,
-                            });
-                            return next(retryReq);
-                        }
-
-                        return throwError(() => error);
-                    }),
-                    catchError((refreshError) => {
-                        authStore.logout();
-                        toast.error('Session Expired', {
-                            description: 'Please log in again to continue.',
-                        });
-                        return throwError(() => refreshError);
-                    }),
-                );
+        catchError((error: HttpErrorResponse): Observable<HttpEvent<unknown>> => {
+            if (error.status === 401 && !isAuthPath) {
+                return handle401Error(authService, authStore, authReq, next);
             }
-
             return throwError(() => error);
         }),
     );
 };
+
+function handle401Error(
+    authService: AuthService,
+    authStore: any,
+    request: HttpRequest<unknown>,
+    next: HttpHandlerFn,
+): Observable<HttpEvent<unknown>> {
+    if (!isRefreshing) {
+        isRefreshing = true;
+        refreshTokenSubject.next(null);
+
+        return authService.refresh().pipe(
+            switchMap((response: any) => {
+                isRefreshing = false;
+                const newToken = response.data.accessToken;
+
+                authStore.setRefreshToken(newToken);
+                refreshTokenSubject.next(newToken);
+
+                return next(
+                    request.clone({
+                        headers: request.headers.set('Authorization', `Bearer ${newToken}`),
+                    }),
+                );
+            }),
+            catchError((err) => {
+                isRefreshing = false;
+                authStore.logout();
+                toast.error('Session Expired', {
+                    description: 'Please log in again to continue.',
+                });
+                return throwError(() => err);
+            }),
+        );
+    } else {
+        return refreshTokenSubject.pipe(
+            filter((token) => token !== null),
+            take(1),
+            switchMap((token) =>
+                next(
+                    request.clone({
+                        headers: request.headers.set('Authorization', `Bearer ${token}`),
+                    }),
+                ),
+            ),
+        );
+    }
+}
