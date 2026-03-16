@@ -41,7 +41,7 @@ export class ReservationService {
 
     verify(uuid: string): Observable<ApiResponse<ReservationVerification>> {
         return this.http.get<ApiResponse<ReservationVerification>>(
-            `${this.baseUrl}/verify/${uuid}`
+            `${this.baseUrl}/verify/${uuid}`,
         );
     }
 
@@ -53,11 +53,10 @@ export class ReservationService {
 
     getPayments(
         uuid: string,
-        params: { page?: number; size?: number }
+        params: { page?: number; size?: number },
     ): Observable<ApiResponse<Pagination<Payment>>> {
-        return this.http.get<ApiResponse<Pagination<Payment>>>(
-            `${this.baseUrl}/${uuid}/payments`,
-            { params: buildHttpParams(params) }
-        );
+        return this.http.get<ApiResponse<Pagination<Payment>>>(`${this.baseUrl}/${uuid}/payments`, {
+            params: buildHttpParams(params),
+        });
     }
 }

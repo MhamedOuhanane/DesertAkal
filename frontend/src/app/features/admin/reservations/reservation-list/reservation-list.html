@@ -1,1 +1,414 @@
-<p>reservation-list works!</p>
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-text-primary">Reservations</h1>
+        <p class="mt-1 text-sm text-text-tertiary">
+            {{ pagination()?.totalElements || 0 }} reservation{{
+                (pagination()?.totalElements || 0) !== 1 ? 's' : ''
+            }}
+        </p>
+    </div>
+
+    <div class="relative self-start">
+        <button
+            (click)="showFilters.set(!showFilters())"
+            class="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-main-bg"
+            [class.border-primary/40]="showFilters()"
+            [class.text-primary]="showFilters()"
+        >
+            <mat-icon style="font-size: 18px; width: 18px; height: 18px">filter_list</mat-icon>
+            Filters
+            @if (hasActiveFilters) {
+                <span
+                    class="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white"
+                    >!</span
+                >
+            }
+        </button>
+
+        @if (showFilters()) {
+            <div class="fixed inset-0 z-30" (click)="showFilters.set(false)"></div>
+
+            <div
+                class="absolute right-0 top-full z-40 mt-2 w-[90vw] max-w-150 animate-slide-down rounded-2xl border border-border bg-surface p-5 shadow-lg"
+            >
+                <div class="mb-4 flex items-center justify-between">
+                    <h3 class="flex items-center gap-2 text-sm font-bold text-text-primary">
+                        <mat-icon style="font-size: 18px; width: 18px; height: 18px">tune</mat-icon>
+                        Advanced Filters
+                    </h3>
+                    <div class="flex items-center gap-2">
+                        @if (hasActiveFilters) {
+                            <button
+                                (click)="clearFilters()"
+                                class="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                            >
+                                <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                                    >clear_all</mat-icon
+                                >
+                                Clear all
+                            </button>
+                        }
+                        <button
+                            (click)="showFilters.set(false)"
+                            class="flex h-7 w-7 items-center justify-center rounded-lg text-text-tertiary transition-colors hover:bg-main-bg hover:text-text-primary"
+                        >
+                            <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                                >close</mat-icon
+                            >
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label class="mb-1.5 block text-xs font-medium text-text-tertiary"
+                            >Status</label
+                        >
+                        <select
+                            class="input w-full"
+                            [value]="statusFilter()"
+                            (change)="onStatusFilter($any($event.target).value)"
+                        >
+                            <option value="">All</option>
+                            @for (s of statuses; track s) {
+                                <option [value]="s">{{ s }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-xs font-medium text-text-tertiary"
+                            >Tour</label
+                        >
+                        <input
+                            type="text"
+                            class="input w-full"
+                            placeholder="Search tour..."
+                            [value]="tourSearch()"
+                            (input)="onTourSearch($any($event.target).value)"
+                        />
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-xs font-medium text-text-tertiary"
+                            >Tourist</label
+                        >
+                        <input
+                            type="text"
+                            class="input w-full"
+                            placeholder="Search tourist..."
+                            [value]="touristSearch()"
+                            (input)="onTouristSearch($any($event.target).value)"
+                        />
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-xs font-medium text-text-tertiary"
+                            >Start Date</label
+                        >
+                        <input
+                            type="date"
+                            class="input w-full"
+                            (change)="onDateFilter('start', $any($event.target).value)"
+                        />
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-xs font-medium text-text-tertiary"
+                            >End Date</label
+                        >
+                        <input
+                            type="date"
+                            class="input w-full"
+                            (change)="onDateFilter('end', $any($event.target).value)"
+                        />
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="mb-6 flex items-center gap-2 overflow-x-auto pb-1">
+    <button
+        (click)="onStatusFilter('')"
+        class="shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+        [class.bg-primary]="!statusFilter()"
+        [class.text-white]="!statusFilter()"
+        [class.bg-main-bg]="statusFilter()"
+        [class.text-text-secondary]="statusFilter()"
+    >
+        All
+    </button>
+    @for (s of statuses; track s) {
+        <button
+            (click)="onStatusFilter(s)"
+            class="flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+            [class]="
+                statusFilter() === s
+                    ? getStatusConfig(s).bg + ' ' + getStatusConfig(s).text
+                    : 'bg-main-bg text-text-secondary'
+            "
+        >
+            <span class="h-1.5 w-1.5 rounded-full" [class]="getStatusConfig(s).dot"></span>
+            {{ s }}
+        </button>
+    }
+</div>
+
+@if (isLoading()) {
+    <div class="card overflow-hidden">
+        <div class="animate-pulse">
+            @for (_ of [1, 2, 3, 4, 5]; track $index) {
+                <div class="flex items-center gap-4 border-b border-border p-4">
+                    <div class="h-10 w-10 rounded-lg bg-border/30"></div>
+                    <div class="flex-1 space-y-2">
+                        <div class="h-4 w-40 rounded bg-border/40"></div>
+                        <div class="h-3 w-64 rounded bg-border/20"></div>
+                    </div>
+                    <div class="h-6 w-20 rounded-full bg-border/30"></div>
+                </div>
+            }
+        </div>
+    </div>
+} @else if (reservations().length > 0) {
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-border bg-main-bg/50">
+                        <th
+                            class="cursor-pointer px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary hover:text-text-primary"
+                            (click)="onSort('reference')"
+                        >
+                            Ref
+                        </th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary"
+                        >
+                            Tour
+                        </th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary"
+                        >
+                            Tourist
+                        </th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary"
+                        >
+                            Guide
+                        </th>
+                        <th
+                            class="cursor-pointer px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary hover:text-text-primary"
+                            (click)="onSort('status')"
+                        >
+                            Status
+                        </th>
+                        <th
+                            class="cursor-pointer px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary hover:text-text-primary"
+                            (click)="onSort('startDate')"
+                        >
+                            Period
+                        </th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary"
+                        >
+                            People
+                        </th>
+                        <th
+                            class="cursor-pointer px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-tertiary hover:text-text-primary"
+                            (click)="onSort('amount')"
+                        >
+                            Amount
+                        </th>
+                        <th
+                            class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-tertiary"
+                        >
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (r of reservations(); track r.uuid) {
+                        <tr
+                            class="cursor-pointer border-b border-border transition-colors last:border-0 hover:bg-main-bg/50"
+                            (click)="viewReservation(r.uuid)"
+                        >
+                            <td class="px-4 py-3">
+                                <span
+                                    class="rounded bg-main-bg px-2 py-0.5 font-mono text-[11px] font-bold text-text-primary"
+                                >
+                                    {{ r.reference }}
+                                </span>
+                            </td>
+
+                            <td class="px-4 py-3">
+                                <span
+                                    class="max-w-30 truncate text-xs font-medium text-text-primary"
+                                >
+                                    {{ r.tourTitle }}
+                                </span>
+                            </td>
+
+                            <td class="px-4 py-3">
+                                <div class="flex items-center gap-2">
+                                    @if (r.touristPhoto) {
+                                        <img
+                                            [src]="r.touristPhoto"
+                                            class="h-6 w-6 rounded-full object-cover"
+                                        />
+                                    } @else {
+                                        <div
+                                            class="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[8px] font-bold text-primary"
+                                        >
+                                            {{ getInitials(r.touristName) }}
+                                        </div>
+                                    }
+                                    <span class="max-w-22.5 truncate text-xs text-text-primary">{{
+                                        r.touristName
+                                    }}</span>
+                                </div>
+                            </td>
+
+                            <td class="px-4 py-3">
+                                <div class="flex items-center gap-2">
+                                    @if (r.guidePhoto) {
+                                        <img
+                                            [src]="r.guidePhoto"
+                                            class="h-6 w-6 rounded-full object-cover"
+                                        />
+                                    } @else if (r.guideName) {
+                                        <div
+                                            class="flex h-6 w-6 items-center justify-center rounded-full bg-info/10 text-[8px] font-bold text-info"
+                                        >
+                                            {{ getInitials(r.guideName) }}
+                                        </div>
+                                    }
+                                    <span class="max-w-22.5 truncate text-xs text-text-primary">{{
+                                        r.guideName || '—'
+                                    }}</span>
+                                </div>
+                            </td>
+
+                            <td class="px-4 py-3">
+                                <span
+                                    class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                                    [class]="
+                                        getStatusConfig(r.status).bg +
+                                        ' ' +
+                                        getStatusConfig(r.status).text
+                                    "
+                                >
+                                    <mat-icon style="font-size: 11px; width: 11px; height: 11px">{{
+                                        getStatusConfig(r.status).icon
+                                    }}</mat-icon>
+                                    {{ r.status }}
+                                </span>
+                            </td>
+
+                            <td class="px-4 py-3">
+                                <div class="text-[11px] text-text-tertiary">
+                                    <p>
+                                        {{ r.startDate | date: 'MMM d' }}
+                                    </p>
+                                    <p class="text-[10px]">
+                                        →
+                                        {{ r.endDate | date: 'MMM d, y' }}
+                                    </p>
+                                </div>
+                            </td>
+
+                            <td class="px-4 py-3">
+                                <span class="flex items-center gap-1 text-xs text-text-primary">
+                                    <mat-icon
+                                        class="text-text-tertiary"
+                                        style="font-size: 13px; width: 13px; height: 13px"
+                                        >group</mat-icon
+                                    >
+                                    {{ r.numberPeople }}
+                                </span>
+                            </td>
+
+                            <td class="px-4 py-3">
+                                <span class="text-xs font-bold text-text-primary">
+                                    {{ r.amount | currency: 'MAD ' : 'symbol' : '1.0-0' }}
+                                </span>
+                            </td>
+
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex items-center justify-end gap-1">
+                                    <button
+                                        (click)="viewReservation(r.uuid); $event.stopPropagation()"
+                                        class="flex h-7 w-7 items-center justify-center rounded-lg text-text-tertiary transition-colors hover:bg-primary/10 hover:text-primary"
+                                        title="View"
+                                    >
+                                        <mat-icon style="font-size: 15px; width: 15px; height: 15px"
+                                            >visibility</mat-icon
+                                        >
+                                    </button>
+                                    @if (r.status === 'PENDING' || r.status === 'CONFIRMED') {
+                                        <button
+                                            (click)="openCancelDialog(r, $event)"
+                                            class="flex h-7 w-7 items-center justify-center rounded-lg text-text-tertiary transition-colors hover:bg-orange-500/10 hover:text-orange-500"
+                                            title="Cancel"
+                                        >
+                                            <mat-icon
+                                                style="font-size: 15px; width: 15px; height: 15px"
+                                                >block</mat-icon
+                                            >
+                                        </button>
+                                    }
+                                    <button
+                                        (click)="openDeleteDialog(r, $event)"
+                                        class="flex h-7 w-7 items-center justify-center rounded-lg text-text-tertiary transition-colors hover:bg-red-500/10 hover:text-red-500"
+                                        title="Delete"
+                                    >
+                                        <mat-icon style="font-size: 15px; width: 15px; height: 15px"
+                                            >delete_outline</mat-icon
+                                        >
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (pagination() && pagination()!.totalPages > 1) {
+            <app-pagination [pagination]="pagination()!" (pageChange)="goToPage($event)" />
+        }
+    </div>
+} @else {
+    <div class="card flex flex-col items-center justify-center p-12 text-center">
+        <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+            <mat-icon class="text-primary" style="font-size: 32px; width: 32px; height: 32px"
+                >calendar_month</mat-icon
+            >
+        </div>
+        <h3 class="text-base font-semibold text-text-primary">No reservations found</h3>
+        <p class="mt-1 text-sm text-text-tertiary">
+            @if (hasActiveFilters) {
+                Try adjusting your filters.
+            } @else {
+                No reservations have been made yet.
+            }
+        </p>
+    </div>
+}
+
+@if (showCancelDialog() && reservationToCancel()) {
+    <app-delete-dialog
+        itemName="Reservation"
+        [itemTitle]="'Ref: ' + reservationToCancel()!.reference"
+        [isDeleting]="isCancelling()"
+        (confirm)="confirmCancel()"
+        (cancel)="showCancelDialog.set(false); reservationToCancel.set(null)"
+    />
+}
+
+@if (showDeleteDialog() && reservationToDelete()) {
+    <app-delete-dialog
+        itemName="Reservation"
+        [itemTitle]="'Ref: ' + reservationToDelete()!.reference"
+        [isDeleting]="isDeleting()"
+        (confirm)="confirmDelete()"
+        (cancel)="showDeleteDialog.set(false); reservationToDelete.set(null)"
+    />
+}

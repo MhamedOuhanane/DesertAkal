@@ -205,14 +205,14 @@ export const ADMIN_ROUTES: Routes = [
                         path: '',
                         loadComponent: () =>
                             import('./reservations/reservation-list/reservation-list').then(
-                                (m) => m.ReservationList
+                                (m) => m.ReservationList,
                             ),
                     },
                     {
                         path: ':uuid',
                         loadComponent: () =>
                             import('./reservations/reservation-detail/reservation-detail').then(
-                                (m) => m.ReservationDetail
+                                (m) => m.ReservationDetail,
                             ),
                         data: { breadcrumb: 'Details' },
                     },

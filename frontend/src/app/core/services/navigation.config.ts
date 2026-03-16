@@ -158,14 +158,14 @@ export const NAV_CONFIG = {
                     roles: ['ADMIN'],
                 },
                 {
-                    label: 'Bookings Overview',
-                    icon: 'book_online',
-                    path: '/dashboard/bookings',
+                    label: 'Reservations',
+                    icon: 'event_available',
+                    path: '/dashboard/reservations',
                     roles: ['ADMIN'],
                     badge: 'New',
                 },
                 {
-                    label: 'Article',
+                    label: 'Article Validation',
                     icon: 'article',
                     path: '/dashboard/articles',
                     roles: ['ADMIN'],

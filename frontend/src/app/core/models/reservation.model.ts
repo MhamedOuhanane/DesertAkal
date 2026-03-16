@@ -26,7 +26,7 @@ export interface ReservationFilters extends PageAble {
     tour?: string;
     guide?: string;
     tourist?: string;
-    status?: ReservationStatus | '';
+    status?: ReservationStatus | string | '';
     startDate?: string;
     endDate?: string;
 }
