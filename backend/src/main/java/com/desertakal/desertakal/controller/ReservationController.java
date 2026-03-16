@@ -196,6 +196,7 @@ public class ReservationController {
     }
 
     @GetMapping("/verify/{uuid}")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<@NonNull StandardResponseDTO<ReservationVerificationDTO>> verify(
             @PathVariable UUID uuid,
             HttpServletRequest request

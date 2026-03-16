@@ -10,6 +10,7 @@ import { Pagination } from '../../../core/models/response.models';
 export class PaginationComponent<T> {
     pagination = input.required<Pagination<T>>();
     pageChange = output<number>();
+    
 
     get totalPages(): number {
         return this.pagination()?.totalPages ?? 0;

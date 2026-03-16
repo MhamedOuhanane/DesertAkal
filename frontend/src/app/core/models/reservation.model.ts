@@ -56,11 +56,16 @@ export interface ReservationUpdate {
 
 export interface ReservationVerification {
     readonly uuid: string;
-    readonly touristName: string;
     readonly tourTitle: string;
+    readonly touristName: string;
+    readonly touristPhoto: string;
+    readonly guideName: string;
+    readonly guidePhoto: string;
+    readonly amount: number;
     readonly startDate: string | Date;
+    readonly endDate: string | Date;
     readonly numberPeople: number;
     readonly status: ReservationStatus;
     readonly reference: string;
-    readonly isValid: boolean;
+    readonly valid: boolean;
 }

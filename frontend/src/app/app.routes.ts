@@ -50,6 +50,15 @@ export const routes: Routes = [
     },
 
     {
+        path: 'reservations/verify/:uuid',
+        loadComponent: () =>
+            import('./features/reservations/reservation-verify/reservation-verify').then(
+                (m) => m.ReservationVerify,
+            ),
+        data: { breadcrumb: 'Verify Reservation' },
+    },
+
+    {
         path: 'unauthorized',
         loadComponent: () =>
             import('./shared/pages/unauthorized/unauthorized').then((m) => m.Unauthorized),

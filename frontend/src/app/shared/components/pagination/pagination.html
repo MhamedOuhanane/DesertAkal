@@ -10,7 +10,7 @@
         <div class="flex items-center gap-1">
             <button
                 (click)="goToPage(pagination().page - 1)"
-                [disabled]="pagination().isFirst"
+                [disabled]="pagination().first"
                 class="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-xs transition-colors hover:bg-primary/5 disabled:opacity-40 disabled:cursor-not-allowed"
             >
                 <svg
@@ -44,7 +44,7 @@
 
             <button
                 (click)="goToPage(pagination().page + 1)"
-                [disabled]="pagination().isLast"
+                [disabled]="pagination().last"
                 class="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-xs transition-colors hover:bg-primary/5 disabled:opacity-40 disabled:cursor-not-allowed"
             >
                 <svg

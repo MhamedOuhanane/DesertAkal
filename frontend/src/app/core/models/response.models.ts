@@ -4,8 +4,8 @@ export interface Pagination<T> {
     size: number;
     totalElements: number;
     totalPages: number;
-    isFirst: boolean;
-    isLast: boolean;
+    first: boolean;
+    last: boolean;
 }
 
 export interface ApiResponse<T> {

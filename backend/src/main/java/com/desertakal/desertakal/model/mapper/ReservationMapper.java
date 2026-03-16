@@ -48,6 +48,9 @@ public abstract class ReservationMapper {
 
     @Mapping(source = "tour.title", target = "tourTitle")
     @Mapping(expression = "java(reservation.getTourist().getFullName())", target = "touristName")
+    @Mapping(source = "tourist.photo", target = "touristPhoto", qualifiedByName = "toPhotoUrl")
+    @Mapping(expression = "java(reservation.getGuide() != null ? reservation.getGuide().getFullName() : null)", target = "guideName")
+    @Mapping(source = "guide.photo", target = "guidePhoto", qualifiedByName = "toPhotoUrl")
     @Mapping(expression = "java(reservation.getStatus() == com.desertakal.desertakal.model.enums.ReservationStatus.CONFIRMED)", target = "isValid")
     public abstract ReservationVerificationDTO toVerificationDto(Reservation reservation);
 
