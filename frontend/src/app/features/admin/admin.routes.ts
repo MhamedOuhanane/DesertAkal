@@ -231,6 +231,7 @@ export const ADMIN_ROUTES: Routes = [
                     },
                 ],
             },
+        
             {
                 path: 'profile',
                 loadComponent: () =>

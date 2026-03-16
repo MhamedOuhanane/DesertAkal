@@ -1,1 +1,405 @@
-<p>profile works!</p>
+@if (isLoading()) {
+    <div class="card animate-pulse p-6">
+        <div class="flex items-center gap-6">
+            <div class="h-24 w-24 rounded-full bg-border/30"></div>
+            <div class="flex-1 space-y-3">
+                <div class="h-6 w-48 rounded bg-border/50"></div>
+                <div class="h-4 w-64 rounded bg-border/30"></div>
+                <div class="h-4 w-32 rounded bg-border/30"></div>
+            </div>
+        </div>
+    </div>
+} @else if (profile()) {
+    <div class="mb-6 flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-text-primary">My Profile</h1>
+            <p class="mt-1 text-xs text-text-tertiary">Manage your personal information</p>
+        </div>
+        <button
+            (click)="openEditDialog()"
+            class="btn-primary inline-flex items-center gap-2 text-sm"
+        >
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px">edit</mat-icon>
+            Edit Profile
+        </button>
+    </div>
+
+    <div
+        class="custom-scrollbar grid h-[calc(100vh-210px)] grid-cols-1 gap-6 overflow-y-auto pr-2 lg:grid-cols-3"
+    >
+        <div class="space-y-6 lg:col-span-2">
+            <div class="card p-6">
+                <div class="flex flex-col gap-6 sm:flex-row sm:items-start">
+                    <div class="group relative shrink-0">
+                        @if (profile()!.photo) {
+                            <img
+                                [src]="profile()!.photo"
+                                [alt]="profile()!.firstName + ' ' + profile()!.lastName"
+                                class="h-24 w-24 rounded-full object-cover ring-4 ring-primary/20"
+                            />
+                        } @else {
+                            <div
+                                class="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary ring-4 ring-primary/20"
+                            >
+                                {{ getInitials() }}
+                            </div>
+                        }
+
+                        <label
+                            class="absolute inset-0 flex cursor-pointer items-center justify-center rounded-full bg-black/0 transition-colors group-hover:bg-black/40"
+                            [class.pointer-events-none]="isUploadingPhoto()"
+                        >
+                            @if (isUploadingPhoto()) {
+                                <mat-icon
+                                    class="animate-spin text-white"
+                                    style="font-size: 20px; width: 20px; height: 20px"
+                                    >autorenew</mat-icon
+                                >
+                            } @else {
+                                <mat-icon
+                                    class="text-white opacity-0 transition-opacity group-hover:opacity-100"
+                                    style="font-size: 20px; width: 20px; height: 20px"
+                                    >photo_camera</mat-icon
+                                >
+                            }
+                            <input
+                                type="file"
+                                accept="image/*"
+                                class="hidden"
+                                (change)="onPhotoSelected($event)"
+                            />
+                        </label>
+                    </div>
+
+                    <div class="flex-1 space-y-3">
+                        <div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h2 class="text-xl font-bold text-text-primary">
+                                    {{ profile()!.firstName }}
+                                    {{ profile()!.lastName }}
+                                </h2>
+                                <span
+                                    class="rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                                    [class]="getRoleBadge()"
+                                >
+                                    {{ role() }}
+                                </span>
+                                <span
+                                    class="flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold"
+                                    [class]="
+                                        getStatusConfig(profile()!.status).bg +
+                                        ' ' +
+                                        getStatusConfig(profile()!.status).text
+                                    "
+                                >
+                                    <span
+                                        class="h-1.5 w-1.5 rounded-full"
+                                        [class]="getStatusConfig(profile()!.status).dot"
+                                    ></span>
+                                    {{ profile()!.status }}
+                                </span>
+                            </div>
+                            <p class="mt-1 text-sm text-text-tertiary">
+                                &#64;{{ profile()!.username }} ·
+                                {{ profile()!.email }}
+                            </p>
+                        </div>
+
+                        @if (isGuide() && asGuide()) {
+                            <div class="flex flex-wrap items-center gap-4">
+                                <div class="flex items-center gap-1.5">
+                                    @for (_ of [1, 2, 3, 4, 5]; track $index) {
+                                        <mat-icon
+                                            style="font-size: 16px; width: 16px; height: 16px"
+                                            [class.text-warning]="$index < asGuide().rating"
+                                            [class.text-border]="$index >= asGuide().rating"
+                                            >star</mat-icon
+                                        >
+                                    }
+                                    <span class="text-sm font-bold text-text-primary">
+                                        {{ asGuide().rating | number: '1.1-1' }}
+                                    </span>
+                                    <span class="text-xs text-text-tertiary">
+                                        ({{ asGuide().reviewCount }}
+                                        reviews)
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap gap-1.5">
+                                @for (lang of asGuide().languages; track lang.uuid) {
+                                    <span
+                                        class="rounded-lg bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
+                                    >
+                                        {{ lang.name }}
+                                    </span>
+                                }
+                            </div>
+                        }
+
+                        @if (isTourist() && asTourist()) {
+                            <div class="flex flex-wrap items-center gap-3">
+                                @if (asTourist().nationality) {
+                                    <span
+                                        class="flex items-center gap-1 rounded-lg bg-teal-500/10 px-2.5 py-1 text-xs font-medium text-teal-600"
+                                    >
+                                        <mat-icon style="font-size: 13px; width: 13px; height: 13px"
+                                            >public</mat-icon
+                                        >
+                                        {{ asTourist().nationality }}
+                                    </span>
+                                }
+                                @if (asTourist().language) {
+                                    <span
+                                        class="flex items-center gap-1 rounded-lg bg-blue-500/10 px-2.5 py-1 text-xs font-medium text-blue-600"
+                                    >
+                                        <mat-icon style="font-size: 13px; width: 13px; height: 13px"
+                                            >translate</mat-icon
+                                        >
+                                        {{ asTourist().language }}
+                                    </span>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <div class="mb-4 flex items-center gap-2">
+                    <mat-icon
+                        class="text-text-tertiary"
+                        style="font-size: 18px; width: 18px; height: 18px"
+                        >security</mat-icon
+                    >
+                    <h2 class="text-sm font-bold text-text-primary">Account Security</h2>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between rounded-xl bg-main-bg/50 p-4">
+                        <div class="flex items-center gap-3">
+                            <mat-icon
+                                class="text-text-tertiary"
+                                style="font-size: 18px; width: 18px; height: 18px"
+                                >mail</mat-icon
+                            >
+                            <div>
+                                <p class="text-sm font-medium text-text-primary">Email</p>
+                                <p class="text-xs text-text-tertiary">
+                                    {{ profile()!.email }}
+                                </p>
+                            </div>
+                        </div>
+                        <mat-icon
+                            class="text-green-500"
+                            style="font-size: 18px; width: 18px; height: 18px"
+                            >verified</mat-icon
+                        >
+                    </div>
+
+                    @if (profile()!.oauthProviders && profile()!.oauthProviders.length > 0) {
+                        <div class="rounded-xl bg-main-bg/50 p-4">
+                            <p class="mb-2 text-xs font-medium text-text-tertiary">
+                                Connected Accounts
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                @for (provider of profile()!.oauthProviders; track provider) {
+                                    <span
+                                        class="flex items-center gap-1.5 rounded-lg bg-surface px-3 py-1.5 text-xs font-medium capitalize text-text-primary shadow-sm"
+                                    >
+                                        <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                                            >link</mat-icon
+                                        >
+                                        {{ provider }}
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (isGuide() && asGuide()) {
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center gap-2">
+                        <mat-icon
+                            class="text-text-tertiary"
+                            style="font-size: 18px; width: 18px; height: 18px"
+                            >work_history</mat-icon
+                        >
+                        <h2 class="text-sm font-bold text-text-primary">Professional Info</h2>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                        <div class="rounded-xl bg-main-bg/50 p-4">
+                            <p
+                                class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                            >
+                                Experience
+                            </p>
+                            <p class="mt-1 text-lg font-bold text-text-primary">
+                                {{ asGuide().experienceYears }}
+                                <span class="text-xs font-normal text-text-tertiary">years</span>
+                            </p>
+                        </div>
+                        <div class="rounded-xl bg-main-bg/50 p-4">
+                            <p
+                                class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                            >
+                                Rating
+                            </p>
+                            <p
+                                class="mt-1 flex items-center gap-1 text-lg font-bold text-text-primary"
+                            >
+                                <mat-icon
+                                    class="text-warning"
+                                    style="font-size: 16px; width: 16px; height: 16px"
+                                    >star</mat-icon
+                                >
+                                {{ asGuide().rating | number: '1.1-1' }}
+                            </p>
+                        </div>
+                        <div class="rounded-xl bg-main-bg/50 p-4">
+                            <p
+                                class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                            >
+                                Reviews
+                            </p>
+                            <p class="mt-1 text-lg font-bold text-text-primary">
+                                {{ asGuide().reviewCount }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="space-y-6">
+            <div class="card p-6">
+                <div class="mb-4 flex items-center gap-2">
+                    <mat-icon
+                        class="text-text-tertiary"
+                        style="font-size: 18px; width: 18px; height: 18px"
+                        >info</mat-icon
+                    >
+                    <h2 class="text-sm font-bold text-text-primary">Details</h2>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Username</span>
+                        <span class="text-xs font-medium text-text-primary"
+                            >&#64;{{ profile()!.username }}</span
+                        >
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Phone</span>
+                        <span class="text-xs font-medium text-text-primary">{{
+                            profile()!.phone || '—'
+                        }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Role</span>
+                        <span
+                            class="rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                            [class]="getRoleBadge()"
+                            >{{ role() }}</span
+                        >
+                    </div>
+
+                    @if (isTourist() && asTourist()) {
+                        <div class="divider"></div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-text-secondary">Nationality</span>
+                            <span class="text-xs font-medium text-text-primary">{{
+                                asTourist().nationality || '—'
+                            }}</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-text-secondary">Language</span>
+                            <span class="text-xs font-medium text-text-primary">{{
+                                asTourist().language || '—'
+                            }}</span>
+                        </div>
+                    }
+
+                    @if (isGuide() && asGuide()) {
+                        <div class="divider"></div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-text-secondary">Experience</span>
+                            <span class="badge badge-primary"
+                                >{{ asGuide().experienceYears }} years</span
+                            >
+                        </div>
+                        <div class="divider"></div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-text-secondary">Languages</span>
+                            <span class="text-xs font-medium text-text-primary">{{
+                                asGuide().languages.length || 0
+                            }}</span>
+                        </div>
+                    }
+
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Last Login</span>
+                        <span class="text-xs text-text-tertiary">
+                            @if (profile()!.lastLoginAt) {
+                                {{ profile()!.lastLoginAt | date: 'MMM d, y HH:mm' }}
+                            } @else {
+                                Never
+                            }
+                        </span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Joined</span>
+                        <span class="text-xs text-text-tertiary">{{
+                            profile()!.createdAt | date: 'MMM d, y'
+                        }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <div class="mb-4 flex items-center gap-2">
+                    <mat-icon
+                        class="text-text-tertiary"
+                        style="font-size: 18px; width: 18px; height: 18px"
+                        >bolt</mat-icon
+                    >
+                    <h2 class="text-sm font-bold text-text-primary">Quick Actions</h2>
+                </div>
+                <div class="space-y-2">
+                    <button
+                        (click)="openEditDialog()"
+                        class="flex w-full items-center gap-2 rounded-xl border border-border p-3 text-sm font-medium text-text-secondary transition-colors hover:bg-main-bg"
+                    >
+                        <mat-icon style="font-size: 18px; width: 18px; height: 18px">edit</mat-icon>
+                        Edit Profile
+                    </button>
+
+                    <label
+                        class="flex w-full cursor-pointer items-center gap-2 rounded-xl border border-border p-3 text-sm font-medium text-text-secondary transition-colors hover:bg-main-bg"
+                        [class.opacity-50]="isUploadingPhoto()"
+                    >
+                        <mat-icon
+                            style="font-size: 18px; width: 18px; height: 18px"
+                            [class.animate-spin]="isUploadingPhoto()"
+                        >
+                            {{ isUploadingPhoto() ? 'autorenew' : 'photo_camera' }}
+                        </mat-icon>
+                        {{ isUploadingPhoto() ? 'Uploading...' : 'Change Photo' }}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            class="hidden"
+                            (change)="onPhotoSelected($event)"
+                            [disabled]="isUploadingPhoto()"
+                        />
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+}

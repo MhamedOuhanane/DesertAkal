@@ -1,8 +1,11 @@
 import { RoleEnum } from '../enums/role.enum';
 import { UserStatus } from '../enums/user-status.enum';
+import { GuideFind } from './guide.model';
 import { PageAble } from './response.models';
+import { Tourist } from './tourist.model';
 
 export type UserRole = RoleEnum;
+export type ProfileData = UserFind | Tourist | GuideFind;
 
 export interface UserFilters extends PageAble {
     search?: string;
