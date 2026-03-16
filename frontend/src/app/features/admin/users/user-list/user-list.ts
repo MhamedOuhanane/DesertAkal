@@ -65,6 +65,7 @@ export class UserList {
 
         effect(() => {
             this.loadUsers();
+            
         });
     }
 

@@ -1,0 +1,379 @@
+<div class="flex min-h-screen items-center justify-center bg-main-bg p-4">
+    <div class="w-full max-w-lg">
+        <div class="mb-8 text-center">
+            <div class="mb-4 flex items-center justify-center gap-3">
+                <app-brand-logo classLogo="h-30" [isExpanded]="false" />
+            </div>
+            <p class="mt-1 text-xs text-text-tertiary">Reservation Verification</p>
+        </div>
+
+        @if (state() === 'loading') {
+            <div class="card p-8 text-center">
+                <div class="mb-6 flex justify-center">
+                    <div class="relative flex h-20 w-20 items-center justify-center">
+                        <div
+                            class="absolute inset-0 animate-spin rounded-full border-4 border-border border-t-primary"
+                        ></div>
+                        <mat-icon
+                            class="text-primary"
+                            style="font-size: 28px; width: 28px; height: 28px"
+                            >verified</mat-icon
+                        >
+                    </div>
+                </div>
+                <h2 class="text-lg font-bold text-text-primary">Verifying Reservation</h2>
+                <p class="mt-2 text-sm text-text-tertiary">
+                    Please wait while we check the validity...
+                </p>
+
+                <div class="mt-4 flex justify-center gap-1.5">
+                    @for (i of [1, 2, 3]; track i) {
+                        <div
+                            class="h-2 w-2 animate-pulse rounded-full bg-primary"
+                            [style.animation-delay]="(i - 1) * 200 + 'ms'"
+                        ></div>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (state() === 'valid' && data()) {
+            <div class="space-y-4 animate-scale-in">
+                <div class="card overflow-hidden">
+                    <div class="bg-green-500 px-6 py-5 text-center text-white">
+                        <div
+                            class="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-white/20 ring-4 ring-white/30"
+                        >
+                            <mat-icon style="font-size: 32px; width: 32px; height: 32px"
+                                >verified</mat-icon
+                            >
+                        </div>
+                        <h2 class="text-xl font-bold">Reservation Valid</h2>
+                        <p class="mt-1 text-sm text-green-100">
+                            {{ 'This reservation has been verified successfully.' }}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center justify-between border-b border-border px-6 py-4">
+                        <div>
+                            <p
+                                class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                            >
+                                Reference
+                            </p>
+                            <p class="font-mono text-lg font-bold text-text-primary">
+                                {{ data()!.reference }}
+                            </p>
+                        </div>
+                        <span
+                            class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold"
+                            [class]="statusConfig().bg + ' ' + statusConfig().text"
+                        >
+                            <mat-icon style="font-size: 14px; width: 14px; height: 14px">
+                                {{ statusConfig().icon }}
+                            </mat-icon>
+                            {{ statusConfig().label }}
+                        </span>
+                    </div>
+
+                    <div class="border-b border-border px-6 py-4">
+                        <div class="flex items-center gap-2 text-text-tertiary">
+                            <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                                >map</mat-icon
+                            >
+                            <span class="text-[10px] font-medium uppercase tracking-wider"
+                                >Tour</span
+                            >
+                        </div>
+                        <p class="mt-1 text-sm font-bold text-text-primary">
+                            {{ data()!.tourTitle }}
+                        </p>
+                    </div>
+
+                    <div class="border-b border-border px-6 py-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p
+                                    class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                                >
+                                    Tourist
+                                </p>
+                                <div class="mt-2 flex items-center gap-2">
+                                    @if (data()!.touristPhoto) {
+                                        <img
+                                            [src]="data()!.touristPhoto"
+                                            class="h-8 w-8 rounded-full object-cover ring-2 ring-border"
+                                        />
+                                    } @else {
+                                        <div
+                                            class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary"
+                                        >
+                                            {{ getInitials(data()!.touristName) }}
+                                        </div>
+                                    }
+                                    <span class="text-sm font-medium text-text-primary">
+                                        {{ data()!.touristName }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            @if (data()!.guideName) {
+                                <div>
+                                    <p
+                                        class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                                    >
+                                        Guide
+                                    </p>
+                                    <div class="mt-2 flex items-center gap-2">
+                                        @if (data()!.guidePhoto) {
+                                            <img
+                                                [src]="data()!.guidePhoto"
+                                                class="h-8 w-8 rounded-full object-cover ring-2 ring-border"
+                                            />
+                                        } @else {
+                                            <div
+                                                class="flex h-8 w-8 items-center justify-center rounded-full bg-info/10 text-[10px] font-bold text-info"
+                                            >
+                                                {{ getInitials(data()!.guideName) }}
+                                            </div>
+                                        }
+                                        <span class="text-sm font-medium text-text-primary">
+                                            {{ data()!.guideName }}
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="px-6 py-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p
+                                    class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                                >
+                                    Period
+                                </p>
+                                <p class="mt-1 text-sm font-medium text-text-primary">
+                                    {{ data()!.startDate | date: 'MMM d' }} →
+                                    {{ data()!.endDate | date: 'MMM d, y' }}
+                                </p>
+                                <p class="text-[10px] text-text-tertiary">
+                                    {{ getDaysDiff() }} day{{ getDaysDiff() !== 1 ? 's' : '' }}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p
+                                    class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                                >
+                                    People
+                                </p>
+                                <div class="mt-1 flex items-center gap-1">
+                                    <mat-icon
+                                        class="text-text-tertiary"
+                                        style="font-size: 16px; width: 16px; height: 16px"
+                                        >group</mat-icon
+                                    >
+                                    <span class="text-sm font-bold text-text-primary">
+                                        {{ data()!.numberPeople }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p
+                                    class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                                >
+                                    Amount
+                                </p>
+                                <p class="mt-1 text-sm font-bold text-green-600">
+                                    {{ data()!.amount | currency: 'MAD ' : 'symbol' : '1.0-0' }}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p
+                                    class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                                >
+                                    Timing
+                                </p>
+                                <div class="mt-1">
+                                    @if (isOngoing) {
+                                        <span
+                                            class="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-[10px] font-semibold text-green-600"
+                                        >
+                                            <span
+                                                class="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500"
+                                            ></span>
+                                            Ongoing
+                                        </span>
+                                    } @else if (isUpcoming) {
+                                        <span
+                                            class="inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2 py-0.5 text-[10px] font-semibold text-blue-600"
+                                        >
+                                            <mat-icon
+                                                style="font-size: 10px; width: 10px; height: 10px"
+                                                >event</mat-icon
+                                            >
+                                            Upcoming
+                                        </span>
+                                    } @else {
+                                        <span
+                                            class="inline-flex items-center gap-1 rounded-full bg-gray-500/10 px-2 py-0.5 text-[10px] font-semibold text-gray-500"
+                                        >
+                                            <mat-icon
+                                                style="font-size: 10px; width: 10px; height: 10px"
+                                                >history</mat-icon
+                                            >
+                                            Past
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="flex items-center justify-center gap-2 text-[10px] text-text-disabled">
+                    <mat-icon style="font-size: 12px; width: 12px; height: 12px">schedule</mat-icon>
+                    Verified at {{ data()!.verifiedAt | date: 'MMM d, y HH:mm:ss' }}
+                </div> -->
+            </div>
+        }
+
+        @if (state() === 'invalid' && data()) {
+            <div class="space-y-4 animate-scale-in">
+                <div class="card overflow-hidden">
+                    <div class="bg-red-500 px-6 py-5 text-center text-white">
+                        <div
+                            class="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-white/20 ring-4 ring-white/30"
+                        >
+                            <mat-icon style="font-size: 32px; width: 32px; height: 32px"
+                                >gpp_bad</mat-icon
+                            >
+                        </div>
+                        <h2 class="text-xl font-bold">Reservation Invalid</h2>
+                        <p class="mt-1 text-sm text-red-100">
+                            {{ 'This reservation is not valid.' }}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center justify-between border-b border-border px-6 py-4">
+                        <div>
+                            <p
+                                class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                            >
+                                Reference
+                            </p>
+                            <p class="font-mono text-lg font-bold text-text-primary">
+                                {{ data()!.reference }}
+                            </p>
+                        </div>
+                        <span
+                            class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold"
+                            [class]="statusConfig().bg + ' ' + statusConfig().text"
+                        >
+                            <mat-icon style="font-size: 14px; width: 14px; height: 14px">
+                                {{ statusConfig().icon }}
+                            </mat-icon>
+                            {{ statusConfig().label }}
+                        </span>
+                    </div>
+
+                    <div class="px-6 py-5">
+                        <div class="flex items-start gap-3 rounded-xl bg-red-500/5 p-4">
+                            <mat-icon
+                                class="mt-0.5 shrink-0 text-red-500"
+                                style="font-size: 18px; width: 18px; height: 18px"
+                                >warning</mat-icon
+                            >
+                            <div>
+                                <p class="text-sm font-semibold text-red-600">
+                                    This reservation cannot be used
+                                </p>
+                                <p class="mt-1 text-xs text-text-secondary">
+                                    The reservation status is
+                                    <strong>{{ data()!.status }}</strong
+                                    >.
+                                    @if (data()!.status === 'CANCELLED') {
+                                        It was cancelled and is no longer valid.
+                                    } @else if (data()!.status === 'REJECTED') {
+                                        It was rejected and cannot be honored.
+                                    } @else if (data()!.status === 'PENDING') {
+                                        It has not been confirmed yet. Please contact support.
+                                    } @else {
+                                        Please contact support for more information.
+                                    }
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-text-tertiary">Tour</span>
+                                <span class="text-xs font-medium text-text-primary">
+                                    {{ data()!.tourTitle }}
+                                </span>
+                            </div>
+                            <div class="divider"></div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-text-tertiary">Tourist</span>
+                                <span class="text-xs font-medium text-text-primary">
+                                    {{ data()!.touristName }}
+                                </span>
+                            </div>
+                            <div class="divider"></div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-text-tertiary">Period</span>
+                                <span class="text-xs text-text-tertiary">
+                                    {{ data()!.startDate | date: 'MMM d' }} →
+                                    {{ data()!.endDate | date: 'MMM d, y' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="flex items-center justify-center gap-2 text-[10px] text-text-disabled">
+                    <mat-icon style="font-size: 12px; width: 12px; height: 12px">schedule</mat-icon>
+                    Verified at {{ data()!.verifiedAt | date: 'MMM d, y HH:mm:ss' }}
+                </div> -->
+            </div>
+        }
+
+        @if (state() === 'error') {
+            <div class="card p-8 text-center animate-scale-in">
+                <div
+                    class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10"
+                >
+                    <mat-icon
+                        class="text-red-500"
+                        style="font-size: 32px; width: 32px; height: 32px"
+                        >error_outline</mat-icon
+                    >
+                </div>
+                <h2 class="text-lg font-bold text-text-primary">Verification Failed</h2>
+                <p class="mt-2 text-sm text-text-secondary">
+                    {{ errorMessage() }}
+                </p>
+
+                <div class="mt-6 flex flex-col gap-3">
+                    <a routerLink="/" class="btn-primary mx-auto justify-center text-sm">
+                        <mat-icon style="font-size: 16px; width: 16px; height: 16px">home</mat-icon>
+                        Go to Homepage
+                    </a>
+                    <p class="text-[10px] text-text-disabled">
+                        If you believe this is an error, please contact support.
+                    </p>
+                </div>
+            </div>
+        }
+
+        <div class="mt-8 text-center">
+            <p class="text-[10px] text-text-disabled">
+                © {{ currentYear }} DesertAkal · Secure Verification System
+            </p>
+        </div>
+    </div>
+</div>

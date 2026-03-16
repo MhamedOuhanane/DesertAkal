@@ -2,6 +2,7 @@ package com.desertakal.desertakal.Security.config;
 
 import com.desertakal.desertakal.Security.handler.CustomAccessDeniedHandler;
 import com.desertakal.desertakal.Security.handler.JwtAuthenticationEntryPoint;
+import com.desertakal.desertakal.Security.handler.OAuth2FailureHandler;
 import com.desertakal.desertakal.Security.handler.OAuth2SuccessHandler;
 import com.desertakal.desertakal.Security.jwt.JwtAuthenticationFilter;
 import com.desertakal.desertakal.config.brand.BrandInfo;
@@ -30,8 +31,8 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final CorsConfigurationSource corsConfigurationSource;
-    private final BrandInfo brandInfo;
     private final DeviceIdOAuth2Filter deviceIdOAuth2Filter;
+    private final OAuth2FailureHandler oAuth2FailureHandler;
 
     @Bean
     public SecurityFilterChain filterChain(@NonNull HttpSecurity http) {
@@ -48,7 +49,8 @@ public class SecurityConfig {
                                 "/oauth2/**",
                                 "/login/**",
                                 "/error",
-                                "/favicon.ico"
+                                "/favicon.ico",
+                                "/api/reservations/verify/**"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/cities/**").permitAll()
@@ -70,7 +72,7 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth -> oauth
                         .successHandler(oAuth2SuccessHandler)
-                        .failureUrl(brandInfo.getFrontendUrl() + "/auth/login?error=oauth2_cancelled")
+                        .failureHandler(oAuth2FailureHandler)
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

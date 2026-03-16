@@ -1,0 +1,480 @@
+@if (isLoading()) {
+    <div class="card animate-pulse p-6">
+        <div class="space-y-4">
+            <div class="h-6 w-48 rounded bg-border/50"></div>
+            <div class="h-4 w-full rounded bg-border/30"></div>
+            <div class="h-4 w-3/4 rounded bg-border/30"></div>
+        </div>
+    </div>
+} @else if (reservation()) {
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-3">
+            <a
+                routerLink="/dashboard/reservations"
+                class="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition-all hover:border-primary/40 hover:text-primary"
+            >
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px">arrow_back</mat-icon>
+            </a>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl font-bold text-text-primary">Reservation</h1>
+                    <span
+                        class="rounded bg-main-bg px-2 py-0.5 font-mono text-sm font-bold text-primary"
+                    >
+                        {{ reservation()!.reference }}
+                    </span>
+                </div>
+                <p class="text-xs text-text-tertiary">
+                    Created {{ reservation()!.createdAt | date: 'MMM d, y HH:mm' }}
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 self-start">
+            <button
+                (click)="downloadPdf()"
+                [disabled]="isDownloading()"
+                class="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-main-bg disabled:opacity-50"
+            >
+                <mat-icon
+                    style="font-size: 16px; width: 16px; height: 16px"
+                    [class.animate-spin]="isDownloading()"
+                >
+                    {{ isDownloading() ? 'autorenew' : 'download' }}
+                </mat-icon>
+                PDF
+            </button>
+            @if (canCancel) {
+                <button
+                    (click)="showCancelDialog.set(true)"
+                    class="inline-flex items-center gap-2 rounded-lg bg-orange-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600"
+                >
+                    <mat-icon style="font-size: 16px; width: 16px; height: 16px">block</mat-icon>
+                    Cancel
+                </button>
+            }
+            <button
+                (click)="showDeleteDialog.set(true)"
+                class="inline-flex items-center gap-2 rounded-lg bg-red-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-red-600"
+            >
+                <mat-icon style="font-size: 16px; width: 16px; height: 16px">delete</mat-icon>
+                Delete
+            </button>
+        </div>
+    </div>
+
+    <div
+        class="custom-scrollbar grid h-[calc(100vh-190px)] grid-cols-1 gap-6 overflow-y-auto pr-2 lg:grid-cols-3"
+    >
+        <div class="space-y-6 lg:col-span-2">
+            <div
+                class="card flex items-center gap-4 p-5"
+                [class]="getStatusConfig(reservation()!.status).bg"
+            >
+                <div
+                    class="flex h-12 w-12 items-center justify-center rounded-xl bg-surface shadow-sm"
+                >
+                    <mat-icon
+                        [class]="getStatusConfig(reservation()!.status).text"
+                        style="font-size: 24px; width: 24px; height: 24px"
+                    >
+                        {{ getStatusConfig(reservation()!.status).icon }}
+                    </mat-icon>
+                </div>
+                <div>
+                    <p
+                        class="text-lg font-bold"
+                        [class]="getStatusConfig(reservation()!.status).text"
+                    >
+                        {{ reservation()!.status }}
+                    </p>
+                    <p class="text-xs text-text-tertiary">
+                        Updated {{ reservation()!.updatedAt | date: 'MMM d, y HH:mm' }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <div class="mb-4 flex items-center gap-2">
+                    <mat-icon
+                        class="text-text-tertiary"
+                        style="font-size: 18px; width: 18px; height: 18px"
+                        >map</mat-icon
+                    >
+                    <h2 class="text-sm font-bold text-text-primary">Tour</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div>
+                        <p class="text-sm font-bold text-text-primary">
+                            {{ reservation()!.tourTitle }}
+                        </p>
+                        <a
+                            [routerLink]="['/dashboard/tours', reservation()!.tourUuid]"
+                            class="mt-1 flex items-center gap-1 text-xs text-primary hover:underline"
+                        >
+                            <mat-icon style="font-size: 12px; width: 12px; height: 12px"
+                                >open_in_new</mat-icon
+                            >
+                            View tour
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <div class="mb-4 flex items-center gap-2">
+                    <mat-icon
+                        class="text-text-tertiary"
+                        style="font-size: 18px; width: 18px; height: 18px"
+                        >people</mat-icon
+                    >
+                    <h2 class="text-sm font-bold text-text-primary">Participants</h2>
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div class="flex items-center gap-3 rounded-xl bg-main-bg/50 p-4">
+                        @if (reservation()!.touristPhoto) {
+                            <img
+                                [src]="reservation()!.touristPhoto"
+                                class="h-10 w-10 rounded-full object-cover ring-2 ring-border"
+                            />
+                        } @else {
+                            <div
+                                class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary"
+                            >
+                                {{ getInitials(reservation()!.touristName) }}
+                            </div>
+                        }
+                        <div>
+                            <p
+                                class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                            >
+                                Tourist
+                            </p>
+                            <p class="text-sm font-bold text-text-primary">
+                                {{ reservation()!.touristName }}
+                            </p>
+                            <a
+                                [routerLink]="['/dashboard/users', reservation()!.touristUuid]"
+                                class="flex items-center gap-0.5 text-[10px] text-primary hover:underline"
+                            >
+                                View profile
+                                <mat-icon style="font-size: 10px; width: 10px; height: 10px"
+                                    >open_in_new</mat-icon
+                                >
+                            </a>
+                        </div>
+                    </div>
+
+                    @if (reservation()!.guideName) {
+                        <div class="flex items-center gap-3 rounded-xl bg-main-bg/50 p-4">
+                            @if (reservation()!.guidePhoto) {
+                                <img
+                                    [src]="reservation()!.guidePhoto"
+                                    class="h-10 w-10 rounded-full object-cover ring-2 ring-border"
+                                />
+                            } @else {
+                                <div
+                                    class="flex h-10 w-10 items-center justify-center rounded-full bg-info/10 text-xs font-bold text-info"
+                                >
+                                    {{ getInitials(reservation()!.guideName) }}
+                                </div>
+                            }
+                            <div>
+                                <p
+                                    class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                                >
+                                    Guide
+                                </p>
+                                <p class="text-sm font-bold text-text-primary">
+                                    {{ reservation()!.guideName }}
+                                </p>
+                                <a
+                                    [routerLink]="['/dashboard/guides', reservation()!.guideUuid]"
+                                    class="flex items-center gap-0.5 text-[10px] text-primary hover:underline"
+                                >
+                                    View profile
+                                    <mat-icon style="font-size: 10px; width: 10px; height: 10px"
+                                        >open_in_new</mat-icon
+                                    >
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (reservation()!.qrCode || reservation()!.pdfUrl) {
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center gap-2">
+                        <mat-icon
+                            class="text-text-tertiary"
+                            style="font-size: 18px; width: 18px; height: 18px"
+                            >qr_code</mat-icon
+                        >
+                        <h2 class="text-sm font-bold text-text-primary">Documents</h2>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-4">
+                        @if (reservation()!.qrCode) {
+                            <div class="text-center">
+                                <img
+                                    [src]="reservation()!.qrCode"
+                                    alt="QR Code"
+                                    class="h-28 w-28 rounded-xl border border-border p-2"
+                                />
+                                <p class="mt-1 text-[10px] text-text-tertiary">QR Code</p>
+                            </div>
+                        }
+                        <button
+                            (click)="downloadPdf()"
+                            [disabled]="isDownloading()"
+                            class="flex items-center gap-2 rounded-xl border border-border px-4 py-3 text-sm font-medium text-text-secondary transition-colors hover:bg-main-bg disabled:opacity-50"
+                        >
+                            <mat-icon
+                                style="font-size: 20px; width: 20px; height: 20px"
+                                [class.animate-spin]="isDownloading()"
+                            >
+                                {{ isDownloading() ? 'autorenew' : 'picture_as_pdf' }}
+                            </mat-icon>
+                            Download Voucher
+                        </button>
+                    </div>
+                </div>
+            }
+
+            <div class="card p-6">
+                <div class="mb-4 flex items-center gap-2">
+                    <mat-icon
+                        class="text-text-tertiary"
+                        style="font-size: 18px; width: 18px; height: 18px"
+                        >payments</mat-icon
+                    >
+                    <h2 class="text-sm font-bold text-text-primary">
+                        Payments ({{ paymentsTotalElements() }})
+                    </h2>
+                </div>
+                @if (paymentsLoading()) {
+                    <div class="animate-pulse space-y-2">
+                        @for (_ of [1, 2]; track $index) {
+                            <div class="h-14 rounded-lg bg-border/20"></div>
+                        }
+                    </div>
+                } @else if (payments().length > 0) {
+                    <div class="space-y-2">
+                        @for (payment of payments(); track payment.uuid) {
+                            <div
+                                class="flex items-center justify-between rounded-xl border border-border p-3"
+                            >
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="flex h-9 w-9 items-center justify-center rounded-lg bg-green-500/10"
+                                    >
+                                        <mat-icon
+                                            class="text-green-600"
+                                            style="font-size: 16px; width: 16px; height: 16px"
+                                            >receipt</mat-icon
+                                        >
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-text-primary">
+                                            {{
+                                                payment.amount
+                                                    | currency: 'MAD ' : 'symbol' : '1.0-0'
+                                            }}
+                                        </p>
+                                        <p class="text-[10px] text-text-tertiary">
+                                            {{ payment.date | date: 'MMM d, y HH:mm' }}
+                                            · {{ payment.method || 'N/A' }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                                        [class]="getPaymentStatusColor(payment.status)"
+                                    >
+                                        {{ payment.status }}
+                                    </span>
+                                    <span
+                                        class="rounded bg-main-bg px-1.5 py-0.5 text-[9px] font-medium text-text-tertiary"
+                                    >
+                                        {{ payment.type }}
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                } @else {
+                    <p class="py-4 text-center text-sm text-text-disabled">No payments recorded.</p>
+                }
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="card p-6">
+                <div class="mb-4 flex items-center gap-2">
+                    <mat-icon
+                        class="text-text-tertiary"
+                        style="font-size: 18px; width: 18px; height: 18px"
+                        >info</mat-icon
+                    >
+                    <h2 class="text-sm font-bold text-text-primary">Details</h2>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Reference</span>
+                        <span
+                            class="rounded bg-main-bg px-2 py-0.5 font-mono text-xs font-bold text-text-primary"
+                        >
+                            {{ reservation()!.reference }}
+                        </span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Status</span>
+                        <span
+                            class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                            [class]="
+                                getStatusConfig(reservation()!.status).bg +
+                                ' ' +
+                                getStatusConfig(reservation()!.status).text
+                            "
+                        >
+                            <mat-icon style="font-size: 11px; width: 11px; height: 11px">
+                                {{ getStatusConfig(reservation()!.status).icon }}
+                            </mat-icon>
+                            {{ reservation()!.status }}
+                        </span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">People</span>
+                        <span class="text-sm font-semibold text-text-primary">{{
+                            reservation()!.numberPeople
+                        }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Amount</span>
+                        <span class="text-sm font-bold text-green-600">
+                            {{ reservation()!.amount | currency: 'MAD ' : 'symbol' : '1.0-0' }}
+                        </span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Start</span>
+                        <span class="text-xs text-text-tertiary">{{
+                            reservation()!.startDate | date: 'MMM d, y'
+                        }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">End</span>
+                        <span class="text-xs text-text-tertiary">{{
+                            reservation()!.endDate | date: 'MMM d, y'
+                        }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Payments</span>
+                        <span class="text-sm font-semibold text-text-primary">{{
+                            paymentsTotalElements()
+                        }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Created</span>
+                        <span class="text-xs text-text-tertiary">{{
+                            reservation()!.createdAt | date: 'MMM d, y HH:mm'
+                        }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-text-secondary">Updated</span>
+                        <span class="text-xs text-text-tertiary">{{
+                            reservation()!.updatedAt | date: 'MMM d, y HH:mm'
+                        }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <div class="mb-4 flex items-center gap-2">
+                    <mat-icon
+                        class="text-text-tertiary"
+                        style="font-size: 18px; width: 18px; height: 18px"
+                        >bolt</mat-icon
+                    >
+                    <h2 class="text-sm font-bold text-text-primary">Actions</h2>
+                </div>
+                <div class="space-y-2">
+                    <button
+                        (click)="downloadPdf()"
+                        [disabled]="isDownloading()"
+                        class="flex w-full items-center gap-2 rounded-xl border border-border p-3 text-sm font-medium text-text-secondary transition-colors hover:bg-main-bg disabled:opacity-50"
+                    >
+                        <mat-icon
+                            style="font-size: 18px; width: 18px; height: 18px"
+                            [class.animate-spin]="isDownloading()"
+                        >
+                            {{ isDownloading() ? 'autorenew' : 'picture_as_pdf' }}
+                        </mat-icon>
+                        Download Voucher PDF
+                    </button>
+
+                    @if (canCancel) {
+                        <button
+                            (click)="showCancelDialog.set(true)"
+                            class="flex w-full items-center gap-2 rounded-xl bg-orange-500/10 p-3 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-500/20"
+                        >
+                            <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                                >block</mat-icon
+                            >
+                            Cancel Reservation
+                        </button>
+                    }
+
+                    <button
+                        (click)="showDeleteDialog.set(true)"
+                        class="flex w-full items-center gap-2 rounded-xl bg-red-500/10 p-3 text-sm font-medium text-red-600 transition-colors hover:bg-red-500/20"
+                    >
+                        <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                            >delete_forever</mat-icon
+                        >
+                        Delete Reservation
+                    </button>
+                </div>
+
+                <div class="mt-4 flex items-start gap-2 rounded-lg bg-warning/5 p-3">
+                    <mat-icon
+                        class="mt-0.5 shrink-0 text-warning"
+                        style="font-size: 14px; width: 14px; height: 14px"
+                        >info</mat-icon
+                    >
+                    <p class="text-[11px] leading-relaxed text-warning">
+                        Deleting a reservation with payment history is not allowed. Use cancellation
+                        instead for audit purposes.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (showCancelDialog()) {
+        <app-delete-dialog
+            itemName="Reservation"
+            [itemTitle]="'Ref: ' + reservation()!.reference"
+            [isDeleting]="isCancelling()"
+            (confirm)="confirmCancel()"
+            (cancel)="showCancelDialog.set(false)"
+        />
+    }
+
+    @if (showDeleteDialog()) {
+        <app-delete-dialog
+            itemName="Reservation"
+            [itemTitle]="'Ref: ' + reservation()!.reference"
+            [isDeleting]="isDeleting()"
+            (confirm)="confirmDelete()"
+            (cancel)="showDeleteDialog.set(false)"
+        />
+    }
+}
