@@ -197,6 +197,27 @@ export const ADMIN_ROUTES: Routes = [
                     },
                 ],
             },
+            {
+                path: 'reservations',
+                data: { breadcrumb: 'Reservations' },
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () =>
+                            import('./reservations/reservation-list/reservation-list').then(
+                                (m) => m.ReservationList
+                            ),
+                    },
+                    {
+                        path: ':uuid',
+                        loadComponent: () =>
+                            import('./reservations/reservation-detail/reservation-detail').then(
+                                (m) => m.ReservationDetail
+                            ),
+                        data: { breadcrumb: 'Details' },
+                    },
+                ],
+            },
         ],
     },
 ];

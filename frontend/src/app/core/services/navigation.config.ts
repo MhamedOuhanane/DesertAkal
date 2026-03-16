@@ -165,7 +165,7 @@ export const NAV_CONFIG = {
                     badge: 'New',
                 },
                 {
-                    label: 'Article Validation',
+                    label: 'Article',
                     icon: 'article',
                     path: '/dashboard/articles',
                     roles: ['ADMIN'],
