@@ -2,15 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ApiResponse, Pagination, PageAble } from '../models/response.models';
-import { Payment, PaymentFind, RefundRequest } from '../models/payment.model';
+import { ApiResponse, Pagination } from '../models/response.models';
+import { Payment, PaymentFilters, PaymentFind, RefundRequest } from '../models/payment.model';
 import { buildHttpParams } from '../utils/http-utils';
-
-export interface PaymentFilters extends PageAble {
-    status?: string;
-    type?: string;
-    method?: string;
-}
 
 @Injectable({ providedIn: 'root' })
 export class PaymentService {

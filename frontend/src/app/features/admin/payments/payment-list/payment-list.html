@@ -1,1 +1,319 @@
-<p>payment-list works!</p>
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-text-primary">Payments</h1>
+    <p class="mt-1 text-sm text-text-tertiary">
+        {{ pagination()?.totalElements || 0 }} transaction{{
+            (pagination()?.totalElements || 0) !== 1 ? 's' : ''
+        }}
+    </p>
+</div>
+
+<div class="card mb-6 p-4">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <select
+            class="input w-full sm:w-40"
+            [value]="statusFilter()"
+            (change)="onStatusFilter($any($event.target).value)"
+        >
+            <option value="">All Status</option>
+            @for (s of statuses; track s) {
+                <option [value]="s">{{ s }}</option>
+            }
+        </select>
+
+        <select
+            class="input w-full sm:w-36"
+            [value]="typeFilter()"
+            (change)="onTypeFilter($any($event.target).value)"
+        >
+            <option value="">All Types</option>
+            @for (t of types; track t) {
+                <option [value]="t">{{ t }}</option>
+            }
+        </select>
+
+        <select
+            class="input w-full sm:w-36"
+            [value]="methodFilter()"
+            (change)="onMethodFilter($any($event.target).value)"
+        >
+            <option value="">All Methods</option>
+            @for (m of methods; track m) {
+                <option [value]="m">{{ m }}</option>
+            }
+        </select>
+
+        <div class="flex-1"></div>
+
+        @if (hasActiveFilters) {
+            <button
+                (click)="clearFilters()"
+                class="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
+                <mat-icon style="font-size: 14px; width: 14px; height: 14px">clear_all</mat-icon>
+                Clear
+            </button>
+        }
+
+        <div class="flex items-center gap-2">
+            <select
+                class="input w-full sm:w-36"
+                [value]="query().sortBy"
+                (change)="onSort($any($event.target).value)"
+            >
+                <option value="date">Date</option>
+                <option value="amount">Amount</option>
+                <option value="status">Status</option>
+            </select>
+            <button
+                (click)="onSort(query().sortBy!)"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition-colors hover:bg-main-bg"
+            >
+                <mat-icon
+                    class="transition-transform"
+                    [class.rotate-180]="query().order === 'desc'"
+                    style="font-size: 18px; width: 18px; height: 18px"
+                    >arrow_upward</mat-icon
+                >
+            </button>
+        </div>
+    </div>
+</div>
+
+@if (isLoading()) {
+    <div class="card overflow-hidden">
+        <div class="animate-pulse">
+            @for (_ of [1, 2, 3, 4, 5]; track $index) {
+                <div class="flex items-center gap-4 border-b border-border p-4">
+                    <div class="h-9 w-9 rounded-lg bg-border/30"></div>
+                    <div class="flex-1 space-y-2">
+                        <div class="h-4 w-32 rounded bg-border/40"></div>
+                        <div class="h-3 w-48 rounded bg-border/20"></div>
+                    </div>
+                    <div class="h-6 w-20 rounded-full bg-border/30"></div>
+                </div>
+            }
+        </div>
+    </div>
+} @else if (payments().length > 0) {
+    <div class="space-y-2">
+        @for (payment of payments(); track payment.uuid) {
+            <div
+                class="card overflow-hidden transition-all"
+                [class.border-primary/30]="expandedPayment() === payment.uuid"
+            >
+                <div
+                    class="flex cursor-pointer items-center gap-4 p-4 transition-colors hover:bg-main-bg/30"
+                    (click)="toggleExpand(payment.uuid)"
+                >
+                    <div
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+                        [class]="getTypeConfig(payment.type).bg"
+                    >
+                        <mat-icon style="font-size: 18px; width: 18px; height: 18px">{{
+                            getTypeConfig(payment.type).icon
+                        }}</mat-icon>
+                    </div>
+
+                    <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-sm font-bold text-text-primary">
+                                {{ payment.amount | currency: 'MAD ' : 'symbol' : '1.2-2' }}
+                            </span>
+
+                            <span
+                                class="rounded-full px-2 py-0.5 text-[9px] font-semibold"
+                                [class]="getTypeConfig(payment.type).bg"
+                            >
+                                {{ payment.type }}
+                            </span>
+
+                            <span class="flex items-center gap-1 text-[11px] text-text-tertiary">
+                                <mat-icon style="font-size: 12px; width: 12px; height: 12px">{{
+                                    getMethodIcon(payment.method)
+                                }}</mat-icon>
+                                {{ payment.method }}
+                            </span>
+                        </div>
+
+                        <div class="mt-0.5 flex items-center gap-3 text-[11px] text-text-tertiary">
+                            <span class="flex items-center gap-1">
+                                @if (payment.touristPhoto) {
+                                    <img
+                                        [src]="payment.touristPhoto"
+                                        class="h-4 w-4 rounded-full object-cover"
+                                    />
+                                } @else {
+                                    <mat-icon style="font-size: 12px; width: 12px; height: 12px"
+                                        >person</mat-icon
+                                    >
+                                }
+                                {{ payment.touristName }}
+                            </span>
+
+                            <span>·</span>
+
+                            <span>{{ payment.date | date: 'MMM d, y HH:mm' }}</span>
+                        </div>
+                    </div>
+
+                    <span
+                        class="inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold"
+                        [class]="
+                            getStatusConfig(payment.status).bg +
+                            ' ' +
+                            getStatusConfig(payment.status).text
+                        "
+                    >
+                        <mat-icon style="font-size: 12px; width: 12px; height: 12px">{{
+                            getStatusConfig(payment.status).icon
+                        }}</mat-icon>
+                        {{ payment.status }}
+                    </span>
+
+                    <div class="flex shrink-0 items-center gap-1">
+                        @if (canRefund(payment)) {
+                            <button
+                                (click)="openRefundDialog(payment, $event)"
+                                class="flex h-8 w-8 items-center justify-center rounded-lg text-text-tertiary transition-colors hover:bg-blue-500/10 hover:text-blue-600"
+                                title="Refund"
+                            >
+                                <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                                    >undo</mat-icon
+                                >
+                            </button>
+                        }
+                        <button
+                            class="flex h-8 w-8 items-center justify-center rounded-lg text-text-tertiary transition-colors hover:bg-main-bg"
+                        >
+                            <mat-icon
+                                class="transition-transform duration-200"
+                                [class.rotate-180]="expandedPayment() === payment.uuid"
+                                style="font-size: 16px; width: 16px; height: 16px"
+                                >expand_more</mat-icon
+                            >
+                        </button>
+                    </div>
+                </div>
+
+                @if (expandedPayment() === payment.uuid) {
+                    <div class="border-t border-border bg-main-bg/30 p-5">
+                        <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                            <div class="rounded-xl bg-surface p-3">
+                                <p
+                                    class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                                >
+                                    Amount
+                                </p>
+                                <p class="mt-1 text-sm font-bold text-text-primary">
+                                    {{ payment.amount | currency: 'MAD ' : 'symbol' : '1.2-2' }}
+                                </p>
+                            </div>
+                            <div class="rounded-xl bg-surface p-3">
+                                <p
+                                    class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                                >
+                                    Method
+                                </p>
+                                <p
+                                    class="mt-1 flex items-center gap-1 text-sm font-bold text-text-primary"
+                                >
+                                    <mat-icon style="font-size: 14px; width: 14px; height: 14px">{{
+                                        getMethodIcon(payment.method)
+                                    }}</mat-icon>
+                                    {{ payment.method }}
+                                </p>
+                            </div>
+                            <div class="rounded-xl bg-surface p-3">
+                                <p
+                                    class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                                >
+                                    Type
+                                </p>
+                                <p class="mt-1 text-sm font-bold text-text-primary">
+                                    {{ payment.type }}
+                                </p>
+                            </div>
+                            <div class="rounded-xl bg-surface p-3">
+                                <p
+                                    class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                                >
+                                    Date
+                                </p>
+                                <p class="mt-1 text-sm font-bold text-text-primary">
+                                    {{ payment.date | date: 'MMM d, y' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 flex flex-wrap items-center gap-3">
+                            <a
+                                [routerLink]="['/dashboard/users', payment.reservationUuid]"
+                                class="flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+                                (click)="$event.stopPropagation()"
+                            >
+                                <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                                    >person</mat-icon
+                                >
+                                {{ payment.touristName }}
+                            </a>
+
+                            <a
+                                [routerLink]="['/dashboard/reservations', payment.reservationUuid]"
+                                class="flex items-center gap-1.5 rounded-lg bg-info/10 px-3 py-1.5 text-xs font-medium text-info transition-colors hover:bg-info/20"
+                                (click)="$event.stopPropagation()"
+                            >
+                                <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                                    >calendar_month</mat-icon
+                                >
+                                View Reservation
+                            </a>
+
+                            @if (canRefund(payment)) {
+                                <button
+                                    (click)="openRefundDialog(payment, $event)"
+                                    class="flex items-center gap-1.5 rounded-lg bg-blue-500/10 px-3 py-1.5 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-500/20"
+                                >
+                                    <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                                        >undo</mat-icon
+                                    >
+                                    Process Refund
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    @if (pagination() && pagination()!.totalPages > 1) {
+        <div class="mt-6">
+            <app-pagination [pagination]="pagination()!" (pageChange)="goToPage($event)" />
+        </div>
+    }
+} @else {
+    <div class="card flex flex-col items-center justify-center p-12 text-center">
+        <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10">
+            <mat-icon class="text-green-600" style="font-size: 32px; width: 32px; height: 32px"
+                >payments</mat-icon
+            >
+        </div>
+        <h3 class="text-base font-semibold text-text-primary">No payments found</h3>
+        <p class="mt-1 text-sm text-text-tertiary">
+            @if (hasActiveFilters) {
+                Try adjusting your filters.
+            } @else {
+                No payment transactions recorded yet.
+            }
+        </p>
+    </div>
+}
+
+@if (showRefundDialog() && paymentToRefund()) {
+    <app-refund-dialog
+        [payment]="paymentToRefund()!"
+        [isSubmitting]="isRefunding()"
+        (confirm)="onRefundConfirm($event)"
+        (cancel)="showRefundDialog.set(false); paymentToRefund.set(null)"
+    />
+}

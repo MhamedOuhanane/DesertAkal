@@ -2,6 +2,7 @@ import { PaymentMethod } from '../enums/payment-method.enum';
 import { PaymentStatus } from '../enums/payment-status.enum';
 import { PaymentType } from '../enums/payment-type.enum';
 import { Reservation } from './reservation.model';
+import { PageAble } from './response.models';
 
 export interface Payment {
     readonly uuid: string;
@@ -13,6 +14,12 @@ export interface Payment {
     readonly reservationUuid: string;
     readonly touristName: string;
     readonly touristPhoto: string;
+}
+
+export interface PaymentFilters extends PageAble {
+    status?: string;
+    type?: string;
+    method?: string;
 }
 
 export interface PaymentFind {
