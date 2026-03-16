@@ -9,6 +9,9 @@ import { UserDropdown } from '../user-dropdown/user-dropdown';
 import { MenuItem } from '../../../core/models/navigation.models';
 import { BrandLogo } from '../brand-logo/brand-logo';
 import { RoleEnum } from '../../../core/enums/role.enum';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 
 @Component({
     selector: 'app-dashboard-header',
@@ -20,11 +23,13 @@ export class DashboardHeader {
     readonly themeService = inject(ThemeService);
     readonly authStore = inject(AuthStore);
     readonly navService = inject(NavigationService);
+    private breakpointObserver = inject(BreakpointObserver);
 
+    
     readonly sidebarToggle = output<void>();
-
+    
     readonly showUserMenu = signal(false);
-
+    
     readonly userMenuLinks = signal<MenuItem[]>([
         {
             label: 'My Profile',
@@ -40,6 +45,11 @@ export class DashboardHeader {
         },
     ]);
 
+    readonly isWeb = toSignal(
+        this.breakpointObserver.observe('(min-width: 768px)').pipe(map((result) => result.matches)),
+        { initialValue: true },
+    );
+    
     closeAll(): void {
         this.showUserMenu.set(false);
     }

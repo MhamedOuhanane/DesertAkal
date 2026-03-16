@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,7 +33,6 @@ public class AdminServiceImpl implements AdminService {
     public AdminDashboardDTO getGlobalDashboardStats() {
         log.info("Calcul des statistiques via les entités Java");
 
-        // 2. توزيع الحجوزات حسب الحالة (Java Stream)
         Map<String, Long> reservationsByStatus = reservationRepository.findAll().stream()
                 .collect(Collectors.groupingBy(
                         res -> res.getStatus().name(),
@@ -63,12 +63,19 @@ public class AdminServiceImpl implements AdminService {
                 })
                 .sorted(Comparator.comparing(MonthlyStatDTO::getMonth).reversed())
                 .toList();
+
+        BigDecimal grandTotalRevenue = confirmedReservations.stream()
+                .map(Reservation::getAmount)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         return AdminDashboardDTO.builder()
                 .totalUsers(userRepository.count())
                 .totalTours(tourRepository.count())
                 .totalReservations(reservationRepository.count())
                 .monthlyPerformance(monthlyPerformance)
                 .averageTourRating(tourRepository.getAverageRating() != null ? tourRepository.getAverageRating() : 0.0)
+                .totalRevenue(grandTotalRevenue)
                 .totalArticles(articleRepository.count())
                 .activeGuides(userRepository.countByRole_NameAndStatus("GUIDE", UserStatus.ACTIVE))
                 .reservationsByStatus(reservationsByStatus)
