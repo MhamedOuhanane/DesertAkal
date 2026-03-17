@@ -1,10 +1,9 @@
 import { Routes } from '@angular/router';
-import { DashboardLayout } from '../../layouts/dashboard-layout/dashboard-layout';
 
 export const GUIDE_ROUTES: Routes = [
     {
-        path: '',
-        component: DashboardLayout,
-        children: [],
+        path: 'profile',
+        loadComponent: () => import('../../shared/pages/profile/profile').then((m) => m.Profile),
+        data: { breadcrumb: 'Profile' },
     },
 ];
