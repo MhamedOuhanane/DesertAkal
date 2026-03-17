@@ -402,4 +402,28 @@
             </div>
         </div>
     </div>
+
+    @if (showEditDialog() && isAdmin()) {
+        <app-profile-edit-admin-dialog
+            [profile]="profile()!"
+            (saved)="onProfileUpdated()"
+            (cancel)="closeEditDialog()"
+        />
+    }
+
+    @if (showEditDialog() && isGuide()) {
+        <app-profile-edit-guide-dialog
+            [profile]="asGuide()"
+            (saved)="onProfileUpdated()"
+            (cancel)="closeEditDialog()"
+        />
+    }
+
+    @if (showEditDialog() && isTourist()) {
+        <app-profile-edit-tourist-dialog
+            [profile]="asTourist()"
+            (saved)="onProfileUpdated()"
+            (cancel)="closeEditDialog()"
+        />
+    }
 }
