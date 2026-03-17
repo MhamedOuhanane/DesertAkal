@@ -122,10 +122,9 @@ public class FileStorageServiceImpl implements FileStorageService {
         return switch (type) {
             case AVATAR -> "defaults/default-avatar.png";
             case PROFILE -> "defaults/default-profile.png";
-            case TOUR -> "defaults/default-tour.png";
-            case CITY -> "defaults/default-city.png";
-            case ARTICLE -> "defaults/default-article.png";
-            default -> "";
+            case TOUR -> "defaults/default-tour.jpg";
+            case CITY -> "defaults/default-city.jpg";
+            case ARTICLE -> "defaults/default-article.jpg";
         };
     }
 
