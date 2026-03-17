@@ -9,13 +9,20 @@ import { ProfileData } from '../../../core/models/user.models';
 import { Tourist } from '../../../core/models/tourist.model';
 import { GuideFind } from '../../../core/models/guide.model';
 import { ProfileService } from '../../../core/services/profile-service';
-import { ProfileEditAdminDialog } from "../../components/profile-edit-admin-dialog/profile-edit-admin-dialog";
-import { ProfileEditGuideDialog } from "../../components/profile-edit-guide-dialog/profile-edit-guide-dialog";
+import { ProfileEditAdminDialog } from '../../components/profile-edit-admin-dialog/profile-edit-admin-dialog';
+import { ProfileEditGuideDialog } from '../../components/profile-edit-guide-dialog/profile-edit-guide-dialog';
 import { ProfileEditTouristDialog } from '../../components/profile-edit-tourist-dialog/profile-edit-tourist-dialog';
 
 @Component({
     selector: 'app-profile',
-    imports: [DatePipe, DecimalPipe, MatIcon, ProfileEditAdminDialog, ProfileEditGuideDialog, ProfileEditTouristDialog],
+    imports: [
+        DatePipe,
+        DecimalPipe,
+        MatIcon,
+        ProfileEditAdminDialog,
+        ProfileEditGuideDialog,
+        ProfileEditTouristDialog,
+    ],
     templateUrl: './profile.html',
 })
 export class Profile implements OnInit {

@@ -28,6 +28,7 @@ export const jwtInterceptor: HttpInterceptorFn = (
     const token = authStore.token();
     const { url } = req;
     const isAuthPath = url.includes('/api/auth');
+    const isLogOut = url.includes('/api/auth/logout');
     const isRefreshPath = url.includes('/api/auth/refresh');
 
     let { headers } = req;
@@ -47,7 +48,7 @@ export const jwtInterceptor: HttpInterceptorFn = (
 
     return next(authReq).pipe(
         catchError((error: HttpErrorResponse): Observable<HttpEvent<unknown>> => {
-            if (error.status === 401 && !isAuthPath) {
+            if ((error.status === 401 || error.status === 403) && (!isAuthPath || isLogOut)) {
                 return handle401Error(authService, authStore, authReq, next);
             }
             return throwError(() => error);

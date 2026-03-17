@@ -5,11 +5,6 @@ export const GUIDE_ROUTES: Routes = [
     {
         path: '',
         component: DashboardLayout,
-        children: [
-            {
-                path: '',
-                loadComponent: () => import('./profile/profile-guide').then((m) => m.ProfileGuide),
-            },
-        ],
+        children: [],
     },
 ];

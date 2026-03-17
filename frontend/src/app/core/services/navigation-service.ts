@@ -63,9 +63,9 @@ export class NavigationService {
             case 'ADMIN':
                 return '/dashboard';
             case 'GUIDE':
-                return '/dashboard/guide';
+                return '/guide/dashboard';
             case 'TOURIST':
-                return '/dashboard/tourist';
+                return '/tourist/dashboard';
             default:
                 return '/';
         }

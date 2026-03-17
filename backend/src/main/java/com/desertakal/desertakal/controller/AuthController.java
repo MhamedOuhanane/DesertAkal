@@ -20,6 +20,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -233,7 +234,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> remoteLogout(
+    public ResponseEntity<?> logout(
             @NonNull @CookieValue(name = "refreshToken") String token,
             @NonNull HttpServletRequest request
     ) {
@@ -253,6 +254,8 @@ public class AuthController {
                 .maxAge(0)
                 .sameSite(cookieConfig.getSameSite())
                 .build();
+
+        SecurityContextHolder.clearContext();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())

@@ -28,31 +28,10 @@ export const routes: Routes = [
     },
 
     {
-        path: 'dashboard',
+        path: '',
         canActivate: [authGuard, roleGuard],
         data: { roles: ['ADMIN', 'GUIDE', 'TOURIST'] },
-        children: [
-            {
-                path: '',
-                canActivate: [roleGuard],
-                data: { roles: ['ADMIN'] },
-                loadChildren: () =>
-                    import('./features/admin/admin.routes').then((r) => r.ADMIN_ROUTES),
-            },
-            {
-                path: 'profile',
-                loadComponent: () =>
-                    import('./shared/pages/profile/profile').then((m) => m.Profile),
-                data: { breadcrumb: 'Profile' },
-            },
-        ],
-    },
-
-    {
-        path: 'guide',
-        canActivate: [authGuard, roleGuard],
-        data: { roles: ['GUIDE'] },
-        loadChildren: () => import('./features/guide/guide.routes').then((r) => r.GUIDE_ROUTES),
+        loadChildren: () => import('./features/dashboard.routes').then((r) => r.DASHBOARD_ROUTES),
     },
 
     {

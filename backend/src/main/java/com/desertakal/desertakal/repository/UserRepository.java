@@ -27,7 +27,13 @@ public interface UserRepository extends JpaRepository<@NonNull User, @NonNull UU
     Optional<User> findByEmailOrUsernameWithSecurity(@Param("identifier") String identifier);
 
     @EntityGraph(attributePaths = {"role", "role.permissions"})
-    Optional<User> findWithSecurityByUuid(UUID uuid);
+    @Query("""
+        SELECT u FROM User u
+        JOIN FETCH u.role r
+        LEFT JOIN FETCH r.permissions
+        WHERE u.uuid = :uuid
+    """)
+    Optional<User> findWithSecurityByUuid(@Param("uuid") UUID uuid);
 
     long countByRole_NameAndStatus(String roleName, UserStatus status);
 
