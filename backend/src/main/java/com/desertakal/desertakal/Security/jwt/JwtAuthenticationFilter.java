@@ -44,7 +44,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
 
                 String uuid = jwtService.extractSub(token);
-
                 if (uuid != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     CustomUserDetails userDetails = userDetailsService.loadUserByUuid(uuid);
 
@@ -65,6 +64,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             } catch (io.jsonwebtoken.ExpiredJwtException e) {
                 log.warn("JWT token expired: {}", e.getMessage());
+                SecurityContextHolder.clearContext();
+                try {
+                    request.getSession(false);
+                    if (request.getSession(false) != null) {
+                        request.getSession().invalidate();
+                    }
+                } catch (Exception ignored) {}
             } catch (Exception e) {
                 log.error("JWT validation failed: {}", e.getMessage());
             }
