@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface NotificationService {
     void create(String title, String message, UUID userUuid);
-    NotificationFindDTO find(@NonNull UUID notifUuid);
+    NotificationFindDTO find(@NonNull UUID notifUuid, @NonNull UUID currentUserUuid, boolean isAdmin);
     PaginationDTO findByUser(@NonNull UUID userUuid, @NonNull Pageable pageable);
-    void delete(@NonNull UUID notifUuid);
+    void delete(@NonNull UUID notifUuid, @NonNull UUID currentUserUuid, boolean isAdmin);
 }

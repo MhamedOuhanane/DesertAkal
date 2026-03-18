@@ -2,6 +2,7 @@ package com.desertakal.desertakal.service.impl;
 
 import com.desertakal.desertakal.exception.custom.BusinessRuleException;
 import com.desertakal.desertakal.exception.custom.ResourceNotFoundException;
+import com.desertakal.desertakal.exception.custom.UnauthorizedActionException;
 import com.desertakal.desertakal.model.dto.notif.NotificationFindDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.entity.Notification;
@@ -58,7 +59,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional
-    public NotificationFindDTO find(@NonNull UUID notifUuid) {
+    public NotificationFindDTO find(@NonNull UUID notifUuid, @NonNull UUID currentUserUuid, boolean isAdmin) {
         log.info("Request to fetch and mark as seen Notification UUID: {}", notifUuid);
 
         Notification notification = repository.findByUuid(notifUuid)
@@ -66,6 +67,14 @@ public class NotificationServiceImpl implements NotificationService {
                     log.error("Fetch failed: Notification with UUID {} not found", notifUuid);
                     return new ResourceNotFoundException("Notification", "identifier", notifUuid.toString());
                 });
+
+        boolean isOwner = notification.getUser().getUuid().equals(currentUserUuid);
+
+        if (!isOwner && !isAdmin) {
+            log.error("Unauthorized Access: User {} attempted to see notification {} owned by {}",
+                    currentUserUuid, notifUuid, notification.getUser().getUuid());
+            throw new UnauthorizedActionException("Access denied: You are not authorized to cancel this reservation.");
+        }
 
         if (Boolean.FALSE.equals(notification.getSeen())) {
             log.debug("Updating status for notification {}: seen = true", notifUuid);
@@ -112,7 +121,8 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void delete(@NonNull UUID notifUuid) {
+    @Transactional
+    public void delete(@NonNull UUID notifUuid, @NonNull UUID currentUserUuid, boolean isAdmin) {
         log.info("Request to delete Notification with UUID: {}", notifUuid);
 
         Notification notification = repository.findByUuid(notifUuid)
@@ -120,6 +130,14 @@ public class NotificationServiceImpl implements NotificationService {
                     log.warn("Delete failed: Notification not found for UUID: {}", notifUuid);
                     return new ResourceNotFoundException("Notification", "identifier", notifUuid.toString());
                 });
+
+        boolean isOwner = notification.getUser().getUuid().equals(currentUserUuid);
+
+        if (!isOwner && !isAdmin) {
+            log.error("Unauthorized Access: User {} attempted to delete notification {} owned by {}",
+                    currentUserUuid, notifUuid, notification.getUser().getUuid());
+            throw new UnauthorizedActionException("Access denied: You are not authorized to cancel this reservation.");
+        }
 
         repository.delete(notification);
 
