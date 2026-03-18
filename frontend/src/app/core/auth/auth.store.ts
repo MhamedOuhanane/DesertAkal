@@ -209,13 +209,13 @@ export const AuthStore = signalStore(
                 try {
                     const response = await firstValueFrom(authService.logout());
                     toast.success(response.message);
-
+                } catch (error) {
+                    toast.error('Server logout failed, cleaning local storage anyway.');
+                } {
                     cookieService.delete('auth_token', '/');
                     cookieService.delete('user_data', '/');
                     patchState(store, initialState);
                     await router.navigate(['/auth/login']);
-                } catch (error) {
-                    toast.error('Server logout failed, cleaning local storage anyway.');
                 }
             },
 

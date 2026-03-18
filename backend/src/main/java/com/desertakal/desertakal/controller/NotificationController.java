@@ -1,5 +1,6 @@
 package com.desertakal.desertakal.controller;
 
+import com.desertakal.desertakal.Security.user.CustomUserDetails;
 import com.desertakal.desertakal.model.dto.notif.NotificationFindDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import com.desertakal.desertakal.model.dto.responce.StandardResponseDTO;
@@ -13,9 +14,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -62,14 +65,15 @@ public class NotificationController {
     }
 
     @GetMapping("/{uuid}")
-    @PreAuthorize("@ownerSecurityService.isOwner(#uuid, authentication, false)")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull NotificationFindDTO>> show(
             @PathVariable UUID uuid,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             HttpServletRequest request
     ) {
         log.info("REST request to get Notification by UUID: {} [Path: {}]", uuid, request.getServletPath());
 
-        var result = service.find(uuid);
+        var result = service.find(uuid, userDetails.getUuid(), isAdmin(userDetails));
 
         var response = StandardResponseDTO.<NotificationFindDTO>builder()
                 .timestamp(LocalDateTime.now())
@@ -84,17 +88,17 @@ public class NotificationController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{uuid}/user/{userUuid}")
-    @PreAuthorize("@ownerSecurityService.isOwner(#userUuid, authentication, false )")
+    @DeleteMapping("/{uuid}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<@NonNull StandardResponseDTO<Void>> delete(
             @PathVariable UUID uuid,
-            @PathVariable UUID userUuid,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             HttpServletRequest request
     ) {
         log.info("REST request to DELETE Notification with UUID: {} [Requested by Path: {}]",
                 uuid, request.getServletPath());
 
-        service.delete(uuid);
+        service.delete(uuid, userDetails.getUuid(), isAdmin(userDetails));
 
         var response = StandardResponseDTO.<Void>builder()
                 .timestamp(LocalDateTime.now())
@@ -106,5 +110,10 @@ public class NotificationController {
         log.info("Successfully deleted Notification with UUID: {} [Status: 200 OK]", uuid);
 
         return ResponseEntity.ok(response);
+    }
+
+    private boolean isAdmin(CustomUserDetails currentUser) {
+        return currentUser.getAuthorities().stream()
+                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN"));
     }
 }
