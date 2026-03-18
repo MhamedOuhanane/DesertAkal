@@ -135,7 +135,7 @@ export const NAV_CONFIG = {
                 },
                 {
                     label: 'Guides',
-                    path: '/guide/dashboards',
+                    path: '/dashboard/guides',
                     icon: 'directions_walk',
                     roles: ['ADMIN'],
                 },

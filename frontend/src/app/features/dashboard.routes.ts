@@ -15,14 +15,14 @@ export const DASHBOARD_ROUTES: Routes = [
                 loadChildren: () => import('./admin/admin.routes').then((r) => r.ADMIN_ROUTES),
             },
             {
-                path: 'guide/dashboard',
+                path: 'guide',
                 canActivate: [roleGuard],
                 data: { roles: ['GUIDE'] },
                 loadChildren: () => import('./guide/guide.routes').then((r) => r.GUIDE_ROUTES),
             },
 
             {
-                path: 'tourist/dashboard',
+                path: 'tourist',
                 canActivate: [roleGuard],
                 data: { roles: ['TOURIST'] },
                 loadChildren: () =>

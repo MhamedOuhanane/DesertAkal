@@ -12,10 +12,11 @@ import { RoleEnum } from '../../../core/enums/role.enum';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
+import { NotificationBell } from "../notification-bell/notification-bell";
 
 @Component({
     selector: 'app-dashboard-header',
-    imports: [MatIcon, MatRipple, UserDropdown, BrandLogo],
+    imports: [MatIcon, MatRipple, UserDropdown, BrandLogo, NotificationBell],
     templateUrl: './dashboard-header.html',
     styles: ``,
 })

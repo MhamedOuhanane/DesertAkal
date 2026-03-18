@@ -10,7 +10,7 @@ export const homeGuard: CanActivateFn = (route, state) => {
 
     if (store.isAuthenticated()) {
         if (role === 'ADMIN') return router.createUrlTree(['/dashboard']);
-        if (role === 'GUIDE') return router.createUrlTree(['/dashboard/guide']);
+        if (role === 'GUIDE') return router.createUrlTree(['/guide/dashboard']);
     }
 
     return true;
