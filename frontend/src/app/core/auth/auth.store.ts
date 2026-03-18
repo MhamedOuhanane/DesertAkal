@@ -6,7 +6,7 @@ import {
     withMethods,
     withState,
 } from '@ngrx/signals';
-import { UserAuth } from '../models/user.models';
+import { ProfileData, UserAuth } from '../models/user.models';
 import { computed, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { CookieService } from 'ngx-cookie-service';
@@ -50,6 +50,32 @@ export const AuthStore = signalStore(
             authService = inject(AuthService),
             router = inject(Router),
         ) => ({
+            updateUserFromProfile(profile: ProfileData): void {
+                console.log(profile);
+                
+                patchState(store, (state) => ({
+                    user: {
+                        ...state.user,
+                        uuid: profile.uuid,
+                        username: profile.username,
+                        fullName: `${profile.firstName} ${profile.lastName}`,
+                        photo: profile      .photo,
+                        role: profile.role
+                    } as UserAuth
+                }));
+                const isSecure = environment.secureCookie;
+
+                cookieService.set(
+                    'user_data',
+                    JSON.stringify(store.user()),
+                    30,
+                    '/',
+                    '',
+                    isSecure,
+                    'Strict',
+                );
+            },
+
             async login(credentials: LoginRequest): Promise<boolean> {
                 if (!isPlatformBrowser(platformId)) return false;
 

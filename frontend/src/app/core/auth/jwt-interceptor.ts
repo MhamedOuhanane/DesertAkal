@@ -48,7 +48,7 @@ export const jwtInterceptor: HttpInterceptorFn = (
 
     return next(authReq).pipe(
         catchError((error: HttpErrorResponse): Observable<HttpEvent<unknown>> => {
-            if ((error.status === 401 || error.status === 403) && (!isAuthPath || isLogOut)) {
+            if (error.status === 401 && (!isAuthPath || isLogOut)) {
                 return handle401Error(authService, authStore, authReq, next);
             }
             return throwError(() => error);

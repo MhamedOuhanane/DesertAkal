@@ -1,4 +1,5 @@
 <div class="relative">
+    <!-- Bell Button -->
     <button
         (click)="togglePanel()"
         matRipple
@@ -23,348 +24,361 @@
         }
     </button>
 
+    <!-- Dropdown -->
     @if (isOpen()) {
-        <div
-            class="fixed inset-0 z-40"
-            (click)="closePanel()"
-        ></div>
+        <!-- Backdrop -->
+        <div class="fixed inset-0 z-40" (click)="closePanel()"></div>
 
+        <!-- Panel -->
         <div
             class="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-2xl border border-border bg-surface shadow-xl sm:w-96"
         >
-            <div
-                class="flex items-center justify-between border-b border-border px-4 py-3"
-            >
-                <div class="flex items-center gap-2">
-                    <mat-icon
-                        class="text-text-tertiary"
-                        style="
-                            font-size: 18px;
-                            width: 18px;
-                            height: 18px;
-                        "
-                        >notifications</mat-icon
+            <!-- ══════ VIEW: Detail ══════ -->
+            @if (selectedNotification()) {
+                <!-- Detail Header -->
+                <div
+                    class="flex items-center gap-2 border-b border-border px-4 py-3"
+                >
+                    <button
+                        (click)="closeDetail()"
+                        class="flex h-7 w-7 items-center justify-center rounded-lg text-text-tertiary transition-colors hover:bg-main-bg"
+                        title="Back to list"
                     >
-                    <h3
+                        <mat-icon
+                            style="
+                                font-size: 16px;
+                                width: 16px;
+                                height: 16px;
+                            "
+                            >arrow_back</mat-icon
+                        >
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10"
+                        >
+                            <mat-icon
+                                class="text-primary"
+                                style="
+                                    font-size: 14px;
+                                    width: 14px;
+                                    height: 14px;
+                                "
+                            >
+                                {{
+                                    getNotifIcon(
+                                        selectedNotification()!.title
+                                    )
+                                }}
+                            </mat-icon>
+                        </div>
+                        <h3
+                            class="text-sm font-bold text-text-primary"
+                        >
+                            Notification
+                        </h3>
+                    </div>
+                </div>
+
+                <!-- Detail Content -->
+                <div class="p-5">
+                    <h4
                         class="text-sm font-bold text-text-primary"
                     >
-                        Notifications
-                    </h3>
-                    @if (unreadCount() > 0) {
-                        <span
-                            class="rounded-full bg-error/10 px-2 py-0.5 text-[10px] font-bold text-error"
-                        >
-                            {{ unreadCount() }} new
-                        </span>
-                    }
-                </div>
-                <button
-                    (click)="closePanel()"
-                    class="flex h-7 w-7 items-center justify-center rounded-lg text-text-tertiary transition-colors hover:bg-main-bg"
-                >
-                    <mat-icon
-                        style="
-                            font-size: 16px;
-                            width: 16px;
-                            height: 16px;
-                        "
-                        >close</mat-icon
+                        {{ selectedNotification()!.title }}
+                    </h4>
+                    <p
+                        class="mt-3 text-[13px] leading-relaxed text-text-secondary"
                     >
-                </button>
-            </div>
+                        {{ selectedNotification()!.message }}
+                    </p>
+                    <div
+                        class="mt-4 flex items-center gap-1.5 text-[10px] text-text-tertiary"
+                    >
+                        <mat-icon
+                            style="
+                                font-size: 12px;
+                                width: 12px;
+                                height: 12px;
+                            "
+                            >schedule</mat-icon
+                        >
+                        {{
+                            selectedNotification()!.date
+                                | date: "MMMM d, y · HH:mm"
+                        }}
+                    </div>
+                </div>
 
-            <div class="max-h-80 overflow-y-auto">
-                @if (isLoading()) {
-                    <div class="animate-pulse space-y-0">
-                        @for (_ of [1, 2, 3]; track $index) {
-                            <div
-                                class="flex gap-3 border-b border-border p-4"
+                <!-- Detail Actions -->
+                <div
+                    class="flex items-center gap-2 border-t border-border px-4 py-3"
+                >
+                    <button
+                        (click)="closeDetail()"
+                        class="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-border py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-main-bg"
+                    >
+                        <mat-icon
+                            style="
+                                font-size: 14px;
+                                width: 14px;
+                                height: 14px;
+                            "
+                            >arrow_back</mat-icon
+                        >
+                        Back
+                    </button>
+                    <button
+                        (click)="
+                            deleteNotification(
+                                selectedNotification()!,
+                                $event
+                            );
+                            closeDetail()
+                        "
+                        class="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-red-500/10 py-2 text-xs font-medium text-red-600 transition-colors hover:bg-red-500/20"
+                    >
+                        <mat-icon
+                            style="
+                                font-size: 14px;
+                                width: 14px;
+                                height: 14px;
+                            "
+                            >delete_outline</mat-icon
+                        >
+                        Delete
+                    </button>
+                </div>
+            } @else {
+                <!-- ══════ VIEW: List ══════ -->
+
+                <!-- List Header -->
+                <div
+                    class="flex items-center justify-between border-b border-border px-4 py-3"
+                >
+                    <div class="flex items-center gap-2">
+                        <mat-icon
+                            class="text-text-tertiary"
+                            style="
+                                font-size: 18px;
+                                width: 18px;
+                                height: 18px;
+                            "
+                            >notifications</mat-icon
+                        >
+                        <h3
+                            class="text-sm font-bold text-text-primary"
+                        >
+                            Notifications
+                        </h3>
+                        @if (unreadCount() > 0) {
+                            <span
+                                class="rounded-full bg-error/10 px-2 py-0.5 text-[10px] font-bold text-error"
                             >
-                                <div
-                                    class="h-8 w-8 shrink-0 rounded-full bg-border/30"
-                                ></div>
-                                <div
-                                    class="flex-1 space-y-2"
-                                >
-                                    <div
-                                        class="h-3 w-32 rounded bg-border/40"
-                                    ></div>
-                                    <div
-                                        class="h-3 w-full rounded bg-border/20"
-                                    ></div>
-                                </div>
-                            </div>
+                                {{ unreadCount() }} new
+                            </span>
                         }
                     </div>
-                } @else if (notifications().length > 0) {
-                    @for (
-                        notif of notifications();
-                        track notif.uuid
-                    ) {
-                        <div
-                            class="group flex cursor-pointer gap-3 border-b border-border p-4 transition-colors last:border-0 hover:bg-main-bg/50"
-                            [class.bg-primary/3]="!notif.seen"
-                            (click)="
-                                openNotification(notif)
+                    <button
+                        (click)="closePanel()"
+                        class="flex h-7 w-7 items-center justify-center rounded-lg text-text-tertiary transition-colors hover:bg-main-bg"
+                    >
+                        <mat-icon
+                            style="
+                                font-size: 16px;
+                                width: 16px;
+                                height: 16px;
                             "
+                            >close</mat-icon
                         >
+                    </button>
+                </div>
+
+                <!-- List Content -->
+                <div class="max-h-80 overflow-y-auto">
+                    @if (isLoading()) {
+                        <div class="animate-pulse space-y-0">
+                            @for (_ of [1, 2, 3]; track $index) {
+                                <div
+                                    class="flex gap-3 border-b border-border p-4"
+                                >
+                                    <div
+                                        class="h-8 w-8 shrink-0 rounded-full bg-border/30"
+                                    ></div>
+                                    <div
+                                        class="flex-1 space-y-2"
+                                    >
+                                        <div
+                                            class="h-3 w-32 rounded bg-border/40"
+                                        ></div>
+                                        <div
+                                            class="h-3 w-full rounded bg-border/20"
+                                        ></div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    } @else if (notifications().length > 0) {
+                        @for (
+                            notif of notifications();
+                            track notif.uuid
+                        ) {
                             <div
-                                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
-                                [class.bg-primary/10]="
-                                    !notif.seen
-                                "
-                                [class.bg-main-bg]="
-                                    notif.seen
-                                "
+                                class="group flex cursor-pointer gap-3 border-b border-border p-4 transition-colors last:border-0 hover:bg-main-bg/50"
+                                [class.bg-primary/3]="!notif.seen"
+                                (click)="openNotification(notif)"
                             >
-                                <mat-icon
-                                    style="
-                                        font-size: 15px;
-                                        width: 15px;
-                                        height: 15px;
-                                    "
-                                    [class.text-primary]="
+                                <!-- Icon -->
+                                <div
+                                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+                                    [class.bg-primary/10]="
                                         !notif.seen
                                     "
-                                    [class.text-text-disabled]="
-                                        notif.seen
-                                    "
+                                    [class.bg-main-bg]="notif.seen"
                                 >
-                                    {{
-                                        getNotifIcon(
-                                            notif.title
-                                        )
-                                    }}
-                                </mat-icon>
-                            </div>
-
-                            <div class="min-w-0 flex-1">
-                                <div
-                                    class="flex items-start justify-between gap-2"
-                                >
-                                    <p
-                                        class="text-xs font-semibold"
-                                        [class.text-text-primary]="
+                                    <mat-icon
+                                        style="
+                                            font-size: 15px;
+                                            width: 15px;
+                                            height: 15px;
+                                        "
+                                        [class.text-primary]="
                                             !notif.seen
                                         "
-                                        [class.text-text-secondary]="
+                                        [class.text-text-disabled]="
                                             notif.seen
                                         "
                                     >
-                                        {{ notif.title }}
-                                    </p>
-
-                                    @if (!notif.seen) {
-                                        <span
-                                            class="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary"
-                                        ></span>
-                                    }
+                                        {{
+                                            getNotifIcon(notif.title)
+                                        }}
+                                    </mat-icon>
                                 </div>
-                                <p
-                                    class="mt-0.5 text-[11px] text-text-tertiary"
-                                >
-                                    {{
-                                        getTimeAgo(
-                                            notif.date
-                                        )
-                                    }}
-                                </p>
-                            </div>
 
-                            <button
-                                (click)="
-                                    deleteNotification(
-                                        notif,
-                                        $event
-                                    )
+                                <!-- Content -->
+                                <div class="min-w-0 flex-1">
+                                    <div
+                                        class="flex items-start justify-between gap-2"
+                                    >
+                                        <p
+                                            class="text-xs font-semibold"
+                                            [class.text-text-primary]="
+                                                !notif.seen
+                                            "
+                                            [class.text-text-secondary]="
+                                                notif.seen
+                                            "
+                                        >
+                                            {{ notif.title }}
+                                        </p>
+                                        @if (!notif.seen) {
+                                            <span
+                                                class="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary"
+                                            ></span>
+                                        }
+                                    </div>
+                                    <p
+                                        class="mt-0.5 text-[11px] text-text-tertiary"
+                                    >
+                                        {{
+                                            getTimeAgo(notif.date)
+                                        }}
+                                    </p>
+                                </div>
+
+                                <!-- Delete -->
+                                <button
+                                    (click)="
+                                        deleteNotification(
+                                            notif,
+                                            $event
+                                        )
+                                    "
+                                    class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-text-tertiary opacity-0 transition-all hover:bg-red-500/10 hover:text-red-500 group-hover:opacity-100"
+                                    title="Delete"
+                                >
+                                    <mat-icon
+                                        style="
+                                            font-size: 14px;
+                                            width: 14px;
+                                            height: 14px;
+                                        "
+                                        >close</mat-icon
+                                    >
+                                </button>
+                            </div>
+                        }
+                    } @else {
+                        <!-- Empty -->
+                        <div
+                            class="flex flex-col items-center justify-center py-10"
+                        >
+                            <mat-icon
+                                class="mb-2 text-text-disabled"
+                                style="
+                                    font-size: 36px;
+                                    width: 36px;
+                                    height: 36px;
                                 "
-                                class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-text-tertiary opacity-0 transition-all hover:bg-red-500/10 hover:text-red-500 group-hover:opacity-100"
-                                title="Delete"
+                                >notifications_off</mat-icon
                             >
+                            <p
+                                class="text-sm font-medium text-text-disabled"
+                            >
+                                No notifications
+                            </p>
+                            <p
+                                class="mt-0.5 text-[11px] text-text-disabled"
+                            >
+                                You're all caught up!
+                            </p>
+                        </div>
+                    }
+                </div>
+
+                <!-- Load More Footer -->
+                @if (
+                    notifications().length > 0 &&
+                    totalElements() > notifications().length
+                ) {
+                    <div
+                        class="border-t border-border bg-main-bg/30 px-4 py-2.5 text-center"
+                    >
+                        <button
+                            (click)="loadMore()"
+                            [disabled]="isLoadingMore()"
+                            class="flex w-full items-center justify-center gap-1.5 text-xs font-medium text-primary transition-colors hover:text-primary/80 disabled:opacity-50"
+                        >
+                            @if (isLoadingMore()) {
+                                <mat-icon
+                                    class="animate-spin"
+                                    style="
+                                        font-size: 14px;
+                                        width: 14px;
+                                        height: 14px;
+                                    "
+                                    >autorenew</mat-icon
+                                >
+                                Loading...
+                            } @else {
                                 <mat-icon
                                     style="
                                         font-size: 14px;
                                         width: 14px;
                                         height: 14px;
                                     "
-                                    >close</mat-icon
+                                    >expand_more</mat-icon
                                 >
-                            </button>
-                        </div>
-                    }
-                } @else {
-                    <div
-                        class="flex flex-col items-center justify-center py-10"
-                    >
-                        <mat-icon
-                            class="mb-2 text-text-disabled"
-                            style="
-                                font-size: 36px;
-                                width: 36px;
-                                height: 36px;
-                            "
-                            >notifications_off</mat-icon
-                        >
-                        <p
-                            class="text-sm font-medium text-text-disabled"
-                        >
-                            No notifications
-                        </p>
-                        <p
-                            class="mt-0.5 text-[11px] text-text-disabled"
-                        >
-                            You're all caught up!
-                        </p>
+                                Load more ({{
+                                    totalElements() -
+                                        notifications().length
+                                }}
+                                remaining)
+                            }
+                        </button>
                     </div>
                 }
-            </div>
-
-            @if (
-                notifications().length > 0 &&
-                totalElements() > notifications().length
-            ) {
-                <div
-                    class="border-t border-border bg-main-bg/30 px-4 py-2.5 text-center"
-                >
-                    <button
-                        (click)="loadMore()"
-                        [disabled]="isLoadingMore()"
-                        class="flex w-full items-center justify-center gap-1.5 text-xs font-medium text-primary transition-colors hover:text-primary/80 disabled:opacity-50"
-                    >
-                        @if (isLoadingMore()) {
-                            <mat-icon
-                                class="animate-spin"
-                                style="
-                                    font-size: 14px;
-                                    width: 14px;
-                                    height: 14px;
-                                "
-                                >autorenew</mat-icon
-                            >
-                            Loading...
-                        } @else {
-                            <mat-icon
-                                style="
-                                    font-size: 14px;
-                                    width: 14px;
-                                    height: 14px;
-                                "
-                                >expand_more</mat-icon
-                            >
-                            Load more ({{
-                                totalElements() -
-                                    notifications().length
-                            }}
-                            remaining)
-                        }
-                    </button>
-                </div>
             }
         </div>
     }
 </div>
-
-@if (selectedNotification()) {
-    <div
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
-        (click)="closeDetail()"
-    >
-        <div
-            class="w-full max-w-sm rounded-2xl border border-border bg-surface shadow-2xl"
-            (click)="$event.stopPropagation()"
-        >
-            <div
-                class="flex items-center justify-between border-b border-border px-5 py-4"
-            >
-                <div class="flex items-center gap-2">
-                    <div
-                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10"
-                    >
-                        <mat-icon
-                            class="text-primary"
-                            style="
-                                font-size: 18px;
-                                width: 18px;
-                                height: 18px;
-                            "
-                        >
-                            {{
-                                getNotifIcon(
-                                    selectedNotification()!
-                                        .title
-                                )
-                            }}
-                        </mat-icon>
-                    </div>
-                    <h3
-                        class="text-sm font-bold text-text-primary"
-                    >
-                        {{
-                            selectedNotification()!.title
-                        }}
-                    </h3>
-                </div>
-                <button
-                    (click)="closeDetail()"
-                    class="flex h-7 w-7 items-center justify-center rounded-lg text-text-tertiary hover:bg-main-bg"
-                >
-                    <mat-icon
-                        style="
-                            font-size: 16px;
-                            width: 16px;
-                            height: 16px;
-                        "
-                        >close</mat-icon
-                    >
-                </button>
-            </div>
-            <div class="p-5">
-                <p
-                    class="text-sm leading-relaxed text-text-secondary"
-                >
-                    {{
-                        selectedNotification()!.message
-                    }}
-                </p>
-                <p
-                    class="mt-3 text-[10px] text-text-tertiary"
-                >
-                    {{
-                        selectedNotification()!.date
-                            | date: "MMMM d, y · HH:mm"
-                    }}
-                </p>
-            </div>
-            <div
-                class="flex items-center gap-3 border-t border-border px-5 py-3"
-            >
-                <button
-                    (click)="
-                        deleteNotification(
-                            selectedNotification()!,
-                            $event
-                        );
-                        closeDetail()
-                    "
-                    class="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-red-500/10 py-2 text-xs font-medium text-red-600 transition-colors hover:bg-red-500/20"
-                >
-                    <mat-icon
-                        style="
-                            font-size: 14px;
-                            width: 14px;
-                            height: 14px;
-                        "
-                        >delete_outline</mat-icon
-                    >
-                    Delete
-                </button>
-                <button
-                    (click)="closeDetail()"
-                    class="flex flex-1 items-center justify-center rounded-xl border border-border py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-main-bg"
-                >
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
-}

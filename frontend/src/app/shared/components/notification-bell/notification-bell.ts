@@ -144,11 +144,8 @@ export class NotificationBell implements OnDestroy {
 
     async deleteNotification(notif: Notification, event: Event): Promise<void> {
         event.stopPropagation();
-        const uuid = this.authStore.user()?.uuid;
-        if (!uuid) return;
-
         try {
-            await firstValueFrom(this.notificationService.delete(notif.uuid, uuid));
+            await firstValueFrom(this.notificationService.delete(notif.uuid));
             this.notifications.update((list) => list.filter((n) => n.uuid !== notif.uuid));
             this.totalElements.update((t) => t - 1);
             toast.success('Notification deleted');
