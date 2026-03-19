@@ -25,13 +25,6 @@ export const NAV_CONFIG = {
             requiresAuth: false,
         },
         {
-            label: 'Contact',
-            path: '/contact',
-            icon: 'mail',
-            roles: ['VISITOR', 'TOURIST', 'GUIDE', 'ADMIN'],
-            requiresAuth: false,
-        },
-        {
             label: 'Guides',
             path: '/guides',
             icon: 'badge',
@@ -44,6 +37,13 @@ export const NAV_CONFIG = {
             icon: 'article',
             roles: ['TOURIST', 'GUIDE', 'ADMIN'],
             requiresAuth: true,
+        },
+        {
+            label: 'Contact',
+            path: '/contact',
+            icon: 'mail',
+            roles: ['VISITOR', 'TOURIST', 'GUIDE', 'ADMIN'],
+            requiresAuth: false,
         },
     ] as PublicNavLink[],
 
