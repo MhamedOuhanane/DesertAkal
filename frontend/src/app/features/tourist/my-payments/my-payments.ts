@@ -12,7 +12,6 @@ import { Payment } from '../../../core/models/payment.model';
 
 @Component({
     selector: 'app-my-payments',
-    standalone: true,
     imports: [PaymentCard, PaginationComponent, MatIcon],
     templateUrl: './my-payments.html',
 })

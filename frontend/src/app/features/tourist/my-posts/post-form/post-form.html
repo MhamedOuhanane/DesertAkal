@@ -1,1 +1,307 @@
-<p>post-form works!</p>
+@if (isLoading()) {
+    <div class="card animate-pulse p-8">
+        <div class="space-y-6">
+            <div class="h-6 w-48 rounded bg-border/50"></div>
+            <div class="h-48 w-full rounded-xl bg-border/20"></div>
+            <div class="space-y-2">
+                <div class="h-4 w-24 rounded bg-border/30"></div>
+                <div class="h-32 w-full rounded bg-border/20"></div>
+            </div>
+        </div>
+    </div>
+} @else {
+    <div class="mb-6 flex items-center gap-3">
+        <a
+            routerLink="/tourist/dashboard/posts"
+            class="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition-all hover:border-primary/40 hover:text-primary"
+        >
+            <mat-icon style="font-size: 18px; width: 18px; height: 18px">arrow_back</mat-icon>
+        </a>
+        <div>
+            <h1 class="text-2xl font-bold text-text-primary">
+                {{ isEditMode() ? 'Edit Post' : 'New Post' }}
+            </h1>
+            <p class="text-xs text-text-tertiary">
+                {{ isEditMode() ? 'Update your article' : 'Share your travel experience' }}
+            </p>
+        </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div class="space-y-6 lg:col-span-2">
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center gap-2">
+                        <div
+                            class="flex h-8 w-8 items-center justify-center rounded-lg bg-success/10"
+                        >
+                            <mat-icon
+                                class="text-success"
+                                style="font-size: 18px; width: 18px; height: 18px"
+                                >image</mat-icon
+                            >
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-bold text-text-primary">Cover Image</h2>
+                            <p class="text-[11px] text-text-tertiary">
+                                @if (isEditMode()) {
+                                    Change or keep current image
+                                } @else {
+                                    Required — displayed as header
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    @if (displayImage) {
+                        <div class="relative mb-4 overflow-hidden rounded-xl">
+                            <img
+                                [src]="displayImage"
+                                alt="Cover"
+                                class="h-48 w-full object-cover sm:h-56"
+                            />
+
+                            <div class="absolute left-2 top-2 flex gap-1">
+                                @if (coverImagePreview() && isEditMode()) {
+                                    <span
+                                        class="rounded bg-success/90 px-2 py-0.5 text-[9px] font-bold text-white backdrop-blur-sm"
+                                    >
+                                        NEW
+                                    </span>
+                                } @else if (existingCoverImage() && !coverImagePreview()) {
+                                    <span
+                                        class="rounded bg-primary/90 px-2 py-0.5 text-[9px] font-bold text-white backdrop-blur-sm"
+                                    >
+                                        CURRENT
+                                    </span>
+                                }
+                            </div>
+
+                            <button
+                                type="button"
+                                (click)="removeCoverImage()"
+                                class="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition-colors hover:bg-red-600"
+                            >
+                                <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                                    >close</mat-icon
+                                >
+                            </button>
+                        </div>
+                    }
+
+                    <label
+                        class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border py-8 transition-colors hover:border-primary/40 hover:bg-primary/5"
+                    >
+                        <mat-icon
+                            class="mb-2 text-text-disabled"
+                            style="font-size: 32px; width: 32px; height: 32px"
+                            >add_photo_alternate</mat-icon
+                        >
+                        <p class="text-sm font-medium text-text-secondary">
+                            @if (displayImage) {
+                                Change image
+                            } @else {
+                                Add cover image
+                            }
+                        </p>
+                        <p class="mt-1 text-[11px] text-text-tertiary">JPG, PNG, WebP up to 5MB</p>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            class="hidden"
+                            (change)="onCoverImageSelected($event)"
+                        />
+                    </label>
+
+                    @if (isEditMode() && hasImageChange) {
+                        <div class="mt-3 flex items-center gap-2 rounded-lg bg-info/5 px-3 py-2">
+                            <mat-icon
+                                class="text-info"
+                                style="font-size: 14px; width: 14px; height: 14px"
+                                >info</mat-icon
+                            >
+                            <span class="text-[11px] text-info">
+                                @if (coverImageFile()) {
+                                    New image selected — will be uploaded on save
+                                } @else if (coverImageRemoved()) {
+                                    Cover image will be removed
+                                }
+                            </span>
+                        </div>
+                    }
+                </div>
+
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center gap-2">
+                        <div
+                            class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10"
+                        >
+                            <mat-icon
+                                class="text-primary"
+                                style="font-size: 18px; width: 18px; height: 18px"
+                                >edit_note</mat-icon
+                            >
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-bold text-text-primary">Content</h2>
+                            <p class="text-[11px] text-text-tertiary">
+                                Tell your story (10 - 5000 characters)
+                            </p>
+                        </div>
+                    </div>
+
+                    <textarea
+                        formControlName="content"
+                        rows="12"
+                        class="input w-full resize-none"
+                        placeholder="Write about your travel experience, tips, stories..."
+                        [class.!border-error]="
+                            form.get('content')?.touched && form.get('content')?.invalid
+                        "
+                    ></textarea>
+
+                    <div class="mt-1 flex items-center justify-between">
+                        <div class="min-h-5">
+                            @if (form.get('content')?.touched && form.get('content')?.invalid) {
+                                <p class="text-xs text-error">
+                                    @if (form.get('content')?.hasError('required')) {
+                                        Content is required
+                                    } @else if (form.get('content')?.hasError('minlength')) {
+                                        Minimum 10 characters
+                                    }
+                                </p>
+                            }
+                        </div>
+                        <span
+                            class="text-[10px]"
+                            [class.text-error]="contentLength > 5000"
+                            [class.text-text-tertiary]="contentLength <= 5000"
+                        >
+                            {{ contentLength }} / 5000
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                @if (isEditMode()) {
+                    <div class="card p-6">
+                        <div class="mb-4 flex items-center gap-2">
+                            <mat-icon
+                                class="text-text-tertiary"
+                                style="font-size: 18px; width: 18px; height: 18px"
+                                >summarize</mat-icon
+                            >
+                            <h2 class="text-sm font-bold text-text-primary">Changes</h2>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="flex items-center gap-1.5 text-xs text-text-tertiary">
+                                    <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                                        >edit_note</mat-icon
+                                    >
+                                    Content
+                                </span>
+                                @if (hasContentChange) {
+                                    <span
+                                        class="rounded-full bg-warning/10 px-2 py-0.5 text-[9px] font-semibold text-warning"
+                                        >Modified</span
+                                    >
+                                } @else {
+                                    <span class="text-[10px] text-text-disabled">Unchanged</span>
+                                }
+                            </div>
+                            <div class="divider"></div>
+
+                            <div class="flex items-center justify-between">
+                                <span class="flex items-center gap-1.5 text-xs text-text-tertiary">
+                                    <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                                        >image</mat-icon
+                                    >
+                                    Cover Image
+                                </span>
+                                @if (coverImageFile()) {
+                                    <span
+                                        class="rounded-full bg-success/10 px-2 py-0.5 text-[9px] font-semibold text-success"
+                                        >New image</span
+                                    >
+                                } @else if (coverImageRemoved()) {
+                                    <span
+                                        class="rounded-full bg-red-500/10 px-2 py-0.5 text-[9px] font-semibold text-red-600"
+                                        >Removed</span
+                                    >
+                                } @else {
+                                    <span class="text-[10px] text-text-disabled">Unchanged</span>
+                                }
+                            </div>
+                            <div class="divider"></div>
+
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-medium text-text-secondary">Status</span>
+                                @if (hasAnyChange) {
+                                    <span
+                                        class="rounded-full bg-warning/10 px-2 py-0.5 text-[10px] font-semibold text-warning"
+                                        >Unsaved changes</span
+                                    >
+                                } @else {
+                                    <span
+                                        class="rounded-full bg-green-500/10 px-2 py-0.5 text-[10px] font-semibold text-green-600"
+                                        >Up to date</span
+                                    >
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="card p-6">
+                    <div class="space-y-3">
+                        <button
+                            type="submit"
+                            [disabled]="isSubmitting() || (isEditMode() && !hasAnyChange)"
+                            class="btn-primary flex w-full items-center justify-center gap-2 py-2.5 text-sm disabled:opacity-50"
+                        >
+                            @if (isSubmitting()) {
+                                <mat-icon
+                                    class="animate-spin"
+                                    style="font-size: 18px; width: 18px; height: 18px"
+                                    >autorenew</mat-icon
+                                >
+                                {{ isEditMode() ? 'Updating...' : 'Publishing...' }}
+                            } @else {
+                                <mat-icon style="font-size: 18px; width: 18px; height: 18px">
+                                    {{ isEditMode() ? 'save' : 'send' }}
+                                </mat-icon>
+                                {{ isEditMode() ? 'Update Post' : 'Publish Post' }}
+                            }
+                        </button>
+
+                        <a
+                            routerLink="/tourist/dashboard/posts"
+                            class="flex w-full items-center justify-center gap-2 rounded-lg border border-border py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-main-bg"
+                        >
+                            <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                                >arrow_back</mat-icon
+                            >
+                            Cancel
+                        </a>
+                    </div>
+
+                    @if (!isEditMode()) {
+                        <div class="mt-4 flex items-start gap-2 rounded-lg bg-info/5 p-3">
+                            <mat-icon
+                                class="mt-0.5 shrink-0 text-info"
+                                style="font-size: 14px; width: 14px; height: 14px"
+                                >info</mat-icon
+                            >
+                            <p class="text-[11px] leading-relaxed text-info">
+                                Your post will be visible to all authenticated users after
+                                publishing.
+                            </p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </form>
+}

@@ -13,27 +13,18 @@ export class ArticleService {
     private http = inject(HttpClient);
     private baseUrl = `${environment.apiUrl}/articles`;
 
-    create(data: ArticleCreate, coverImage: File): Observable<ApiResponse<Article>> {
-        const formData = new FormData();
-        formData.append('article', new Blob([JSON.stringify(data)], { type: 'application.json' }));
-        formData.append('coverImage', coverImage);
-        return this.http.post<ApiResponse<Article>>(this.baseUrl, formData);
+    create(data: FormData): Observable<ApiResponse<Article>> {
+        return this.http.post<ApiResponse<Article>>(this.baseUrl, data);
     }
 
-    update(uuid: string, data: ArticleUpdate, coverImage?: File): Observable<ApiResponse<Article>> {
-        const formData = new FormData();
-        formData.append('article', new Blob([JSON.stringify(data)], { type: 'application/json' }));
-
-        if (coverImage) {
-            formData.append('coverImage', coverImage);
-        }
-        return this.http.put<ApiResponse<Article>>(`${this.baseUrl}/${uuid}`, formData);
+    update(uuid: string, data: FormData): Observable<ApiResponse<Article>> {
+        return this.http.put<ApiResponse<Article>>(`${this.baseUrl}/${uuid}`, data);
     }
 
     updateImage(uuid: string, coverImage: File): Observable<ApiResponse<Article>> {
         const formData = new FormData();
         formData.append('coverImage', coverImage);
-        return this.http.put<ApiResponse<Article>>(`${this.baseUrl}/${uuid}/image`, formData);
+        return this.http.patch<ApiResponse<Article>>(`${this.baseUrl}/${uuid}/image`, formData);
     }
 
     findAll(params: ArticleFilters): Observable<ApiResponse<Pagination<Article>>> {

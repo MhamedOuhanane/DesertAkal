@@ -15,7 +15,6 @@ import { Reservation, ReservationFilters } from '../../../core/models/reservatio
 
 @Component({
     selector: 'app-my-bookings',
-    standalone: true,
     imports: [RouterLink, FormsModule, MatIcon, ReservationCard, PaginationComponent, DeleteDialog],
     templateUrl: './my-bookings.html',
 })
