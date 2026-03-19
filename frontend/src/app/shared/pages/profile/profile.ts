@@ -102,10 +102,10 @@ export class Profile implements OnInit {
             await firstValueFrom(this.profileService.updateUserPhoto(this.userUuid(), file));
             toast.success('Photo updated successfully');
             await this.loadProfile();
-            
+
             const updatedData = this.profile();
             if (updatedData) {
-                this.authStore.updateUserFromProfile(updatedData)
+                this.authStore.updateUserFromProfile(updatedData);
             }
         } catch (err: any) {
             toast.error(err?.error?.message || 'Failed to update photo');
@@ -129,9 +129,9 @@ export class Profile implements OnInit {
 
         const updatedData = this.profile();
         if (updatedData) {
-            this.authStore.updateUserFromProfile(updatedData)
+            this.authStore.updateUserFromProfile(updatedData);
         }
-        
+
         toast.success('Profile updated successfully');
     }
 

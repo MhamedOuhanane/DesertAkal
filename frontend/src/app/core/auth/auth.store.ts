@@ -52,16 +52,16 @@ export const AuthStore = signalStore(
         ) => ({
             updateUserFromProfile(profile: ProfileData): void {
                 console.log(profile);
-                
+
                 patchState(store, (state) => ({
                     user: {
                         ...state.user,
                         uuid: profile.uuid,
                         username: profile.username,
                         fullName: `${profile.firstName} ${profile.lastName}`,
-                        photo: profile      .photo,
-                        role: profile.role
-                    } as UserAuth
+                        photo: profile.photo,
+                        role: profile.role,
+                    } as UserAuth,
                 }));
                 const isSecure = environment.secureCookie;
 
@@ -211,7 +211,8 @@ export const AuthStore = signalStore(
                     toast.success(response.message);
                 } catch (error) {
                     toast.error('Server logout failed, cleaning local storage anyway.');
-                } {
+                }
+                {
                     cookieService.delete('auth_token', '/');
                     cookieService.delete('user_data', '/');
                     patchState(store, initialState);
