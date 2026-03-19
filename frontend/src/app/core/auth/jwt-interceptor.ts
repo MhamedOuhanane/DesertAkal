@@ -35,7 +35,7 @@ export const jwtInterceptor: HttpInterceptorFn = (
 
     if (token) {
         console.log(token);
-        
+
         headers = headers.set('Authorization', `Bearer ${token}`);
     }
 

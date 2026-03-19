@@ -3,7 +3,8 @@ import { Routes } from '@angular/router';
 export const TOURIST_ROUTES: Routes = [
     {
         path: 'dashboard',
-        loadComponent: () => import('./tourist-dashboard/tourist-dashboard').then((m) => m.TouristDashboard),
+        loadComponent: () =>
+            import('./tourist-dashboard/tourist-dashboard').then((m) => m.TouristDashboard),
     },
     {
         path: 'dashboard/profile',
@@ -14,5 +15,5 @@ export const TOURIST_ROUTES: Routes = [
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full',
-    }
+    },
 ];

@@ -1,0 +1,97 @@
+<div
+    class="card group cursor-pointer overflow-hidden transition-all hover:border-primary/30"
+    [class.p-3]="compact()"
+    [class.p-4]="!compact()"
+    (click)="viewClick.emit(reservation().uuid)"
+>
+    <div class="flex items-center gap-3" [class.gap-4]="!compact()">
+        <div
+            class="flex shrink-0 items-center justify-center rounded-xl"
+            [class.h-10]="!compact()"
+            [class.w-10]="!compact()"
+            [class.h-8]="compact()"
+            [class.w-8]="compact()"
+            [class]="getStatusConfig(reservation().status).bg"
+        >
+            <mat-icon
+                [style.font-size]="compact() ? '15px' : '18px'"
+                [style.width]="compact() ? '15px' : '18px'"
+                [style.height]="compact() ? '15px' : '18px'"
+                [class]="getStatusConfig(reservation().status).text"
+            >
+                {{ getStatusConfig(reservation().status).icon }}
+            </mat-icon>
+        </div>
+
+        <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+                <span
+                    class="rounded bg-main-bg px-1.5 py-0.5 font-mono text-[10px] font-bold text-text-primary"
+                >
+                    {{ reservation().reference }}
+                </span>
+                <span
+                    class="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-semibold"
+                    [class]="
+                        getStatusConfig(reservation().status).bg +
+                        ' ' +
+                        getStatusConfig(reservation().status).text
+                    "
+                >
+                    {{ reservation().status }}
+                </span>
+            </div>
+            <p class="mt-0.5 truncate text-sm font-medium text-text-primary">
+                {{ reservation().tourTitle }}
+            </p>
+            <p class="text-[11px] text-text-tertiary">
+                {{ reservation().startDate | date: 'MMM d' }} →
+                {{ reservation().endDate | date: 'MMM d, y' }} ·
+                {{ reservation().numberPeople }} people
+            </p>
+
+            @if (showGuide() && reservation().guideName) {
+                <p class="mt-0.5 flex items-center gap-1 text-[10px] text-text-tertiary">
+                    <mat-icon style="font-size: 11px; width: 11px; height: 11px">person</mat-icon>
+                    Guide: {{ reservation().guideName }}
+                </p>
+            }
+            @if (showTourist()) {
+                <p class="mt-0.5 flex items-center gap-1 text-[10px] text-text-tertiary">
+                    <mat-icon style="font-size: 11px; width: 11px; height: 11px">person</mat-icon>
+                    {{ reservation().touristName }}
+                </p>
+            }
+        </div>
+
+        @if (showPrice()) {
+            <span class="shrink-0 text-sm font-bold text-text-primary">
+                {{ reservation().amount | currency: 'MAD ' : 'symbol' : '1.0-0' }}
+            </span>
+        }
+    </div>
+
+    @if (showActions() && (canPay || canCancel)) {
+        <div class="mt-3 flex items-center gap-2 border-t border-border pt-3">
+            @if (canPay) {
+                <button
+                    (click)="payClick.emit(reservation().uuid); $event.stopPropagation()"
+                    class="flex items-center gap-1 rounded-lg bg-primary/10 px-3 py-1.5 text-[11px] font-medium text-primary transition-colors hover:bg-primary/20"
+                >
+                    <mat-icon style="font-size: 13px; width: 13px; height: 13px">payment</mat-icon>
+                    Pay Now
+                </button>
+            }
+            @if (canCancel) {
+                <button
+                    (click)="cancelClick.emit(reservation().uuid); $event.stopPropagation()"
+                    class="flex items-center gap-1 rounded-lg bg-red-500/10 px-3 py-1.5 text-[11px] font-medium text-red-600 transition-colors hover:bg-red-500/20"
+                >
+                    <mat-icon style="font-size: 13px; width: 13px; height: 13px">cancel</mat-icon>
+                    Cancel
+                </button>
+            }
+            <ng-content select="[extra-actions]" />
+        </div>
+    }
+</div>
