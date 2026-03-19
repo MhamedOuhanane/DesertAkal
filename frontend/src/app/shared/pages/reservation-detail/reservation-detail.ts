@@ -1,23 +1,31 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 import { toast } from 'ngx-sonner';
 import { MatIcon } from '@angular/material/icon';
-import { ReservationFind } from '../../../../core/models/reservation.model';
-import { Payment } from '../../../../core/models/payment.model';
-import { DeleteDialog } from '../../../../shared/components/delete-dialog/delete-dialog';
-import { ReservationService } from '../../../../core/services/reservation-service';
+import { AuthStore } from '../../../core/auth/auth.store';
+import { NavigationService } from '../../../core/services/navigation-service';
+import { ReservationFind } from '../../../core/models/reservation.model';
+import { Payment } from '../../../core/models/payment.model';
+import { RoleEnum } from '../../../core/enums/role.enum';
+import { PaymentCard } from '../../components/payment-card/payment-card';
+import { DeleteDialog } from '../../components/delete-dialog/delete-dialog';
+import { HasRole } from '../../directives';
+import { ReservationService } from '../../../core/services/reservation-service';
 
 @Component({
     selector: 'app-reservation-detail',
-    imports: [RouterLink, DatePipe, CurrencyPipe, MatIcon, DeleteDialog],
+    standalone: true,
+    imports: [RouterLink, DatePipe, CurrencyPipe, MatIcon, HasRole, PaymentCard, DeleteDialog],
     templateUrl: './reservation-detail.html',
 })
 export class ReservationDetail implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private reservationService = inject(ReservationService);
+    private authStore = inject(AuthStore);
+    private navService = inject(NavigationService);
 
     reservation = signal<ReservationFind | null>(null);
     isLoading = signal(true);
@@ -32,10 +40,51 @@ export class ReservationDetail implements OnInit {
     isDeleting = signal(false);
     isDownloading = signal(false);
 
+    role = computed(() => this.authStore.userRole());
+    isAdmin = computed(() => this.role() === RoleEnum.ADMIN);
+    isGuide = computed(() => this.role() === RoleEnum.GUIDE);
+    isTourist = computed(() => this.role() === RoleEnum.TOURIST);
+
+    backLink = computed(() => {
+        switch (this.role()) {
+            case RoleEnum.ADMIN:
+                return '/dashboard/reservations';
+            case RoleEnum.GUIDE:
+                return '/guide/dashboard/assignments';
+            case RoleEnum.TOURIST:
+                return '/tourist/dashboard/bookings';
+            default:
+                return '/';
+        }
+    });
+
+    pageTitle = computed(() => {
+        switch (this.role()) {
+            case RoleEnum.ADMIN:
+                return 'Reservation';
+            case RoleEnum.GUIDE:
+                return 'Assignment';
+            case RoleEnum.TOURIST:
+                return 'My Booking';
+            default:
+                return 'Reservation';
+        }
+    });
+
+    tourLink = computed(() => {
+        if (this.isAdmin()) return '/dashboard/tours';
+        return '/tours';
+    });
+
+    touristProfileLink = computed(() => (this.isAdmin() ? '/dashboard/users' : null));
+    guideProfileLink = computed(() => (this.isAdmin() ? '/dashboard/guides' : null));
+
+    protected readonly RoleEnum = RoleEnum;
+
     async ngOnInit(): Promise<void> {
         const uuid = this.route.snapshot.paramMap.get('uuid');
         if (!uuid) {
-            this.router.navigate(['/dashboard/reservations']);
+            this.router.navigate([this.backLink()]);
             return;
         }
         await this.loadReservation(uuid);
@@ -48,7 +97,7 @@ export class ReservationDetail implements OnInit {
             await this.loadPayments();
         } catch (err: any) {
             toast.error(err?.error?.message || 'Reservation not found');
-            this.router.navigate(['/dashboard/reservations']);
+            this.router.navigate([this.backLink()]);
         } finally {
             this.isLoading.set(false);
         }
@@ -85,7 +134,7 @@ export class ReservationDetail implements OnInit {
             a.download = `Voucher_${this.reservation()!.reference}.pdf`;
             a.click();
             window.URL.revokeObjectURL(url);
-            toast.success('PDF downloaded');
+            toast.success('Voucher downloaded');
         } catch {
             toast.error('Failed to download PDF');
         } finally {
@@ -114,7 +163,7 @@ export class ReservationDetail implements OnInit {
         try {
             await firstValueFrom(this.reservationService.delete(this.reservation()!.uuid));
             toast.success('Reservation deleted');
-            this.router.navigate(['/dashboard/reservations']);
+            this.router.navigate([this.backLink()]);
         } catch (err: any) {
             toast.error(err?.error?.message || 'Failed to delete');
         } finally {
@@ -134,15 +183,45 @@ export class ReservationDetail implements OnInit {
         );
     }
 
-    getStatusConfig(status: string): { bg: string; text: string; icon: string } {
+    getStatusConfig(status: string): {
+        bg: string;
+        text: string;
+        icon: string;
+    } {
         const map: Record<string, any> = {
-            CONFIRMED: { bg: 'bg-green-500/10', text: 'text-green-600', icon: 'check_circle' },
-            PENDING: { bg: 'bg-orange-500/10', text: 'text-orange-600', icon: 'schedule' },
-            CANCELLED: { bg: 'bg-red-500/10', text: 'text-red-600', icon: 'cancel' },
-            COMPLETED: { bg: 'bg-blue-500/10', text: 'text-blue-600', icon: 'task_alt' },
-            REJECTED: { bg: 'bg-gray-500/10', text: 'text-gray-500', icon: 'do_not_disturb' },
+            CONFIRMED: {
+                bg: 'bg-green-500/10',
+                text: 'text-green-600',
+                icon: 'check_circle',
+            },
+            PENDING: {
+                bg: 'bg-orange-500/10',
+                text: 'text-orange-600',
+                icon: 'schedule',
+            },
+            CANCELLED: {
+                bg: 'bg-red-500/10',
+                text: 'text-red-600',
+                icon: 'cancel',
+            },
+            COMPLETED: {
+                bg: 'bg-blue-500/10',
+                text: 'text-blue-600',
+                icon: 'task_alt',
+            },
+            REJECTED: {
+                bg: 'bg-gray-500/10',
+                text: 'text-gray-500',
+                icon: 'do_not_disturb',
+            },
         };
-        return map[status] || { bg: 'bg-gray-500/10', text: 'text-gray-500', icon: 'help' };
+        return (
+            map[status] || {
+                bg: 'bg-gray-500/10',
+                text: 'text-gray-500',
+                icon: 'help',
+            }
+        );
     }
 
     get canCancel(): boolean {
@@ -151,17 +230,12 @@ export class ReservationDetail implements OnInit {
     }
 
     getPaymentStatusColor(status: string): string {
-        switch (status) {
-            case 'COMPLETED':
-                return 'bg-green-500/10 text-green-600';
-            case 'PENDING':
-                return 'bg-orange-500/10 text-orange-600';
-            case 'FAILED':
-                return 'bg-red-500/10 text-red-600';
-            case 'REFUNDED':
-                return 'bg-blue-500/10 text-blue-600';
-            default:
-                return 'bg-gray-500/10 text-gray-500';
-        }
+        const map: Record<string, string> = {
+            COMPLETED: 'bg-green-500/10 text-green-600',
+            PENDING: 'bg-orange-500/10 text-orange-600',
+            FAILED: 'bg-red-500/10 text-red-600',
+            REFUNDED: 'bg-blue-500/10 text-blue-600',
+        };
+        return map[status] || 'bg-gray-500/10 text-gray-500';
     }
 }

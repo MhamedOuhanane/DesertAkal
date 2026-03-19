@@ -16,8 +16,8 @@ export const TOURIST_ROUTES: Routes = [
             {
                 path: ':uuid',
                 loadComponent: () =>
-                    import('./my-bookings/booking-detail/booking-detail').then(
-                        (m) => m.BookingDetail,
+                    import('../../shared/pages/reservation-detail/reservation-detail').then(
+                        (m) => m.ReservationDetail,
                     ),
                 data: { breadcrumb: 'Details' },
             },
