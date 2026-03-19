@@ -10,10 +10,11 @@ import { GuideService } from '../../../../core/services/guide-service';
 import { Guide, GuideFilters } from '../../../../core/models/guide.model';
 import { Pagination } from '../../../../core/models/response.models';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination';
+import { StarRating } from '../../../../shared/components/star-rating/star-rating';
 
 @Component({
     selector: 'app-guide-list',
-    imports: [RouterLink, FormsModule, DecimalPipe, PaginationComponent],
+    imports: [RouterLink, FormsModule, DecimalPipe, PaginationComponent, StarRating],
     templateUrl: './guide-list.html',
 })
 export class GuideList {

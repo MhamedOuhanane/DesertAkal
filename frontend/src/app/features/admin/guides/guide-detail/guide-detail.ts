@@ -5,10 +5,11 @@ import { firstValueFrom } from 'rxjs';
 import { toast } from 'ngx-sonner';
 import { GuideService } from '../../../../core/services/guide-service';
 import { GuideFind } from '../../../../core/models/guide.model';
+import { StarRating } from '../../../../shared/components/star-rating/star-rating';
 
 @Component({
     selector: 'app-guide-detail',
-    imports: [RouterLink, DatePipe, DecimalPipe],
+    imports: [RouterLink, DatePipe, DecimalPipe, StarRating],
     templateUrl: './guide-detail.html',
 })
 export class GuideDetail implements OnInit {

@@ -9,11 +9,12 @@ import { firstValueFrom } from 'rxjs';
 import { TourService } from '../../../../core/services/tour-service';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination';
 import { DeleteDialog } from '../../../../shared/components/delete-dialog/delete-dialog';
+import { StarRating } from '../../../../shared/components/star-rating/star-rating';
 
 @Component({
     selector: 'app-tour-list',
     standalone: true,
-    imports: [RouterLink, FormsModule, DecimalPipe, PaginationComponent, DeleteDialog],
+    imports: [RouterLink, FormsModule, DecimalPipe, PaginationComponent, DeleteDialog, StarRating],
     templateUrl: './tour-list.html',
 })
 export class TourList implements OnInit {

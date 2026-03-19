@@ -194,16 +194,22 @@ export const NAV_CONFIG = {
                     path: '/tourist/dashboard/bookings',
                     roles: ['TOURIST'],
                 },
-                {
-                    label: 'Interactive Map',
-                    icon: 'map',
-                    path: '/tourist/dashboard/map',
-                    roles: ['TOURIST'],
-                },
+                // {
+                //     label: 'Interactive Map',
+                //     icon: 'map',
+                //     path: '/tourist/dashboard/map',
+                //     roles: ['TOURIST'],
+                // },
                 {
                     label: 'My Publications',
                     icon: 'history_edu',
                     path: '/tourist/dashboard/posts',
+                    roles: ['TOURIST'],
+                },
+                {
+                    label: 'My Reviews',
+                    icon: 'star_rate',
+                    path: '/tourist/dashboard/reviews',
                     roles: ['TOURIST'],
                 },
             ],

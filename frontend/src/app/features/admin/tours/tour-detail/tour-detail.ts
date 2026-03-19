@@ -5,10 +5,11 @@ import { TourFind } from '../../../../core/models/tour.model';
 import { toast } from 'ngx-sonner';
 import { firstValueFrom } from 'rxjs';
 import { TourService } from '../../../../core/services/tour-service';
+import { StarRating } from '../../../../shared/components/star-rating/star-rating';
 
 @Component({
     selector: 'app-tour-detail',
-    imports: [RouterLink, DatePipe, DecimalPipe],
+    imports: [RouterLink, DatePipe, DecimalPipe, StarRating],
     templateUrl: './tour-detail.html',
 })
 export class TourDetail implements OnInit {
