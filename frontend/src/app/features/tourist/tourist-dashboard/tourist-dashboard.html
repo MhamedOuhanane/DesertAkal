@@ -1,1 +1,196 @@
-<p>tourist-dashboard works!</p>
+@if (isLoading()) {
+    <div class="space-y-6">
+        <div class="h-8 w-64 animate-pulse rounded bg-border/50"></div>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            @for (_ of [1, 2, 3, 4]; track $index) {
+                <div class="card animate-pulse p-5">
+                    <div class="h-4 w-20 rounded bg-border/30"></div>
+                    <div class="mt-2 h-8 w-16 rounded bg-border/50"></div>
+                </div>
+            }
+        </div>
+    </div>
+} @else {
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-text-primary">
+            {{ getGreeting() }}, {{ userName() }} 👋
+        </h1>
+        <p class="mt-1 text-sm text-text-tertiary">
+            Here's what's happening with your travel plans
+        </p>
+    </div>
+
+    <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <app-stats-card
+            label="Total Bookings"
+            [value]="bookingsCount()"
+            icon="book_online"
+            iconBg="bg-primary/10"
+            iconColor="text-primary"
+        />
+        <app-stats-card
+            label="Pending"
+            [value]="pendingCount()"
+            icon="schedule"
+            iconBg="bg-orange-500/10"
+            iconColor="text-orange-600"
+            subtitle="Awaiting payment"
+        />
+        <app-stats-card
+            label="My Articles"
+            [value]="articlesCount()"
+            icon="edit_note"
+            iconBg="bg-blue-500/10"
+            iconColor="text-blue-600"
+        />
+        <app-stats-card
+            label="My Reviews"
+            [value]="reviewsCount()"
+            icon="star_rate"
+            iconBg="bg-warning/10"
+            iconColor="text-warning"
+        />
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div class="space-y-4 lg:col-span-2">
+            <div class="flex items-center justify-between">
+                <h2 class="flex items-center gap-2 text-base font-bold text-text-primary">
+                    <mat-icon
+                        class="text-text-tertiary"
+                        style="font-size: 18px; width: 18px; height: 18px"
+                        >book_online</mat-icon
+                    >
+                    Recent Bookings
+                </h2>
+                <a
+                    routerLink="/tourist/dashboard/bookings"
+                    class="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                >
+                    View all
+                    <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                        >arrow_forward</mat-icon
+                    >
+                </a>
+            </div>
+
+            @if (recentBookings().length > 0) {
+                <div class="space-y-3">
+                    @for (booking of recentBookings(); track booking.uuid) {
+                        <app-reservation-card
+                            [reservation]="booking"
+                            [showGuide]="true"
+                            [showTourist]="false"
+                            [showActions]="true"
+                            (viewClick)="viewBooking($event)"
+                            (payClick)="viewBooking($event)"
+                        />
+                    }
+                </div>
+            } @else {
+                <div class="card flex flex-col items-center justify-center p-8 text-center">
+                    <mat-icon
+                        class="mb-2 text-text-disabled"
+                        style="font-size: 36px; width: 36px; height: 36px"
+                        >luggage</mat-icon
+                    >
+                    <p class="text-sm font-medium text-text-disabled">No bookings yet</p>
+                    <a
+                        routerLink="/tours"
+                        class="btn-primary mt-3 inline-flex items-center gap-2 text-sm"
+                    >
+                        <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                            >explore</mat-icon
+                        >
+                        Explore Tours
+                    </a>
+                </div>
+            }
+        </div>
+
+        <div class="space-y-4">
+            <h2 class="flex items-center gap-2 text-base font-bold text-text-primary">
+                <mat-icon
+                    class="text-text-tertiary"
+                    style="font-size: 18px; width: 18px; height: 18px"
+                    >bolt</mat-icon
+                >
+                Quick Actions
+            </h2>
+
+            <div class="space-y-2">
+                <a
+                    routerLink="/tours"
+                    class="card flex items-center gap-3 p-4 transition-all hover:border-primary/30"
+                >
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10"
+                    >
+                        <mat-icon
+                            class="text-primary"
+                            style="font-size: 20px; width: 20px; height: 20px"
+                            >explore</mat-icon
+                        >
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-text-primary">Browse Tours</p>
+                        <p class="text-[11px] text-text-tertiary">Find your next adventure</p>
+                    </div>
+                    <mat-icon
+                        class="ml-auto text-text-tertiary"
+                        style="font-size: 16px; width: 16px; height: 16px"
+                        >chevron_right</mat-icon
+                    >
+                </a>
+
+                <a
+                    routerLink="/tourist/dashboard/posts/create"
+                    class="card flex items-center gap-3 p-4 transition-all hover:border-primary/30"
+                >
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10"
+                    >
+                        <mat-icon
+                            class="text-blue-600"
+                            style="font-size: 20px; width: 20px; height: 20px"
+                            >edit_note</mat-icon
+                        >
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-text-primary">Write a Post</p>
+                        <p class="text-[11px] text-text-tertiary">Share your experience</p>
+                    </div>
+                    <mat-icon
+                        class="ml-auto text-text-tertiary"
+                        style="font-size: 16px; width: 16px; height: 16px"
+                        >chevron_right</mat-icon
+                    >
+                </a>
+
+                <a
+                    routerLink="/tourist/dashboard/reviews"
+                    class="card flex items-center gap-3 p-4 transition-all hover:border-primary/30"
+                >
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-warning/10"
+                    >
+                        <mat-icon
+                            class="text-warning"
+                            style="font-size: 20px; width: 20px; height: 20px"
+                            >star_rate</mat-icon
+                        >
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-text-primary">My Reviews</p>
+                        <p class="text-[11px] text-text-tertiary">See your ratings</p>
+                    </div>
+                    <mat-icon
+                        class="ml-auto text-text-tertiary"
+                        style="font-size: 16px; width: 16px; height: 16px"
+                        >chevron_right</mat-icon
+                    >
+                </a>
+            </div>
+        </div>
+    </div>
+}

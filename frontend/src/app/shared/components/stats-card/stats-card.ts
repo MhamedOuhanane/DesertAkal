@@ -7,7 +7,9 @@ import { MatIcon } from '@angular/material/icon';
     standalone: true,
     imports: [MatIcon, DecimalPipe],
     template: `
-        <div class="card p-5 transition-all hover:border-primary/20">
+        <div
+            class="card flex flex-col justify-between h-full p-5 transition-all hover:border-primary/20"
+        >
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs font-medium text-text-tertiary">{{ label() }}</p>
@@ -27,7 +29,7 @@ import { MatIcon } from '@angular/material/icon';
                     }
                 </div>
                 <div
-                    class="flex h-12 w-12 items-center justify-center rounded-xl"
+                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
                     [class]="iconBg()"
                 >
                     <mat-icon
