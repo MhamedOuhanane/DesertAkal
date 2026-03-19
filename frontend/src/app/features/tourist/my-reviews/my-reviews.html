@@ -1,0 +1,66 @@
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-text-primary">My Reviews</h1>
+    <p class="mt-1 text-sm text-text-tertiary">
+        {{ pagination()?.totalElements || 0 }} review{{
+            (pagination()?.totalElements || 0) !== 1 ? 's' : ''
+        }}
+    </p>
+</div>
+
+@if (isLoading()) {
+    <div class="space-y-3">
+        @for (_ of [1, 2, 3]; track $index) {
+            <div class="card animate-pulse p-4">
+                <div class="space-y-2">
+                    <div class="h-4 w-32 rounded bg-border/40"></div>
+                    <div class="h-3 w-full rounded bg-border/20"></div>
+                    <div class="h-3 w-2/3 rounded bg-border/20"></div>
+                </div>
+            </div>
+        }
+    </div>
+} @else if (reviews().length > 0) {
+    <div class="space-y-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        @for (review of reviews(); track review.uuid) {
+            <app-review-card [review]="review" [showAuthor]="false" [showActions]="true">
+                <div actions>
+                    <button
+                        (click)="openDeleteDialog(review)"
+                        class="flex items-center gap-1 text-[11px] font-medium text-red-500 hover:underline"
+                    >
+                        <mat-icon style="font-size: 13px; width: 13px; height: 13px"
+                            >delete_outline</mat-icon
+                        >
+                        Delete
+                    </button>
+                </div>
+            </app-review-card>
+        }
+    </div>
+
+    @if (pagination() && pagination()!.totalPages > 1) {
+        <div class="mt-6">
+            <app-pagination [pagination]="pagination()!" (pageChange)="goToPage($event)" />
+        </div>
+    }
+} @else {
+    <div class="card flex flex-col items-center justify-center p-12 text-center">
+        <mat-icon class="mb-3 text-text-disabled" style="font-size: 48px; width: 48px; height: 48px"
+            >star_outline</mat-icon
+        >
+        <h3 class="text-base font-semibold text-text-primary">No reviews yet</h3>
+        <p class="mt-1 text-sm text-text-tertiary">
+            After completing a tour, you can leave a review.
+        </p>
+    </div>
+}
+
+@if (showDeleteDialog() && reviewToDelete()) {
+    <app-delete-dialog
+        itemName="Review"
+        [itemTitle]="truncate(reviewToDelete()!.comment, 40)"
+        [isDeleting]="isDeleting()"
+        (confirm)="confirmDelete()"
+        (cancel)="showDeleteDialog.set(false); reviewToDelete.set(null)"
+    />
+}

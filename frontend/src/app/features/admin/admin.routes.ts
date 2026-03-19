@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { DashboardLayout } from '../../layouts/dashboard-layout/dashboard-layout';
 
 export const ADMIN_ROUTES: Routes = [
     {
@@ -185,7 +184,7 @@ export const ADMIN_ROUTES: Routes = [
             {
                 path: ':uuid',
                 loadComponent: () =>
-                    import('./reservations/reservation-detail/reservation-detail').then(
+                    import('../../shared/pages/reservation-detail/reservation-detail').then(
                         (m) => m.ReservationDetail,
                     ),
                 data: { breadcrumb: 'Details' },

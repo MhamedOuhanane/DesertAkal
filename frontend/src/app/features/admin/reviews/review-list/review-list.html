@@ -121,33 +121,7 @@
                             </span>
                         </div>
 
-                        <div class="mb-1 flex items-center gap-1">
-                            @for (state of getStarArray(review.rating); track $index) {
-                                <mat-icon
-                                    style="font-size: 14px; width: 14px; height: 14px"
-                                    [class.star-filled]="state !== 'empty'"
-                                    [class.star-empty]="state === 'empty'"
-                                >
-                                    @switch (state) {
-                                        @case ('full') {
-                                            star
-                                        }
-                                        @case ('half') {
-                                            star_half
-                                        }
-                                        @case ('empty') {
-                                            star_outline
-                                        }
-                                    }
-                                </mat-icon>
-                            }
-                            <span
-                                class="ml-1 text-xs font-bold"
-                                [class]="getRatingColor(review.rating)"
-                            >
-                                {{ review.rating | number: '1.1-1' }}
-                            </span>
-                        </div>
+                        <app-star-rating [rating]="review.rating" />
 
                         <p
                             class="text-sm text-text-secondary"
@@ -263,34 +237,10 @@
 
                                     <div class="flex items-center justify-between">
                                         <span class="text-[11px] text-text-tertiary">Rating</span>
-                                        <div class="mb-1 flex items-center gap-1">
-                                            @for (
-                                                state of getStarArray(review.rating);
-                                                track $index
-                                            ) {
-                                                <mat-icon
-                                                    style="
-                                                        font-size: 14px;
-                                                        width: 14px;
-                                                        height: 14px;
-                                                    "
-                                                    [class.star-filled]="state !== 'empty'"
-                                                    [class.star-empty]="state === 'empty'"
-                                                >
-                                                    @switch (state) {
-                                                        @case ('full') {
-                                                            star
-                                                        }
-                                                        @case ('half') {
-                                                            star_half
-                                                        }
-                                                        @case ('empty') {
-                                                            star_outline
-                                                        }
-                                                    }
-                                                </mat-icon>
-                                            }
-                                        </div>
+                                        <app-star-rating
+                                            [rating]="review.rating"
+                                            [showValue]="false"
+                                        />
                                     </div>
 
                                     <div class="divider"></div>

@@ -10,14 +10,16 @@
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-center gap-3">
             <a
-                routerLink="/dashboard/reservations"
+                [routerLink]="backLink()"
                 class="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition-all hover:border-primary/40 hover:text-primary"
             >
                 <mat-icon style="font-size: 18px; width: 18px; height: 18px">arrow_back</mat-icon>
             </a>
             <div>
                 <div class="flex items-center gap-2">
-                    <h1 class="text-2xl font-bold text-text-primary">Reservation</h1>
+                    <h1 class="text-2xl font-bold text-text-primary">
+                        {{ pageTitle() }}
+                    </h1>
                     <span
                         class="rounded bg-main-bg px-2 py-0.5 font-mono text-sm font-bold text-primary"
                     >
@@ -25,40 +27,52 @@
                     </span>
                 </div>
                 <p class="text-xs text-text-tertiary">
-                    Created {{ reservation()!.createdAt | date: 'MMM d, y HH:mm' }}
+                    Created
+                    {{ reservation()!.createdAt | date: 'MMM d, y HH:mm' }}
                 </p>
             </div>
         </div>
+
         <div class="flex items-center gap-2 self-start">
-            <button
-                (click)="downloadPdf()"
-                [disabled]="isDownloading()"
-                class="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-main-bg disabled:opacity-50"
-            >
-                <mat-icon
-                    style="font-size: 16px; width: 16px; height: 16px"
-                    [class.animate-spin]="isDownloading()"
-                >
-                    {{ isDownloading() ? 'autorenew' : 'download' }}
-                </mat-icon>
-                PDF
-            </button>
-            @if (canCancel) {
+            @if (reservation()!.status === 'CONFIRMED') {
                 <button
-                    (click)="showCancelDialog.set(true)"
-                    class="inline-flex items-center gap-2 rounded-lg bg-orange-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600"
+                    (click)="downloadPdf()"
+                    [disabled]="isDownloading()"
+                    class="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-main-bg disabled:opacity-50"
                 >
-                    <mat-icon style="font-size: 16px; width: 16px; height: 16px">block</mat-icon>
-                    Cancel
+                    <mat-icon
+                        style="font-size: 16px; width: 16px; height: 16px"
+                        [class.animate-spin]="isDownloading()"
+                    >
+                        {{ isDownloading() ? 'autorenew' : 'download' }}
+                    </mat-icon>
+                    Voucher
                 </button>
             }
-            <button
-                (click)="showDeleteDialog.set(true)"
-                class="inline-flex items-center gap-2 rounded-lg bg-red-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-red-600"
-            >
-                <mat-icon style="font-size: 16px; width: 16px; height: 16px">delete</mat-icon>
-                Delete
-            </button>
+
+            @if (canCancel) {
+                <ng-container *appHasRole="[RoleEnum.ADMIN, RoleEnum.TOURIST]">
+                    <button
+                        (click)="showCancelDialog.set(true)"
+                        class="inline-flex items-center gap-2 rounded-lg bg-orange-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600"
+                    >
+                        <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                            >block</mat-icon
+                        >
+                        Cancel
+                    </button>
+                </ng-container>
+            }
+
+            <ng-container *appHasRole="RoleEnum.ADMIN">
+                <button
+                    (click)="showDeleteDialog.set(true)"
+                    class="inline-flex items-center gap-2 rounded-lg bg-red-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-red-600"
+                >
+                    <mat-icon style="font-size: 16px; width: 16px; height: 16px">delete</mat-icon>
+                    Delete
+                </button>
+            </ng-container>
         </div>
     </div>
 
@@ -86,7 +100,8 @@
                         {{ reservation()!.status }}
                     </p>
                     <p class="text-xs text-text-tertiary">
-                        Updated {{ reservation()!.updatedAt | date: 'MMM d, y HH:mm' }}
+                        Updated
+                        {{ reservation()!.updatedAt | date: 'MMM d, y HH:mm' }}
                     </p>
                 </div>
             </div>
@@ -106,7 +121,7 @@
                             {{ reservation()!.tourTitle }}
                         </p>
                         <a
-                            [routerLink]="['/dashboard/tours', reservation()!.tourUuid]"
+                            [routerLink]="[tourLink(), reservation()!.tourUuid]"
                             class="mt-1 flex items-center gap-1 text-xs text-primary hover:underline"
                         >
                             <mat-icon style="font-size: 12px; width: 12px; height: 12px"
@@ -150,15 +165,20 @@
                             <p class="text-sm font-bold text-text-primary">
                                 {{ reservation()!.touristName }}
                             </p>
-                            <a
-                                [routerLink]="['/dashboard/users', reservation()!.touristUuid]"
-                                class="flex items-center gap-0.5 text-[10px] text-primary hover:underline"
-                            >
-                                View profile
-                                <mat-icon style="font-size: 10px; width: 10px; height: 10px"
-                                    >open_in_new</mat-icon
+                            @if (touristProfileLink()) {
+                                <a
+                                    [routerLink]="[
+                                        touristProfileLink(),
+                                        reservation()!.touristUuid,
+                                    ]"
+                                    class="flex items-center gap-0.5 text-[10px] text-primary hover:underline"
                                 >
-                            </a>
+                                    View profile
+                                    <mat-icon style="font-size: 10px; width: 10px; height: 10px"
+                                        >open_in_new</mat-icon
+                                    >
+                                </a>
+                            }
                         </div>
                     </div>
 
@@ -185,15 +205,20 @@
                                 <p class="text-sm font-bold text-text-primary">
                                     {{ reservation()!.guideName }}
                                 </p>
-                                <a
-                                    [routerLink]="['/dashboard/guides', reservation()!.guideUuid]"
-                                    class="flex items-center gap-0.5 text-[10px] text-primary hover:underline"
-                                >
-                                    View profile
-                                    <mat-icon style="font-size: 10px; width: 10px; height: 10px"
-                                        >open_in_new</mat-icon
+                                @if (guideProfileLink()) {
+                                    <a
+                                        [routerLink]="[
+                                            guideProfileLink(),
+                                            reservation()!.guideUuid,
+                                        ]"
+                                        class="flex items-center gap-0.5 text-[10px] text-primary hover:underline"
                                     >
-                                </a>
+                                        View profile
+                                        <mat-icon style="font-size: 10px; width: 10px; height: 10px"
+                                            >open_in_new</mat-icon
+                                        >
+                                    </a>
+                                }
                             </div>
                         </div>
                     }
@@ -208,7 +233,9 @@
                             style="font-size: 18px; width: 18px; height: 18px"
                             >qr_code</mat-icon
                         >
-                        <h2 class="text-sm font-bold text-text-primary">Documents</h2>
+                        <h2 class="text-sm font-bold text-text-primary">
+                            {{ isTourist() ? 'Your Ticket' : 'Documents' }}
+                        </h2>
                     </div>
                     <div class="flex flex-wrap items-center gap-4">
                         @if (reservation()!.qrCode) {
@@ -218,7 +245,9 @@
                                     alt="QR Code"
                                     class="h-28 w-28 rounded-xl border border-border p-2"
                                 />
-                                <p class="mt-1 text-[10px] text-text-tertiary">QR Code</p>
+                                <p class="mt-1 text-[10px] text-text-tertiary">
+                                    {{ isTourist() ? 'Show to your guide' : 'QR Code' }}
+                                </p>
                             </div>
                         }
                         <button
@@ -238,72 +267,37 @@
                 </div>
             }
 
-            <div class="card p-6">
-                <div class="mb-4 flex items-center gap-2">
-                    <mat-icon
-                        class="text-text-tertiary"
-                        style="font-size: 18px; width: 18px; height: 18px"
-                        >payments</mat-icon
-                    >
-                    <h2 class="text-sm font-bold text-text-primary">
-                        Payments ({{ paymentsTotalElements() }})
-                    </h2>
+            <ng-container *appHasRole="[RoleEnum.ADMIN, RoleEnum.TOURIST]">
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center gap-2">
+                        <mat-icon
+                            class="text-text-tertiary"
+                            style="font-size: 18px; width: 18px; height: 18px"
+                            >payments</mat-icon
+                        >
+                        <h2 class="text-sm font-bold text-text-primary">
+                            Payments ({{ paymentsTotalElements() }})
+                        </h2>
+                    </div>
+                    @if (paymentsLoading()) {
+                        <div class="animate-pulse space-y-2">
+                            @for (_ of [1, 2]; track $index) {
+                                <div class="h-14 rounded-lg bg-border/20"></div>
+                            }
+                        </div>
+                    } @else if (payments().length > 0) {
+                        <div class="space-y-2">
+                            @for (payment of payments(); track payment.uuid) {
+                                <app-payment-card [payment]="payment" />
+                            }
+                        </div>
+                    } @else {
+                        <p class="py-4 text-center text-sm text-text-disabled">
+                            No payments recorded.
+                        </p>
+                    }
                 </div>
-                @if (paymentsLoading()) {
-                    <div class="animate-pulse space-y-2">
-                        @for (_ of [1, 2]; track $index) {
-                            <div class="h-14 rounded-lg bg-border/20"></div>
-                        }
-                    </div>
-                } @else if (payments().length > 0) {
-                    <div class="space-y-2">
-                        @for (payment of payments(); track payment.uuid) {
-                            <div
-                                class="flex items-center justify-between rounded-xl border border-border p-3"
-                            >
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="flex h-9 w-9 items-center justify-center rounded-lg bg-green-500/10"
-                                    >
-                                        <mat-icon
-                                            class="text-green-600"
-                                            style="font-size: 16px; width: 16px; height: 16px"
-                                            >receipt</mat-icon
-                                        >
-                                    </div>
-                                    <div>
-                                        <p class="text-xs font-bold text-text-primary">
-                                            {{
-                                                payment.amount
-                                                    | currency: 'MAD ' : 'symbol' : '1.0-0'
-                                            }}
-                                        </p>
-                                        <p class="text-[10px] text-text-tertiary">
-                                            {{ payment.date | date: 'MMM d, y HH:mm' }}
-                                            · {{ payment.method || 'N/A' }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span
-                                        class="rounded-full px-2 py-0.5 text-[10px] font-semibold"
-                                        [class]="getPaymentStatusColor(payment.status)"
-                                    >
-                                        {{ payment.status }}
-                                    </span>
-                                    <span
-                                        class="rounded bg-main-bg px-1.5 py-0.5 text-[9px] font-medium text-text-tertiary"
-                                    >
-                                        {{ payment.type }}
-                                    </span>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                } @else {
-                    <p class="py-4 text-center text-sm text-text-disabled">No payments recorded.</p>
-                }
-            </div>
+            </ng-container>
         </div>
 
         <div class="space-y-6">
@@ -370,13 +364,17 @@
                             reservation()!.endDate | date: 'MMM d, y'
                         }}</span>
                     </div>
-                    <div class="divider"></div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-text-secondary">Payments</span>
-                        <span class="text-sm font-semibold text-text-primary">{{
-                            paymentsTotalElements()
-                        }}</span>
-                    </div>
+
+                    <ng-container *appHasRole="[RoleEnum.ADMIN, RoleEnum.TOURIST]">
+                        <div class="divider"></div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-text-secondary">Payments</span>
+                            <span class="text-sm font-semibold text-text-primary">{{
+                                paymentsTotalElements()
+                            }}</span>
+                        </div>
+                    </ng-container>
+
                     <div class="divider"></div>
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-text-secondary">Created</span>
@@ -419,38 +417,58 @@
                     </button>
 
                     @if (canCancel) {
-                        <button
-                            (click)="showCancelDialog.set(true)"
-                            class="flex w-full items-center gap-2 rounded-xl bg-orange-500/10 p-3 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-500/20"
-                        >
-                            <mat-icon style="font-size: 18px; width: 18px; height: 18px"
-                                >block</mat-icon
+                        <ng-container *appHasRole="[RoleEnum.ADMIN, RoleEnum.TOURIST]">
+                            <button
+                                (click)="showCancelDialog.set(true)"
+                                class="flex w-full items-center gap-2 rounded-xl bg-orange-500/10 p-3 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-500/20"
                             >
-                            Cancel Reservation
-                        </button>
+                                <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                                    >block</mat-icon
+                                >
+                                Cancel Reservation
+                            </button>
+                        </ng-container>
                     }
 
-                    <button
-                        (click)="showDeleteDialog.set(true)"
-                        class="flex w-full items-center gap-2 rounded-xl bg-red-500/10 p-3 text-sm font-medium text-red-600 transition-colors hover:bg-red-500/20"
-                    >
-                        <mat-icon style="font-size: 18px; width: 18px; height: 18px"
-                            >delete_forever</mat-icon
+                    <ng-container *appHasRole="RoleEnum.ADMIN">
+                        <button
+                            (click)="showDeleteDialog.set(true)"
+                            class="flex w-full items-center gap-2 rounded-xl bg-red-500/10 p-3 text-sm font-medium text-red-600 transition-colors hover:bg-red-500/20"
                         >
-                        Delete Reservation
-                    </button>
-                </div>
+                            <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                                >delete_forever</mat-icon
+                            >
+                            Delete Reservation
+                        </button>
 
-                <div class="mt-4 flex items-start gap-2 rounded-lg bg-warning/5 p-3">
-                    <mat-icon
-                        class="mt-0.5 shrink-0 text-warning"
-                        style="font-size: 14px; width: 14px; height: 14px"
-                        >info</mat-icon
-                    >
-                    <p class="text-[11px] leading-relaxed text-warning">
-                        Deleting a reservation with payment history is not allowed. Use cancellation
-                        instead for audit purposes.
-                    </p>
+                        <div class="mt-2 flex items-start gap-2 rounded-lg bg-warning/5 p-3">
+                            <mat-icon
+                                class="mt-0.5 shrink-0 text-warning"
+                                style="font-size: 14px; width: 14px; height: 14px"
+                                >info</mat-icon
+                            >
+                            <p class="text-[11px] leading-relaxed text-warning">
+                                Deleting a reservation with payment history is not allowed. Use
+                                cancellation instead.
+                            </p>
+                        </div>
+                    </ng-container>
+
+                    <ng-container *appHasRole="RoleEnum.TOURIST">
+                        @if (canCancel) {
+                            <div class="mt-2 flex items-start gap-2 rounded-lg bg-info/5 p-3">
+                                <mat-icon
+                                    class="mt-0.5 shrink-0 text-info"
+                                    style="font-size: 14px; width: 14px; height: 14px"
+                                    >info</mat-icon
+                                >
+                                <p class="text-[11px] leading-relaxed text-info">
+                                    Cancellation incurs a 10% fee. The remaining 90% will be
+                                    refunded.
+                                </p>
+                            </div>
+                        }
+                    </ng-container>
                 </div>
             </div>
         </div>

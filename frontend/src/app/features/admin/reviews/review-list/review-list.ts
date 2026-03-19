@@ -11,6 +11,7 @@ import { PaginationComponent } from '../../../../shared/components/pagination/pa
 import { DeleteDialog } from '../../../../shared/components/delete-dialog/delete-dialog';
 import { ReviewService } from '../../../../core/services/review-service';
 import { ReviewableType } from '../../../../core/enums/reviewable-type.enum';
+import { StarRating } from '../../../../shared/components/star-rating/star-rating';
 
 @Component({
     selector: 'app-review-list',
@@ -22,6 +23,7 @@ import { ReviewableType } from '../../../../core/enums/reviewable-type.enum';
         MatIcon,
         PaginationComponent,
         DeleteDialog,
+        StarRating,
     ],
     templateUrl: './review-list.html',
 })
@@ -131,16 +133,6 @@ export class ReviewList {
                 .toUpperCase()
                 .slice(0, 2) || '?'
         );
-    }
-
-    getStarArray(rating: number): string[] {
-        return Array.from({ length: 5 }, (_, i) => {
-            const starValue = i + 1;
-
-            if (rating >= starValue) return 'full';
-            else if (rating >= starValue - 0.5) return 'half';
-            else return 'empty';
-        });
     }
 
     getRatingColor(rating: number): string {

@@ -2,11 +2,12 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { Review } from '../../../core/models/review.model';
+import { StarRating } from '../star-rating/star-rating';
 
 @Component({
     selector: 'app-review-card',
     standalone: true,
-    imports: [DatePipe, MatIcon],
+    imports: [DatePipe, MatIcon, StarRating],
     template: `
         <div class="rounded-xl border border-border p-4 transition-all hover:border-primary/20">
             <div class="mb-2 flex items-start justify-between">
@@ -32,16 +33,7 @@ import { Review } from '../../../core/models/review.model';
                         {{ review().reviewableType }}
                     </span>
                 </div>
-                <div class="flex items-center gap-0.5">
-                    @for (_ of [1, 2, 3, 4, 5]; track $index) {
-                        <mat-icon
-                            style="font-size: 13px; width: 13px; height: 13px"
-                            [class.text-warning]="$index < review().rating"
-                            [class.text-border]="$index >= review().rating"
-                            >star</mat-icon
-                        >
-                    }
-                </div>
+                <app-star-rating [rating]="review().rating" />
             </div>
             @if (review().reviewableName) {
                 <p class="mb-1 text-[11px] text-text-tertiary">

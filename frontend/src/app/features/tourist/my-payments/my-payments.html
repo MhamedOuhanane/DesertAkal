@@ -1,0 +1,57 @@
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-text-primary">My Payments</h1>
+    <p class="mt-1 text-sm text-text-tertiary">
+        {{ pagination()?.totalElements || 0 }} transaction{{
+            (pagination()?.totalElements || 0) !== 1 ? 's' : ''
+        }}
+    </p>
+</div>
+
+<div class="card mb-6 p-4">
+    <select
+        class="input w-full sm:w-44"
+        [value]="statusFilter()"
+        (change)="onStatusFilter($any($event.target).value)"
+    >
+        <option value="">All Status</option>
+        @for (s of statuses; track s) {
+            <option [value]="s">{{ s }}</option>
+        }
+    </select>
+</div>
+
+@if (isLoading()) {
+    <div class="space-y-2">
+        @for (_ of [1, 2, 3, 4]; track $index) {
+            <div class="card animate-pulse p-4">
+                <div class="flex items-center gap-3">
+                    <div class="h-9 w-9 rounded-xl bg-border/30"></div>
+                    <div class="flex-1 space-y-2">
+                        <div class="h-4 w-24 rounded bg-border/40"></div>
+                        <div class="h-3 w-40 rounded bg-border/20"></div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+} @else if (payments().length > 0) {
+    <div class="space-y-2">
+        @for (payment of payments(); track payment.uuid) {
+            <app-payment-card [payment]="payment" />
+        }
+    </div>
+
+    @if (pagination() && pagination()!.totalPages > 1) {
+        <div class="mt-6">
+            <app-pagination [pagination]="pagination()!" (pageChange)="goToPage($event)" />
+        </div>
+    }
+} @else {
+    <div class="card flex flex-col items-center justify-center p-12 text-center">
+        <mat-icon class="mb-3 text-text-disabled" style="font-size: 48px; width: 48px; height: 48px"
+            >receipt_long</mat-icon
+        >
+        <h3 class="text-base font-semibold text-text-primary">No payments found</h3>
+        <p class="mt-1 text-sm text-text-tertiary">Your payment history will appear here.</p>
+    </div>
+}
