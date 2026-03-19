@@ -2,15 +2,17 @@
     <h1 class="text-2xl font-bold text-text-primary">My Payments</h1>
     <p class="mt-1 text-sm text-text-tertiary">
         {{ pagination()?.totalElements || 0 }} transaction{{
-            (pagination()?.totalElements || 0) !== 1 ? "s" : ""
+            (pagination()?.totalElements || 0) !== 1 ? 's' : ''
         }}
     </p>
 </div>
 
 <div class="card mb-6 p-4">
-    <select class="input w-full sm:w-44"
-            [value]="statusFilter()"
-            (change)="onStatusFilter($any($event.target).value)">
+    <select
+        class="input w-full sm:w-44"
+        [value]="statusFilter()"
+        (change)="onStatusFilter($any($event.target).value)"
+    >
         <option value="">All Status</option>
         @for (s of statuses; track s) {
             <option [value]="s">{{ s }}</option>
@@ -41,15 +43,14 @@
 
     @if (pagination() && pagination()!.totalPages > 1) {
         <div class="mt-6">
-            <app-pagination
-                [pagination]="pagination()!"
-                (pageChange)="goToPage($event)"
-            />
+            <app-pagination [pagination]="pagination()!" (pageChange)="goToPage($event)" />
         </div>
     }
 } @else {
     <div class="card flex flex-col items-center justify-center p-12 text-center">
-        <mat-icon class="mb-3 text-text-disabled" style="font-size: 48px; width: 48px; height: 48px">receipt_long</mat-icon>
+        <mat-icon class="mb-3 text-text-disabled" style="font-size: 48px; width: 48px; height: 48px"
+            >receipt_long</mat-icon
+        >
         <h3 class="text-base font-semibold text-text-primary">No payments found</h3>
         <p class="mt-1 text-sm text-text-tertiary">Your payment history will appear here.</p>
     </div>

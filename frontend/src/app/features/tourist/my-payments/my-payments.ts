@@ -32,7 +32,9 @@ export class MyPayments {
     readonly statuses = ['COMPLETED', 'PENDING', 'FAILED', 'REFUNDED'];
 
     constructor() {
-        effect(() => { this.loadPayments(); });
+        effect(() => {
+            this.loadPayments();
+        });
     }
 
     async loadPayments(): Promise<void> {
@@ -43,7 +45,7 @@ export class MyPayments {
                     page: this.currentPage(),
                     size: 10,
                     status: this.statusFilter() || undefined,
-                })
+                }),
             );
             if (res.data) this.pagination.set(res.data);
         } catch (err: any) {

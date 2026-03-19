@@ -1,1 +1,93 @@
-<p>my-posts works!</p>
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-text-primary">My Posts</h1>
+        <p class="mt-1 text-sm text-text-tertiary">
+            {{ pagination()?.totalElements || 0 }} article{{
+                (pagination()?.totalElements || 0) !== 1 ? 's' : ''
+            }}
+        </p>
+    </div>
+    <a
+        routerLink="/tourist/dashboard/posts/create"
+        class="btn-primary inline-flex items-center gap-2 self-start text-sm"
+    >
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px">edit_note</mat-icon>
+        New Post
+    </a>
+</div>
+
+@if (isLoading()) {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        @for (_ of [1, 2, 3]; track $index) {
+            <div class="card animate-pulse overflow-hidden">
+                <div class="h-36 bg-border/20"></div>
+                <div class="space-y-2 p-4">
+                    <div class="h-4 w-full rounded bg-border/30"></div>
+                    <div class="h-3 w-2/3 rounded bg-border/20"></div>
+                </div>
+            </div>
+        }
+    </div>
+} @else if (articles().length > 0) {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        @for (article of articles(); track article.uuid) {
+            <app-article-card
+                [article]="article"
+                [showAuthor]="false"
+                [showActions]="true"
+                (viewClick)="viewArticle($event)"
+            >
+                <div actions class="flex items-center gap-2">
+                    <a
+                        [routerLink]="['/tourist/dashboard/posts', article.uuid, 'edit']"
+                        (click)="$event.stopPropagation()"
+                        class="flex items-center gap-1 text-[11px] font-medium text-primary hover:underline"
+                    >
+                        <mat-icon style="font-size: 13px; width: 13px; height: 13px">edit</mat-icon>
+                        Edit
+                    </a>
+                    <button
+                        (click)="openDeleteDialog(article, $event)"
+                        class="flex items-center gap-1 text-[11px] font-medium text-red-500 hover:underline"
+                    >
+                        <mat-icon style="font-size: 13px; width: 13px; height: 13px"
+                            >delete_outline</mat-icon
+                        >
+                        Delete
+                    </button>
+                </div>
+            </app-article-card>
+        }
+    </div>
+
+    @if (pagination() && pagination()!.totalPages > 1) {
+        <div class="mt-6">
+            <app-pagination [pagination]="pagination()!" (pageChange)="goToPage($event)" />
+        </div>
+    }
+} @else {
+    <div class="card flex flex-col items-center justify-center p-12 text-center">
+        <mat-icon class="mb-3 text-text-disabled" style="font-size: 48px; width: 48px; height: 48px"
+            >article</mat-icon
+        >
+        <h3 class="text-base font-semibold text-text-primary">No posts yet</h3>
+        <p class="mt-1 text-sm text-text-tertiary">Share your travel stories with the community!</p>
+        <a
+            routerLink="/tourist/dashboard/posts/create"
+            class="btn-primary mt-4 inline-flex items-center gap-2 text-sm"
+        >
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px">edit_note</mat-icon>
+            Write your first post
+        </a>
+    </div>
+}
+
+@if (showDeleteDialog() && articleToDelete()) {
+    <app-delete-dialog
+        itemName="Post"
+        [itemTitle]="truncate(articleToDelete()!.content, 40)"
+        [isDeleting]="isDeleting()"
+        (confirm)="confirmDelete()"
+        (cancel)="showDeleteDialog.set(false); articleToDelete.set(null)"
+    />
+}
