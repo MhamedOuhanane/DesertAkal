@@ -15,7 +15,7 @@ import { Review } from '../../../core/models/review.model';
                         <div
                             class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-[9px] font-bold text-primary"
                         >
-                            {{ review().touristName?.charAt(0) || '?' }}
+                            {{ review().touristName.charAt(0) || '?' }}
                         </div>
                         <span class="text-xs font-semibold text-text-primary">{{
                             review().touristName
