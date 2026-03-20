@@ -1,1 +1,252 @@
-<p>guide-dashboard works!</p>
+@if (isLoading()) {
+    <div class="space-y-6">
+        <div class="h-8 w-64 animate-pulse rounded bg-border/50"></div>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            @for (_ of [1, 2, 3, 4]; track $index) {
+                <div class="card animate-pulse p-5">
+                    <div class="h-4 w-20 rounded bg-border/30"></div>
+                    <div class="mt-2 h-8 w-16 rounded bg-border/50"></div>
+                </div>
+            }
+        </div>
+    </div>
+} @else {
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-text-primary">
+            {{ getGreeting() }}, {{ userName() }} 🧭
+        </h1>
+        <p class="mt-1 text-sm text-text-tertiary">Here's an overview of your guide activity</p>
+    </div>
+
+    <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <app-stats-card
+            label="Assigned Tours"
+            [value]="toursCount()"
+            icon="tour"
+            iconBg="bg-primary/10"
+            iconColor="text-primary"
+        />
+        <app-stats-card
+            label="Total Bookings"
+            [value]="totalReservations()"
+            icon="event_available"
+            iconBg="bg-blue-500/10"
+            iconColor="text-blue-600"
+        />
+        <app-stats-card
+            label="Upcoming"
+            [value]="upcomingCount()"
+            icon="upcoming"
+            iconBg="bg-green-500/10"
+            iconColor="text-green-600"
+            subtitle="Confirmed assignments"
+        />
+        <app-stats-card
+            label="Reviews"
+            [value]="reviewsCount()"
+            icon="star_rate"
+            iconBg="bg-warning/10"
+            iconColor="text-warning"
+        />
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div class="space-y-4 lg:col-span-2">
+            <div class="flex items-center justify-between">
+                <h2 class="flex items-center gap-2 text-base font-bold text-text-primary">
+                    <mat-icon
+                        class="text-text-tertiary"
+                        style="font-size: 18px; width: 18px; height: 18px"
+                        >event_available</mat-icon
+                    >
+                    Upcoming Assignments
+                </h2>
+                <a
+                    routerLink="/guide/dashboard/assignments"
+                    class="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                >
+                    View all
+                    <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                        >arrow_forward</mat-icon
+                    >
+                </a>
+            </div>
+
+            @if (upcomingAssignments().length > 0) {
+                <div class="space-y-3">
+                    @for (assignment of upcomingAssignments(); track assignment.uuid) {
+                        <app-reservation-card
+                            [reservation]="assignment"
+                            [showGuide]="false"
+                            [showTourist]="true"
+                            [showActions]="false"
+                            [showPrice]="false"
+                            (viewClick)="viewAssignment($event)"
+                        />
+                    }
+                </div>
+            } @else {
+                <div class="card flex flex-col items-center justify-center p-8 text-center">
+                    <mat-icon
+                        class="mb-2 text-text-disabled"
+                        style="font-size: 36px; width: 36px; height: 36px"
+                        >event_busy</mat-icon
+                    >
+                    <p class="text-sm font-medium text-text-disabled">No upcoming assignments</p>
+                    <p class="mt-1 text-xs text-text-tertiary">
+                        New bookings will appear here when tourists reserve your tours
+                    </p>
+                </div>
+            }
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <div class="mb-3 flex items-center justify-between">
+                    <h2 class="flex items-center gap-2 text-base font-bold text-text-primary">
+                        <mat-icon
+                            class="text-text-tertiary"
+                            style="font-size: 18px; width: 18px; height: 18px"
+                            >tour</mat-icon
+                        >
+                        My Tours
+                    </h2>
+                    <a
+                        routerLink="/guide/dashboard/tours"
+                        class="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                    >
+                        View all
+                        <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                            >arrow_forward</mat-icon
+                        >
+                    </a>
+                </div>
+
+                @if (myTours().length > 0) {
+                    <div class="space-y-2">
+                        @for (tour of myTours(); track tour.uuid) {
+                            <div
+                                class="card flex items-center gap-3 p-3 transition-all hover:border-primary/30"
+                            >
+                                @if (tour.image) {
+                                    <img
+                                        [src]="tour.image"
+                                        class="h-12 w-12 shrink-0 rounded-lg object-cover"
+                                    />
+                                } @else {
+                                    <div
+                                        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10"
+                                    >
+                                        <mat-icon
+                                            class="text-primary"
+                                            style="font-size: 20px; width: 20px; height: 20px"
+                                            >landscape</mat-icon
+                                        >
+                                    </div>
+                                }
+                                <div class="min-w-0 flex-1">
+                                    <p class="truncate text-sm font-medium text-text-primary">
+                                        {{ tour.title }}
+                                    </p>
+                                    <p class="text-[10px] text-text-tertiary">
+                                        {{ tour.durationDays }} days
+                                    </p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                } @else {
+                    <div class="card p-4 text-center">
+                        <p class="text-xs text-text-disabled">No tours assigned yet</p>
+                    </div>
+                }
+            </div>
+
+            <div>
+                <h2 class="mb-3 flex items-center gap-2 text-base font-bold text-text-primary">
+                    <mat-icon
+                        class="text-text-tertiary"
+                        style="font-size: 18px; width: 18px; height: 18px"
+                        >bolt</mat-icon
+                    >
+                    Quick Actions
+                </h2>
+                <div class="space-y-2">
+                    <a
+                        routerLink="/guide/dashboard/schedule"
+                        class="card flex items-center gap-3 p-3 transition-all hover:border-primary/30"
+                    >
+                        <div
+                            class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10"
+                        >
+                            <mat-icon
+                                class="text-blue-600"
+                                style="font-size: 18px; width: 18px; height: 18px"
+                                >calendar_month</mat-icon
+                            >
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-text-primary">My Schedule</p>
+                            <p class="text-[10px] text-text-tertiary">View your planning</p>
+                        </div>
+                        <mat-icon
+                            class="text-text-tertiary"
+                            style="font-size: 16px; width: 16px; height: 16px"
+                            >chevron_right</mat-icon
+                        >
+                    </a>
+
+                    <a
+                        routerLink="/guide/dashboard/reviews"
+                        class="card flex items-center gap-3 p-3 transition-all hover:border-primary/30"
+                    >
+                        <div
+                            class="flex h-9 w-9 items-center justify-center rounded-xl bg-warning/10"
+                        >
+                            <mat-icon
+                                class="text-warning"
+                                style="font-size: 18px; width: 18px; height: 18px"
+                                >star_rate</mat-icon
+                            >
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-text-primary">My Reviews</p>
+                            <p class="text-[10px] text-text-tertiary">
+                                {{ reviewsCount() }} reviews
+                            </p>
+                        </div>
+                        <mat-icon
+                            class="text-text-tertiary"
+                            style="font-size: 16px; width: 16px; height: 16px"
+                            >chevron_right</mat-icon
+                        >
+                    </a>
+
+                    <a
+                        routerLink="/guide/dashboard/profile"
+                        class="card flex items-center gap-3 p-3 transition-all hover:border-primary/30"
+                    >
+                        <div
+                            class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-500/10"
+                        >
+                            <mat-icon
+                                class="text-green-600"
+                                style="font-size: 18px; width: 18px; height: 18px"
+                                >person</mat-icon
+                            >
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-text-primary">My Profile</p>
+                            <p class="text-[10px] text-text-tertiary">Update your info</p>
+                        </div>
+                        <mat-icon
+                            class="text-text-tertiary"
+                            style="font-size: 16px; width: 16px; height: 16px"
+                            >chevron_right</mat-icon
+                        >
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

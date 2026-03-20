@@ -219,6 +219,12 @@ export const NAV_CONFIG = {
             roles: ['GUIDE'],
             items: [
                 {
+                    label: 'My Assignments',
+                    icon: 'assignment',
+                    path: '/guide/dashboard/assignments',
+                    roles: ['GUIDE'],
+                },
+                {
                     label: 'Assigned Tours',
                     icon: 'tour',
                     path: '/guide/dashboard/tours',
@@ -228,6 +234,12 @@ export const NAV_CONFIG = {
                     label: 'My Schedule',
                     icon: 'event_available',
                     path: '/guide/dashboard/schedule',
+                    roles: ['GUIDE'],
+                },
+                {
+                    label: 'Reviews',
+                    icon: 'star_rate',
+                    path: '/guide/dashboard/reviews',
                     roles: ['GUIDE'],
                 },
             ],

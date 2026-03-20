@@ -1,0 +1,107 @@
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-text-primary">My Assignments</h1>
+    <p class="mt-1 text-sm text-text-tertiary">
+        {{ pagination()?.totalElements || 0 }} assignment{{
+            (pagination()?.totalElements || 0) !== 1 ? 's' : ''
+        }}
+    </p>
+</div>
+
+<div class="mb-6 flex items-center gap-2 overflow-x-auto pb-1">
+    <button
+        (click)="onStatusFilter('')"
+        class="shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+        [class.bg-primary]="!statusFilter()"
+        [class.text-white]="!statusFilter()"
+        [class.bg-main-bg]="statusFilter()"
+        [class.text-text-secondary]="statusFilter()"
+    >
+        All
+    </button>
+    @for (s of statuses; track s) {
+        <button
+            (click)="onStatusFilter(s)"
+            class="flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+            [class]="
+                statusFilter() === s
+                    ? getStatusConfig(s).bg + ' ' + getStatusConfig(s).text
+                    : 'bg-main-bg text-text-secondary'
+            "
+        >
+            <span class="h-1.5 w-1.5 rounded-full" [class]="getStatusConfig(s).dot"></span>
+            {{ s }}
+        </button>
+    }
+</div>
+
+@if (isLoading()) {
+    <div class="space-y-3">
+        @for (_ of [1, 2, 3, 4]; track $index) {
+            <div class="card animate-pulse p-4">
+                <div class="flex items-center gap-4">
+                    <div class="h-10 w-10 rounded-xl bg-border/30"></div>
+                    <div class="flex-1 space-y-2">
+                        <div class="h-4 w-40 rounded bg-border/40"></div>
+                        <div class="h-3 w-64 rounded bg-border/20"></div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+} @else if (assignments().length > 0) {
+    <div class="space-y-3">
+        @for (assignment of assignments(); track assignment.uuid) {
+            <div class="relative">
+                @if (assignment.status === 'CONFIRMED' && getDaysUntil(assignment.startDate) > 0) {
+                    <div
+                        class="absolute -right-1 -top-1 z-10 flex items-center gap-1 rounded-full bg-green-500 px-2 py-0.5 text-[9px] font-bold text-white shadow-sm"
+                    >
+                        <mat-icon style="font-size: 10px; width: 10px; height: 10px"
+                            >schedule</mat-icon
+                        >
+                        In {{ getDaysUntil(assignment.startDate) }}d
+                    </div>
+                }
+                @if (
+                    assignment.status === 'CONFIRMED' && getDaysUntil(assignment.startDate) === 0
+                ) {
+                    <div
+                        class="absolute -right-1 -top-1 z-10 flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[9px] font-bold text-white shadow-sm"
+                    >
+                        <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-white"></span>
+                        Today!
+                    </div>
+                }
+
+                <app-reservation-card
+                    [reservation]="assignment"
+                    [showGuide]="false"
+                    [showTourist]="true"
+                    [showActions]="false"
+                    [showPrice]="false"
+                    (viewClick)="viewAssignment($event)"
+                />
+            </div>
+        }
+    </div>
+
+    @if (pagination() && pagination()!.totalPages > 1) {
+        <div class="mt-6">
+            <app-pagination [pagination]="pagination()!" (pageChange)="goToPage($event)" />
+        </div>
+    }
+} @else {
+    <div class="card flex flex-col items-center justify-center p-12 text-center">
+        <mat-icon class="mb-3 text-text-disabled" style="font-size: 48px; width: 48px; height: 48px"
+            >event_busy</mat-icon
+        >
+        <h3 class="text-base font-semibold text-text-primary">No assignments found</h3>
+        <p class="mt-1 text-sm text-text-tertiary">
+            @if (statusFilter()) {
+                No {{ statusFilter().toLowerCase() }} assignments.
+            } @else {
+                When tourists book your tours, assignments will appear here.
+            }
+        </p>
+    </div>
+}

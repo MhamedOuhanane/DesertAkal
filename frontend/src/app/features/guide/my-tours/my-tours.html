@@ -1,0 +1,84 @@
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-text-primary">My Tours</h1>
+    <p class="mt-1 text-sm text-text-tertiary">
+        {{ pagination()?.totalElements || 0 }} tour{{
+            (pagination()?.totalElements || 0) !== 1 ? 's' : ''
+        }}
+        assigned to you
+    </p>
+</div>
+
+@if (isLoading()) {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        @for (_ of [1, 2, 3]; track $index) {
+            <div class="card animate-pulse overflow-hidden">
+                <div class="h-36 bg-border/20"></div>
+                <div class="space-y-2 p-4">
+                    <div class="h-4 w-full rounded bg-border/30"></div>
+                    <div class="h-3 w-2/3 rounded bg-border/20"></div>
+                </div>
+            </div>
+        }
+    </div>
+} @else if (tours().length > 0) {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        @for (tour of tours(); track tour.uuid) {
+            <div
+                class="card group overflow-hidden transition-all hover:border-primary/30 hover:shadow-md"
+            >
+                @if (tour.image) {
+                    <div class="relative h-36 overflow-hidden bg-main-bg">
+                        <img
+                            [src]="tour.image"
+                            [alt]="tour.title"
+                            class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                    </div>
+                } @else {
+                    <div class="flex h-36 items-center justify-center bg-primary/5">
+                        <mat-icon
+                            class="text-primary/30"
+                            style="font-size: 48px; width: 48px; height: 48px"
+                            >landscape</mat-icon
+                        >
+                    </div>
+                }
+                <div class="p-4">
+                    <h3 class="truncate text-sm font-bold text-text-primary">
+                        {{ tour.title }}
+                    </h3>
+                    <div class="mt-2 flex items-center gap-3 text-[11px] text-text-tertiary">
+                        <span class="flex items-center gap-1">
+                            <mat-icon style="font-size: 12px; width: 12px; height: 12px"
+                                >schedule</mat-icon
+                            >
+                            {{ tour.durationDays }} days
+                        </span>
+                        @if (tour.cityTours && tour.cityTours.length > 0) {
+                            <span class="flex items-center gap-1">
+                                <mat-icon style="font-size: 12px; width: 12px; height: 12px"
+                                    >location_on</mat-icon
+                                >
+                                {{ tour.cityTours[0].cityName }}
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (pagination() && pagination()!.totalPages > 1) {
+        <div class="mt-6">
+            <app-pagination [pagination]="pagination()!" (pageChange)="goToPage($event)" />
+        </div>
+    }
+} @else {
+    <div class="card flex flex-col items-center justify-center p-12 text-center">
+        <mat-icon class="mb-3 text-text-disabled" style="font-size: 48px; width: 48px; height: 48px"
+            >tour</mat-icon
+        >
+        <h3 class="text-base font-semibold text-text-primary">No tours assigned</h3>
+        <p class="mt-1 text-sm text-text-tertiary">Contact the admin to get assigned to tours.</p>
+    </div>
+}
