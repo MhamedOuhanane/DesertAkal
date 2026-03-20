@@ -107,7 +107,11 @@
 
                         @if (isGuide() && asGuide()) {
                             <div class="flex flex-wrap items-center gap-4">
-                                <app-star-rating [rating]="asGuide().rating" [showCount]="true" [count]="asGuide().reviewCount" />
+                                <app-star-rating
+                                    [rating]="asGuide().rating"
+                                    [showCount]="true"
+                                    [count]="asGuide().reviewCount"
+                                />
                             </div>
 
                             <div class="flex flex-wrap gap-1.5">

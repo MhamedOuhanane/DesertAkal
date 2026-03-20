@@ -230,6 +230,12 @@ export const NAV_CONFIG = {
                     path: '/guide/dashboard/schedule',
                     roles: ['GUIDE'],
                 },
+                {
+                    label: 'Reviews',
+                    icon: 'star_rate',
+                    path: '/guide/dashboard/reviews',
+                    roles: ['GUIDE'],
+                },
             ],
         },
         {

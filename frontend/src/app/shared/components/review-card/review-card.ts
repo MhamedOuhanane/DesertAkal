@@ -1,13 +1,12 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, input } from '@angular/core';
-import { MatIcon } from '@angular/material/icon';
 import { Review } from '../../../core/models/review.model';
 import { StarRating } from '../star-rating/star-rating';
 
 @Component({
     selector: 'app-review-card',
     standalone: true,
-    imports: [DatePipe, MatIcon, StarRating],
+    imports: [DatePipe, StarRating],
     template: `
         <div class="rounded-xl border border-border p-4 transition-all hover:border-primary/20">
             <div class="mb-2 flex items-start justify-between">

@@ -1,7 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DecimalPipe } from '@angular/common';
 import { Tour, TourFilters } from '../../../../core/models/tour.model';
 import { Pagination } from '../../../../core/models/response.models';
 import { toast } from 'ngx-sonner';
@@ -14,7 +13,7 @@ import { StarRating } from '../../../../shared/components/star-rating/star-ratin
 @Component({
     selector: 'app-tour-list',
     standalone: true,
-    imports: [RouterLink, FormsModule, DecimalPipe, PaginationComponent, DeleteDialog, StarRating],
+    imports: [RouterLink, FormsModule, PaginationComponent, DeleteDialog, StarRating],
     templateUrl: './tour-list.html',
 })
 export class TourList implements OnInit {

@@ -12,19 +12,19 @@ import { ProfileService } from '../../../core/services/profile-service';
 import { ProfileEditAdminDialog } from '../../components/profile-edit-admin-dialog/profile-edit-admin-dialog';
 import { ProfileEditGuideDialog } from '../../components/profile-edit-guide-dialog/profile-edit-guide-dialog';
 import { ProfileEditTouristDialog } from '../../components/profile-edit-tourist-dialog/profile-edit-tourist-dialog';
-import { StarRating } from "../../components/star-rating/star-rating";
+import { StarRating } from '../../components/star-rating/star-rating';
 
 @Component({
     selector: 'app-profile',
     imports: [
-    DatePipe,
-    DecimalPipe,
-    MatIcon,
-    ProfileEditAdminDialog,
-    ProfileEditGuideDialog,
-    ProfileEditTouristDialog,
-    StarRating
-],
+        DatePipe,
+        DecimalPipe,
+        MatIcon,
+        ProfileEditAdminDialog,
+        ProfileEditGuideDialog,
+        ProfileEditTouristDialog,
+        StarRating,
+    ],
     templateUrl: './profile.html',
 })
 export class Profile implements OnInit {

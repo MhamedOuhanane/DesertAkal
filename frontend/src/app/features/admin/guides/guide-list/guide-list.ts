@@ -1,7 +1,6 @@
 import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DatePipe, DecimalPipe } from '@angular/common';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
@@ -14,7 +13,7 @@ import { StarRating } from '../../../../shared/components/star-rating/star-ratin
 
 @Component({
     selector: 'app-guide-list',
-    imports: [RouterLink, FormsModule, DecimalPipe, PaginationComponent, StarRating],
+    imports: [RouterLink, FormsModule, PaginationComponent, StarRating],
     templateUrl: './guide-list.html',
 })
 export class GuideList {
