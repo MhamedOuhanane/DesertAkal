@@ -107,23 +107,7 @@
 
                         @if (isGuide() && asGuide()) {
                             <div class="flex flex-wrap items-center gap-4">
-                                <div class="flex items-center gap-1.5">
-                                    @for (_ of [1, 2, 3, 4, 5]; track $index) {
-                                        <mat-icon
-                                            style="font-size: 16px; width: 16px; height: 16px"
-                                            [class.star-filled]="$index < asGuide().rating"
-                                            [class.star-empty]="$index >= asGuide().rating"
-                                            >star</mat-icon
-                                        >
-                                    }
-                                    <span class="text-sm font-bold text-text-primary">
-                                        {{ asGuide().rating | number: '1.1-1' }}
-                                    </span>
-                                    <span class="text-xs text-text-tertiary">
-                                        ({{ asGuide().reviewCount }}
-                                        reviews)
-                                    </span>
-                                </div>
+                                <app-star-rating [rating]="asGuide().rating" [showCount]="true" [count]="asGuide().reviewCount" />
                             </div>
 
                             <div class="flex flex-wrap gap-1.5">

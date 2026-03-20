@@ -7,7 +7,7 @@ export const GUIDE_ROUTES: Routes = [
             import('./guide-dashboard/guide-dashboard').then((m) => m.GuideDashboard),
     },
     {
-        path: 'profile',
+        path: 'dashboard/profile',
         loadComponent: () => import('../../shared/pages/profile/profile').then((m) => m.Profile),
         data: { breadcrumb: 'Profile' },
     },
