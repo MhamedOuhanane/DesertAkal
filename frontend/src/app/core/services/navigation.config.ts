@@ -219,6 +219,12 @@ export const NAV_CONFIG = {
             roles: ['GUIDE'],
             items: [
                 {
+                    label: 'My Assignments',
+                    icon: 'assignment',
+                    path: '/guide/dashboard/assignments',
+                    roles: ['GUIDE'],
+                },
+                {
                     label: 'Assigned Tours',
                     icon: 'tour',
                     path: '/guide/dashboard/tours',
