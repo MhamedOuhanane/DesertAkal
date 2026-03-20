@@ -26,6 +26,11 @@ export const GUIDE_ROUTES: Routes = [
         ],
     },
     {
+        path: 'dashboard/tours',
+        loadComponent: () => import('./my-tours/my-tours').then((m) => m.MyTours),
+        data: { breadcrumb: 'My Tours' },
+    },
+    {
         path: 'dashboard/schedule',
         loadComponent: () => import('./my-schedule/my-schedule').then((m) => m.MySchedule),
         data: { breadcrumb: 'Schedule' },
