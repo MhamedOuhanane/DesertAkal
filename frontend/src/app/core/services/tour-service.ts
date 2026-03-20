@@ -5,6 +5,8 @@ import { Tour, TourCreate, TourFilters, TourFind, TourUpdate } from '../models/t
 import { Observable } from 'rxjs';
 import { ApiResponse, Pagination } from '../models/response.models';
 import { buildHttpParams } from '../utils/http-utils';
+import { City } from '../models/city.model';
+import { Review, ReviewFilters } from '../models/review.model';
 
 @Injectable({
     providedIn: 'root',
@@ -42,5 +44,19 @@ export class TourService {
 
     delete(uuid: string): Observable<ApiResponse<void>> {
         return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${uuid}`);
+    }
+
+    getCities(uuid: string): Observable<ApiResponse<City[]>> {
+        return this.http.get<ApiResponse<City[]>>(`${this.apiUrl}/${uuid}/cities`)
+    }
+
+    getTop5Tours(): Observable<ApiResponse<Tour[]>> {
+        return this.http.get<ApiResponse<Tour[]>>(`${this.apiUrl}/top5`)
+    }
+    
+    getReviews(uuid:string, params: ReviewFilters): Observable<ApiResponse<Pagination<Review>>> {
+        return this.http.get<ApiResponse<Pagination<Review>>>(`${this.apiUrl}/${uuid}/reviews`, {
+            params: buildHttpParams(params),
+        });
     }
 }

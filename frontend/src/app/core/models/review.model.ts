@@ -31,3 +31,11 @@ export interface ReviewUpdate {
     rating?: string;
     comment?: string;
 }
+
+export interface HomeReview {
+    comment: string;
+    rating: number;
+    authorName: string;
+    authorInitial: string;
+    tourTitle: string;
+}
