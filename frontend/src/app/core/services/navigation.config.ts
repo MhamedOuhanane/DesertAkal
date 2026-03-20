@@ -84,12 +84,12 @@ export const NAV_CONFIG = {
             path: '/guide/dashboard/assignments',
             roles: ['GUIDE'],
         },
-        {
-            label: 'My Earnings',
-            icon: 'payments',
-            path: '/guide/dashboard/earnings',
-            roles: ['GUIDE'],
-        },
+        // {
+        //     label: 'My Earnings',
+        //     icon: 'payments',
+        //     path: '/guide/dashboard/earnings',
+        //     roles: ['GUIDE'],
+        // },
 
         // { label: 'Settings', icon: 'settings', path: '/dashboard/settings', roles: ['TOURIST', 'GUIDE'] },
     ] as MenuItem[],
@@ -242,12 +242,12 @@ export const NAV_CONFIG = {
                     path: '/dashboard/payments',
                     roles: ['ADMIN'],
                 },
-                {
-                    label: 'My Earnings',
-                    icon: 'account_balance_wallet',
-                    path: '/guide/dashboard/earnings',
-                    roles: ['GUIDE'],
-                },
+                // {
+                //     label: 'My Earnings',
+                //     icon: 'account_balance_wallet',
+                //     path: '/guide/dashboard/earnings',
+                //     roles: ['GUIDE'],
+                // },
                 {
                     label: 'My Payments',
                     icon: 'receipt',
