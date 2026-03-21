@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { MainLayout } from '../../layouts/main-layout/main-layout';
 
 export const PUBLIC_ROUTES: Routes = [
     { path: '', loadComponent: () => import('./home/home').then((m) => m.Home) },

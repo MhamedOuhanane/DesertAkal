@@ -13,7 +13,7 @@ import { Footer } from '../../shared/components/footer/footer';
         <div class="flex min-h-screen flex-col bg-main-bg">
             <app-public-header />
 
-            <main class="flex-1">
+            <main class="flex-1 mt-16">
                 <router-outlet />
             </main>
 
