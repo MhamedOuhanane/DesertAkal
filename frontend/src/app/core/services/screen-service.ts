@@ -23,4 +23,11 @@ export class ScreenService {
         this.breakpointObserver.observe('(min-width: 1024px)').pipe(map((res) => res.matches)),
         { initialValue: true },
     );
+
+    readonly highlights = [
+        { icon: 'landscape', value: '12+', label: 'Regions Covered' },
+        { icon: 'groups', value: '50+', label: 'Local Guides' },
+        { icon: 'tour', value: '100+', label: 'Unique Tours' },
+        { icon: 'star', value: '4.8', label: 'Average Rating' },
+    ];
 }

@@ -1,1 +1,212 @@
-<p>about works!</p>
+<section
+    class="relative pb-14 pt-16"
+    style="
+        background: linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--primary-color) 12%, var(--bg-color)),
+            var(--bg-color)
+        );
+    "
+>
+    <div class="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+        <span class="badge badge-primary gap-1.5">
+            <mat-icon style="font-size: 14px; width: 14px; height: 14px">info</mat-icon>
+            Our Story
+        </span>
+        <h1 class="mt-4 text-3xl font-black text-text-primary sm:text-5xl">About MoroccoVoyage</h1>
+        <p class="mx-auto mt-3 max-w-xl text-base text-text-secondary">
+            A platform connecting travelers with Morocco's rich culture, stunning landscapes, and
+            passionate local guides — from the Atlantic coast to the Sahara dunes.
+        </p>
+    </div>
+</section>
+
+<section class="py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="grid items-center gap-12 lg:grid-cols-2">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-primary">
+                    Our Mission
+                </span>
+                <h2 class="mt-2 text-3xl font-black text-text-primary">
+                    Discover the Real Morocco
+                </h2>
+                <p class="mt-4 text-sm leading-relaxed text-text-secondary">
+                    Morocco is a land of extraordinary contrasts — the bustling souks of Marrakech,
+                    the blue streets of Chefchaouen, the ancient medina of Fes, the surf beaches of
+                    Essaouira, the majestic Atlas Mountains, and the endless golden dunes of
+                    Merzouga.
+                </p>
+                <p class="mt-3 text-sm leading-relaxed text-text-secondary">
+                    Our platform bridges the gap between passionate local guides who know every
+                    hidden gem and curious travelers looking for authentic experiences beyond the
+                    typical tourist trail.
+                </p>
+                <div class="mt-6 flex gap-4">
+                    <a routerLink="/tours" class="btn-primary text-sm">
+                        <mat-icon style="font-size: 16px; width: 16px; height: 16px">
+                            explore
+                        </mat-icon>
+                        Explore Tours
+                    </a>
+                    <a routerLink="/guides" class="btn-secondary text-sm">Meet Our Guides</a>
+                </div>
+            </div>
+            <div class="card overflow-hidden p-2">
+                <img
+                    src="https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=600&q=80"
+                    alt="Morocco"
+                    class="h-80 w-full rounded-xl object-cover"
+                    (error)="
+                        $any($event.target).src =
+                            'https://placehold.co/600x320/2d1e0e/f49d25?text=Morocco'
+                    "
+                />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="border-y border-border bg-surface py-14">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 gap-6 lg:grid-cols-4">
+            @for (h of screenService.highlights; track h.label) {
+                <div class="text-center">
+                    <div
+                        class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"
+                    >
+                        <mat-icon style="font-size: 24px; width: 24px; height: 24px">
+                            {{ h.icon }}
+                        </mat-icon>
+                    </div>
+                    <p class="text-2xl font-black text-text-primary">{{ h.value }}</p>
+                    <p class="text-xs text-text-tertiary">{{ h.label }}</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-12 text-center">
+            <span class="text-xs font-bold uppercase tracking-widest text-primary">
+                Our Values
+            </span>
+            <h2 class="mt-2 text-3xl font-black text-text-primary">What Drives Us</h2>
+        </div>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            @for (v of values; track v.title) {
+                <div class="card hover-lift p-6 text-center">
+                    <div
+                        class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
+                        [class]="v.color"
+                    >
+                        <mat-icon style="font-size: 26px; width: 26px; height: 26px">
+                            {{ v.icon }}
+                        </mat-icon>
+                    </div>
+                    <h3 class="text-sm font-bold text-text-primary">{{ v.title }}</h3>
+                    <p class="mt-2 text-xs leading-relaxed text-text-tertiary">{{ v.desc }}</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="bg-surface py-20">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-10 text-center">
+            <span class="text-xs font-bold uppercase tracking-widest text-primary">
+                Behind The Code
+            </span>
+            <h2 class="mt-2 text-3xl font-black text-text-primary">Built Solo, Built Right</h2>
+        </div>
+
+        <div class="card overflow-hidden">
+            <div class="bg-linear-to-r from-primary/10 to-primary/5 px-6 py-8 text-center sm:px-10">
+                <div
+                    class="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-primary text-3xl font-black text-white ring-4 ring-primary/20"
+                >
+                    MO
+                </div>
+                <h3 class="mt-4 text-xl font-black text-text-primary">M'hamed Ouhanane</h3>
+                <p class="text-sm font-medium text-primary">Full-Stack Java Developer</p>
+                <p class="mt-1 text-xs text-text-tertiary">
+                    YouCode (OCP | UM6P) · Designed, developed & deployed — solo
+                </p>
+            </div>
+
+            <div class="p-6 sm:p-10">
+                <p class="text-sm leading-relaxed text-text-secondary">
+                    This entire platform — from database architecture and REST API design to the
+                    responsive UI — was built as a solo full-stack project. Every feature, every
+                    animation, and every line of code reflects a dedication to clean engineering,
+                    scalable architecture, and pixel-perfect user experiences.
+                </p>
+
+                <div class="mt-8 flex flex-wrap gap-3">
+                    <a
+                        href="https://github.com/mhmdouhanane"
+                        target="_blank"
+                        rel="noopener"
+                        class="btn-secondary inline-flex items-center gap-1.5 text-xs"
+                    >
+                        <mat-icon style="font-size: 14px; width: 14px; height: 14px">
+                            code
+                        </mat-icon>
+                        GitHub
+                    </a>
+                    <a
+                        href="https://linkedin.com/in/mhamed-ouhanane"
+                        target="_blank"
+                        rel="noopener"
+                        class="btn-secondary inline-flex items-center gap-1.5 text-xs"
+                    >
+                        <mat-icon style="font-size: 14px; width: 14px; height: 14px">
+                            person
+                        </mat-icon>
+                        LinkedIn
+                    </a>
+                    <a
+                        href="mailto:mhmdeouhnan60@gmail.com"
+                        class="btn-secondary inline-flex items-center gap-1.5 text-xs"
+                    >
+                        <mat-icon style="font-size: 14px; width: 14px; height: 14px">
+                            email
+                        </mat-icon>
+                        Email
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div
+            class="card overflow-hidden bg-linear-to-r from-primary/10 to-primary/5 p-10 text-center sm:p-16"
+        >
+            <h2 class="text-2xl font-black text-text-primary sm:text-3xl">
+                Ready to Explore Morocco?
+            </h2>
+            <p class="mx-auto mt-3 max-w-md text-sm text-text-secondary">
+                Browse our curated tours, connect with local guides, and start planning your
+                unforgettable Moroccan adventure.
+            </p>
+            <div class="mt-6 flex flex-wrap justify-center gap-4">
+                <a routerLink="/tours" class="btn-primary text-sm">
+                    <mat-icon style="font-size: 16px; width: 16px; height: 16px">
+                        explore
+                    </mat-icon>
+                    Browse Tours
+                </a>
+                <a routerLink="/guides" class="btn-secondary flex items-center gap-2 text-sm">
+                    <mat-icon style="font-size: 16px; width: 16px; height: 16px"> groups </mat-icon>
+                    Meet Guides
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

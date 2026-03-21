@@ -100,30 +100,32 @@
                 </div>
 
                 <div class="mt-14 flex items-center gap-6 border-t border-border/40 pt-8 sm:gap-10">
-                    @for (h of highlights; track h.label; let last = $last) {
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/8 ring-1 ring-primary/10"
-                            >
-                                <mat-icon
-                                    class="text-primary"
-                                    style="font-size: 18px; width: 18px; height: 18px"
-                                    >{{ h.icon }}</mat-icon
+                    @for (h of screenService.highlights; track h.label; let last = $last) {
+                        @if (h.icon !== 'landscape') {
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/8 ring-primary/10"
                                 >
+                                    <mat-icon
+                                        class="text-primary"
+                                        style="font-size: 18px; width: 18px; height: 18px"
+                                        >{{ h.icon }}</mat-icon
+                                    >
+                                </div>
+                                <div>
+                                    <p
+                                        class="text-xl font-black leading-none tracking-tight text-text-primary"
+                                    >
+                                        {{ h.value }}
+                                    </p>
+                                    <p
+                                        class="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-text-tertiary"
+                                    >
+                                        {{ h.label }}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <p
-                                    class="text-xl font-black leading-none tracking-tight text-text-primary"
-                                >
-                                    {{ h.value }}
-                                </p>
-                                <p
-                                    class="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-text-tertiary"
-                                >
-                                    {{ h.label }}
-                                </p>
-                            </div>
-                        </div>
+                        }
                         @if (!last) {
                             <div class="hidden h-10 w-px bg-border/30 sm:block"></div>
                         }
