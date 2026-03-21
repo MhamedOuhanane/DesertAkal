@@ -1,0 +1,132 @@
+<section class="py-28">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div
+            class="relative overflow-hidden rounded-4xl px-8 py-24 text-center sm:px-16"
+            style="
+                background: linear-gradient(
+                    155deg,
+                    color-mix(in srgb, var(--primary-color) 15%, var(--surface-elevated-color)) 0%,
+                    var(--surface-elevated-color) 40%,
+                    color-mix(in srgb, var(--secondary-color) 8%, var(--surface-elevated-color)) 70%,
+                    var(--surface-elevated-color) 100%
+                );
+                border: 1px solid var(--border-color);
+            "
+        >
+            <div class="absolute inset-0 overflow-hidden">
+                <div
+                    class="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-primary/10 blur-[100px]"
+                ></div>
+                <div
+                    class="absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-secondary/8 blur-[80px]"
+                ></div>
+                <div
+                    class="absolute left-1/2 top-0 h-40 w-40 -translate-x-1/2 rounded-full bg-warning/5 blur-[60px]"
+                ></div>
+            </div>
+
+            <div
+                class="absolute inset-0 opacity-[0.03]"
+                style="
+                    background-image: radial-gradient(
+                        circle,
+                        var(--text-primary-color) 1px,
+                        transparent 1px
+                    );
+                    background-size: 20px 20px;
+                "
+            ></div>
+
+            <div class="relative">
+                <div
+                    class="mx-auto mb-10 flex h-20 w-20 items-center justify-center rounded-3xl shadow-lg"
+                    style="
+                        background: color-mix(
+                            in srgb,
+                            var(--primary-color) 10%,
+                            var(--surface-color)
+                        );
+                        border: 1px solid var(--border-color);
+                    "
+                >
+                    <mat-icon
+                        class="text-primary"
+                        style="font-size: 32px; width: 32px; height: 32px"
+                        >flight_takeoff</mat-icon
+                    >
+                </div>
+
+                <h2
+                    class="text-3xl font-black leading-tight text-text-primary sm:text-4xl lg:text-5xl"
+                >
+                    Ready to Explore
+                    <br class="hidden sm:block" />
+                    <span class="text-gradient">Morocco</span>?
+                </h2>
+
+                <div class="mx-auto mt-6 flex items-center justify-center gap-2">
+                    <div class="h-0.5 w-8 rounded-full bg-primary/40"></div>
+                    <div class="h-0.5 w-4 rounded-full bg-primary/20"></div>
+                </div>
+
+                <p class="mx-auto mt-6 max-w-md text-sm leading-[1.8] text-text-tertiary">
+                    From imperial cities to coastal towns, from mountain trails to golden dunes —
+                    your perfect Moroccan adventure is waiting for you.
+                </p>
+
+                <div class="mt-12 flex flex-wrap items-center justify-center gap-4">
+                    <a routerLink="/tours" class="btn-primary group rounded-2xl px-9 py-4 text-sm">
+                        <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                            >explore</mat-icon
+                        >
+                        Browse Tours
+                        <mat-icon
+                            class="transition-transform group-hover:translate-x-1"
+                            style="font-size: 16px; width: 16px; height: 16px"
+                            >east</mat-icon
+                        >
+                    </a>
+                    <a
+                        *appIsAuthenticated="false"
+                        routerLink="/auth/register"
+                        class="btn-outline rounded-2xl px-9 py-4 text-sm"
+                    >
+                        Create Account
+                        <mat-icon style="font-size: 18px; width: 18px; height: 18px">east</mat-icon>
+                    </a>
+                </div>
+
+                <div
+                    class="mx-auto mt-12 flex flex-wrap items-center justify-center gap-5 text-[11px] text-text-tertiary"
+                >
+                    <div class="flex items-center gap-1.5">
+                        <mat-icon
+                            class="text-success"
+                            style="font-size: 14px; width: 14px; height: 14px"
+                            >verified</mat-icon
+                        >
+                        <span>Verified guides</span>
+                    </div>
+                    <div class="h-3 w-px bg-border"></div>
+                    <div class="flex items-center gap-1.5">
+                        <mat-icon
+                            class="text-info"
+                            style="font-size: 14px; width: 14px; height: 14px"
+                            >lock</mat-icon
+                        >
+                        <span>Secure booking</span>
+                    </div>
+                    <div class="h-3 w-px bg-border"></div>
+                    <div class="flex items-center gap-1.5">
+                        <mat-icon
+                            class="text-warning"
+                            style="font-size: 14px; width: 14px; height: 14px"
+                            >support_agent</mat-icon
+                        >
+                        <span>24/7 support</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

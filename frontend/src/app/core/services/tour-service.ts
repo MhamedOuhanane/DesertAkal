@@ -47,14 +47,14 @@ export class TourService {
     }
 
     getCities(uuid: string): Observable<ApiResponse<City[]>> {
-        return this.http.get<ApiResponse<City[]>>(`${this.apiUrl}/${uuid}/cities`)
+        return this.http.get<ApiResponse<City[]>>(`${this.apiUrl}/${uuid}/cities`);
     }
 
     getTop5Tours(): Observable<ApiResponse<Tour[]>> {
-        return this.http.get<ApiResponse<Tour[]>>(`${this.apiUrl}/top5`)
+        return this.http.get<ApiResponse<Tour[]>>(`${this.apiUrl}/top5`);
     }
-    
-    getReviews(uuid:string, params: ReviewFilters): Observable<ApiResponse<Pagination<Review>>> {
+
+    getReviews(uuid: string, params: ReviewFilters): Observable<ApiResponse<Pagination<Review>>> {
         return this.http.get<ApiResponse<Pagination<Review>>>(`${this.apiUrl}/${uuid}/reviews`, {
             params: buildHttpParams(params),
         });

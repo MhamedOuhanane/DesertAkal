@@ -1,0 +1,160 @@
+<section class="relative overflow-hidden py-28">
+    <div
+        class="absolute inset-0"
+        style="
+            background: linear-gradient(
+                180deg,
+                var(--bg-color) 0%,
+                color-mix(in srgb, var(--primary-color) 3%, var(--surface-color)) 30%,
+                color-mix(in srgb, var(--primary-color) 3%, var(--surface-color)) 70%,
+                var(--bg-color) 100%
+            );
+        "
+    ></div>
+
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto mb-20 max-w-2xl text-center">
+            <div class="flex items-center justify-center gap-3">
+                <div class="h-px w-10 bg-primary/40"></div>
+                <div
+                    class="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5"
+                >
+                    <mat-icon
+                        class="text-primary"
+                        style="font-size: 12px; width: 12px; height: 12px"
+                        >forum</mat-icon
+                    >
+                    <span class="text-[10px] font-bold uppercase tracking-[0.15em] text-primary"
+                        >Testimonials</span
+                    >
+                </div>
+                <div class="h-px w-10 bg-primary/40"></div>
+            </div>
+            <h2 class="mt-6 text-3xl font-black tracking-tight text-text-primary sm:text-4xl">
+                What Travelers
+                <span class="text-gradient">Say</span>
+            </h2>
+            <p class="mt-4 text-sm leading-relaxed text-text-secondary">
+                Real reviews from adventurers who explored Morocco with our expert guides
+            </p>
+        </div>
+
+        @if (loading()) {
+            <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                @for (_ of [1, 2, 3]; track $index) {
+                    <div class="card animate-pulse rounded-2xl p-8">
+                        <div class="flex gap-1">
+                            @for (_ of [1, 2, 3, 4, 5]; track $index) {
+                                <div class="h-3.5 w-3.5 rounded bg-border/12"></div>
+                            }
+                        </div>
+                        <div class="mt-6 space-y-3">
+                            <div class="h-3 w-full rounded bg-border/12"></div>
+                            <div class="h-3 w-5/6 rounded bg-border/10"></div>
+                            <div class="h-3 w-2/3 rounded bg-border/10"></div>
+                        </div>
+                        <div class="mt-8 flex items-center gap-3 border-t border-border/20 pt-6">
+                            <div class="h-12 w-12 rounded-full bg-border/12"></div>
+                            <div class="space-y-2">
+                                <div class="h-3 w-24 rounded bg-border/15"></div>
+                                <div class="h-2.5 w-16 rounded bg-border/10"></div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        } @else if (reviews().length) {
+            <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                @for (review of reviews(); track $index; let i = $index) {
+                    <div
+                        class="card group relative overflow-hidden rounded-2xl p-8 transition-all duration-500 hover:border-primary/20 hover:shadow-elevated"
+                    >
+                        <div
+                            class="absolute -right-4 -top-4 transition-all duration-500 group-hover:scale-110"
+                        >
+                            <mat-icon
+                                class="text-primary/3 transition-colors duration-500 group-hover:text-primary/[0.07]"
+                                style="font-size: 100px; width: 100px; height: 100px"
+                                >format_quote</mat-icon
+                            >
+                        </div>
+
+                        <div class="relative">
+                            <div class="flex items-center gap-1">
+                                @for (_ of [1, 2, 3, 4, 5]; track $index) {
+                                    <mat-icon
+                                        style="font-size: 15px; width: 15px; height: 15px"
+                                        [class]="
+                                            $index < review.rating ? 'star-filled' : 'star-empty'
+                                        "
+                                        >star</mat-icon
+                                    >
+                                }
+                            </div>
+
+                            <p class="mt-6 text-[13px] leading-[1.85] text-text-secondary">
+                                "{{ review.comment }}"
+                            </p>
+
+                            @if (review.tourTitle) {
+                                <div
+                                    class="mt-5 inline-flex items-center gap-1.5 rounded-full border border-primary/10 bg-primary/5 px-3.5 py-1.5"
+                                >
+                                    <mat-icon
+                                        class="text-primary"
+                                        style="font-size: 11px; width: 11px; height: 11px"
+                                        >tour</mat-icon
+                                    >
+                                    <span class="text-[10px] font-semibold text-primary/80">{{
+                                        review.tourTitle
+                                    }}</span>
+                                </div>
+                            }
+
+                            <div
+                                class="mt-7 flex items-center gap-3.5 border-t border-border/40 pt-6"
+                            >
+                                <div
+                                    class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/8 text-sm font-black text-primary ring-2 ring-primary/10"
+                                >
+                                    {{ review.authorInitial }}
+                                </div>
+                                <div>
+                                    <p class="text-[13px] font-bold text-text-primary">
+                                        {{ review.authorName }}
+                                    </p>
+                                    <div
+                                        class="mt-0.5 flex items-center gap-1.5 text-[10px] text-text-tertiary"
+                                    >
+                                        <mat-icon
+                                            class="text-success"
+                                            style="font-size: 10px; width: 10px; height: 10px"
+                                            >check_circle</mat-icon
+                                        >
+                                        <span>Verified traveler</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        } @else {
+            <div class="card flex flex-col items-center rounded-2xl px-8 py-24 text-center">
+                <div
+                    class="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/8"
+                >
+                    <mat-icon
+                        class="text-primary"
+                        style="font-size: 36px; width: 36px; height: 36px"
+                        >rate_review</mat-icon
+                    >
+                </div>
+                <p class="text-base font-bold text-text-primary">No reviews yet</p>
+                <p class="mt-1.5 text-sm text-text-tertiary">
+                    Be the first to share your Morocco experience!
+                </p>
+            </div>
+        }
+    </div>
+</section>

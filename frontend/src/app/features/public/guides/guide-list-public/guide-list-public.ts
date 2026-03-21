@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-guide-list-public',
-  imports: [],
-  templateUrl: './guide-list-public.html',
-  styles: ``,
+    selector: 'app-guide-list-public',
+    imports: [],
+    templateUrl: './guide-list-public.html',
+    styles: ``,
 })
-export class GuideListPublic {
-
-}
+export class GuideListPublic {}

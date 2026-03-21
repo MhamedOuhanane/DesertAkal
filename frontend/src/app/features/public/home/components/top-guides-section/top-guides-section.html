@@ -1,0 +1,144 @@
+<section class="py-28">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-14 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+            <div class="max-w-xl">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                        <mat-icon
+                            class="text-primary"
+                            style="font-size: 16px; width: 16px; height: 16px"
+                            >person_pin</mat-icon
+                        >
+                    </div>
+                    <span class="text-xs font-bold uppercase tracking-[0.15em] text-primary"
+                        >Local Experts</span
+                    >
+                </div>
+                <h2 class="mt-4 text-3xl font-black tracking-tight text-text-primary sm:text-4xl">
+                    Meet Our Top Guides
+                </h2>
+                <p class="mt-3 text-sm leading-relaxed text-text-secondary">
+                    Passionate locals who bring Morocco's stories, traditions, and hidden spots to
+                    life on every tour
+                </p>
+            </div>
+            <a
+                routerLink="/guides"
+                class="group inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-5 py-3 text-sm font-bold text-text-primary transition-all hover:border-primary/30 hover:shadow-elevated"
+            >
+                All guides
+                <mat-icon
+                    class="text-primary transition-transform group-hover:translate-x-1"
+                    style="font-size: 16px; width: 16px; height: 16px"
+                    >east</mat-icon
+                >
+            </a>
+        </div>
+
+        @if (loading()) {
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                @for (_ of [1, 2, 3, 4]; track $index) {
+                    <div class="card animate-pulse rounded-2xl p-8 text-center">
+                        <div class="mx-auto h-24 w-24 rounded-full bg-border/12"></div>
+                        <div class="mx-auto mt-5 h-4 w-28 rounded-lg bg-border/15"></div>
+                        <div class="mx-auto mt-3 h-3 w-20 rounded bg-border/10"></div>
+                    </div>
+                }
+            </div>
+        } @else if (guides().length) {
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                @for (guide of guides(); track guide.uuid) {
+                    <a
+                        [routerLink]="['/guides', guide.uuid]"
+                        class="card group cursor-pointer overflow-hidden rounded-2xl transition-all duration-500 hover:border-primary/20 hover:shadow-elevated"
+                    >
+                        <div
+                            class="h-1 w-full bg-linear-to-r from-primary/40 via-primary to-primary/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                        ></div>
+
+                        <div class="p-8 text-center">
+                            <div class="relative mx-auto h-24 w-24">
+                                <div
+                                    class="h-full w-full overflow-hidden rounded-full ring-[3px] ring-border/30 transition-all duration-500 group-hover:ring-primary/40 group-hover:shadow-lg"
+                                >
+                                    @if (guide.photo) {
+                                        <img
+                                            [src]="guide.photo"
+                                            [alt]="guide.firstName"
+                                            class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        />
+                                    } @else {
+                                        <div
+                                            class="flex h-full w-full items-center justify-center bg-primary/8 text-2xl font-black text-primary"
+                                        >
+                                            {{ guide.firstName.charAt(0)
+                                            }}{{ guide.lastName.charAt(0) }}
+                                        </div>
+                                    }
+                                </div>
+
+                                <div
+                                    class="absolute bottom-1 right-1 h-4 w-4 rounded-full border-[3px] border-surface bg-success shadow-sm"
+                                ></div>
+                            </div>
+
+                            <h3
+                                class="mt-5 text-[15px] font-bold text-text-primary transition-colors group-hover:text-primary"
+                            >
+                                {{ guide.firstName }} {{ guide.lastName }}
+                            </h3>
+
+                            @if (guide.rating > 0) {
+                                <div class="mt-2.5 flex items-center justify-center gap-0.5">
+                                    @for (_ of [1, 2, 3, 4, 5]; track $index) {
+                                        <mat-icon
+                                            style="font-size: 13px; width: 13px; height: 13px"
+                                            [class]="
+                                                $index < guide.rating ? 'star-filled' : 'star-empty'
+                                            "
+                                            >star</mat-icon
+                                        >
+                                    }
+                                    <span class="ml-1.5 text-[11px] font-bold text-text-tertiary">{{
+                                        guide.rating | number: '1.1-1'
+                                    }}</span>
+                                </div>
+                            }
+
+                            @if (getLanguageNames(guide)) {
+                                <div
+                                    class="mx-auto mt-4 inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-main-bg px-3.5 py-1.5"
+                                >
+                                    <mat-icon
+                                        class="text-primary"
+                                        style="font-size: 11px; width: 11px; height: 11px"
+                                        >translate</mat-icon
+                                    >
+                                    <span class="text-[10px] font-semibold text-text-tertiary">{{
+                                        getLanguageNames(guide)
+                                    }}</span>
+                                </div>
+                            }
+                        </div>
+                    </a>
+                }
+            </div>
+        } @else {
+            <div class="card flex flex-col items-center rounded-2xl px-8 py-24 text-center">
+                <div
+                    class="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/8"
+                >
+                    <mat-icon
+                        class="text-primary"
+                        style="font-size: 36px; width: 36px; height: 36px"
+                        >groups</mat-icon
+                    >
+                </div>
+                <p class="text-base font-bold text-text-primary">Guides coming soon</p>
+                <p class="mt-1.5 text-sm text-text-tertiary">
+                    Our team of local experts is getting ready
+                </p>
+            </div>
+        }
+    </div>
+</section>
