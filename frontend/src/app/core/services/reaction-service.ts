@@ -6,7 +6,7 @@ import { ApiResponse } from '../models/response.models';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
-export class CommentService {
+export class ReactionService {
     private http = inject(HttpClient);
     private baseUrl = `${environment.apiUrl}/reactions`;
 
