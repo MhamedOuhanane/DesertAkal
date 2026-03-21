@@ -1,1 +1,135 @@
-<p>guide-list-public works!</p>
+<section
+    class="relative overflow-hidden pb-14 pt-16"
+    style="
+        background: linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--primary-color) 12%, var(--bg-color)),
+            var(--bg-color)
+        );
+    "
+>
+    <div class="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-black text-text-primary sm:text-4xl">Our Expert Guides</h1>
+        <p class="mx-auto mt-2 max-w-md text-sm text-text-secondary">
+            Meet our passionate local guides who bring Morocco to life
+        </p>
+        <div class="mx-auto mt-6 max-w-xl">
+            <div class="relative">
+                <mat-icon
+                    class="absolute left-4 top-1/2 -translate-y-1/2 text-text-tertiary"
+                    style="font-size: 20px; width: 20px; height: 20px"
+                    >search</mat-icon
+                >
+                <input
+                    type="text"
+                    [value]="query().search"
+                    (input)="onSearch($any($event.target).value)"
+                    placeholder="Search guides..."
+                    class="input w-full rounded-xl py-3.5 pl-10 pr-4 shadow-elevated"
+                />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-10">
+    <div class="mx-auto min-h-screen max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="card mb-8 flex items-center justify-between px-4 py-3">
+            <span class="text-xs text-text-tertiary">
+                {{ pagination()?.totalElements || 0 }} guides
+            </span>
+            <select
+                class="input w-40"
+                [value]="currentSort"
+                (change)="onSortChange($any($event.target).value)"
+            >
+                @for (opt of sortOptions; track opt.value) {
+                    <option [value]="opt.value">{{ opt.label }}</option>
+                }
+            </select>
+        </div>
+
+        @if (isLoading()) {
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                @for (_ of [1, 2, 3, 4, 5, 6, 7, 8]; track $index) {
+                    <div class="card animate-pulse p-6 text-center">
+                        <div class="mx-auto h-20 w-20 rounded-full bg-border/20"></div>
+                        <div class="mx-auto mt-3 h-4 w-24 rounded bg-border/30"></div>
+                    </div>
+                }
+            </div>
+        } @else if (guides().length > 0) {
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                @for (guide of guides(); track guide.uuid) {
+                    <a
+                        [routerLink]="['/guides', guide.uuid]"
+                        class="card group cursor-pointer p-6 text-center transition-all hover:border-primary/30"
+                    >
+                        <div
+                            class="mx-auto h-24 w-24 overflow-hidden rounded-full ring-4 ring-primary/10 transition-all group-hover:ring-primary/30"
+                        >
+                            @if (guide.photo) {
+                                <img
+                                    [src]="guide.photo"
+                                    class="h-full w-full object-cover"
+                                    (error)="$any($event.target).style.display = 'none'"
+                                />
+                            } @else {
+                                <div
+                                    class="flex h-full w-full items-center justify-center bg-primary/10 text-2xl font-bold text-primary"
+                                >
+                                    {{ guide.firstName.charAt(0) }}{{ guide.lastName.charAt(0) }}
+                                </div>
+                            }
+                        </div>
+                        <h3
+                            class="mt-4 text-sm font-bold text-text-primary group-hover:text-primary"
+                        >
+                            {{ guide.firstName }} {{ guide.lastName }}
+                        </h3>
+                        @if (guide.rating > 0) {
+                            <div class="mt-2 flex items-center justify-center gap-1">
+                                @for (_ of [1, 2, 3, 4, 5]; track $index) {
+                                    <mat-icon
+                                        style="font-size: 14px; width: 14px; height: 14px"
+                                        [class]="
+                                            $index < guide.rating ? 'star-filled' : 'star-empty'
+                                        "
+                                        >star</mat-icon
+                                    >
+                                }
+                                <span class="ml-1 text-[11px] font-medium text-text-tertiary">
+                                    {{ guide.rating | number: '1.1-1' }}
+                                </span>
+                            </div>
+                        }
+                        @if (getLanguageNames(guide)) {
+                            <p
+                                class="mt-2 flex items-center justify-center gap-1 text-[11px] text-text-tertiary"
+                            >
+                                <mat-icon style="font-size: 12px; width: 12px; height: 12px"
+                                    >translate</mat-icon
+                                >
+                                {{ getLanguageNames(guide) }}
+                            </p>
+                        }
+                    </a>
+                }
+            </div>
+            @if (pagination() && pagination()!.totalPages > 1) {
+                <div class="mt-10">
+                    <app-pagination [pagination]="pagination()!" (pageChange)="goToPage($event)" />
+                </div>
+            }
+        } @else {
+            <div class="card flex flex-col items-center justify-center p-16 text-center">
+                <mat-icon
+                    class="mb-3 text-text-disabled"
+                    style="font-size: 56px; width: 56px; height: 56px"
+                    >person_search</mat-icon
+                >
+                <h3 class="text-lg font-bold text-text-primary">No guides found</h3>
+            </div>
+        }
+    </div>
+</section>
