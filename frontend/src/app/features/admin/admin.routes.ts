@@ -59,7 +59,9 @@ export const ADMIN_ROUTES: Routes = [
                     {
                         path: '',
                         loadComponent: () =>
-                            import('./guides/guide-detail/guide-detail').then((m) => m.GuideDetail),
+                            import('../public/guides/guide-detail-public/guide-detail-public').then(
+                                (m) => m.GuideDetailPublic,
+                            ),
                         data: { breadcrumb: 'Details' },
                     },
                     {

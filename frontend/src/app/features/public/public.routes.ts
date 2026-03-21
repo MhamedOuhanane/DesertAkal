@@ -23,8 +23,22 @@ export const PUBLIC_ROUTES: Routes = [
     },
     {
         path: 'guides',
-        loadComponent: () =>
-            import('./guides/guide-list-public/guide-list-public').then((m) => m.GuideListPublic),
+        children: [
+            {
+                path: '',
+                loadComponent: () =>
+                    import('./guides/guide-list-public/guide-list-public').then(
+                        (m) => m.GuideListPublic,
+                    ),
+            },
+            {
+                path: ':uuid',
+                loadComponent: () =>
+                    import('./guides/guide-detail-public/guide-detail-public').then(
+                        (m) => m.GuideDetailPublic,
+                    ),
+            },
+        ],
     },
     { path: 'blog', loadComponent: () => import('./blog/blog').then((m) => m.Blog) },
     { path: 'about', loadComponent: () => import('./about/about').then((m) => m.About) },
