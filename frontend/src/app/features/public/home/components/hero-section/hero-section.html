@@ -1,0 +1,243 @@
+<section class="relative min-h-screen overflow-hidden">
+    <div
+        class="absolute inset-0"
+        style="
+            background: linear-gradient(
+                170deg,
+                color-mix(in srgb, var(--primary-color) 12%, var(--bg-color)) 0%,
+                var(--bg-color) 35%,
+                color-mix(in srgb, var(--secondary-color) 6%, var(--bg-color)) 70%,
+                var(--bg-color) 100%
+            );
+        "
+    ></div>
+
+    <div class="absolute inset-0 overflow-hidden">
+        <div
+            class="absolute -right-24 -top-24 h-130 w-130 rounded-full bg-primary/8 blur-[120px]"
+        ></div>
+        <div
+            class="absolute -bottom-32 left-0 h-80 w-80 rounded-full bg-secondary/6 blur-[100px]"
+        ></div>
+        <div
+            class="absolute left-1/3 top-1/4 h-40 w-40 rounded-full bg-warning/5 blur-[60px]"
+        ></div>
+    </div>
+
+    <div
+        class="absolute inset-0 opacity-[0.03]"
+        style="
+            background-image: radial-gradient(
+                circle,
+                var(--text-primary-color) 1px,
+                transparent 1px
+            );
+            background-size: 24px 24px;
+        "
+    ></div>
+
+    <div class="relative mx-auto flex min-h-screen max-w-7xl items-center px-4 sm:px-6 lg:px-8">
+        <div class="grid w-full items-center gap-12 py-24 lg:grid-cols-12 lg:gap-8">
+            <div class="animate-slide-up lg:col-span-7">
+                <div
+                    class="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-2 backdrop-blur-sm"
+                >
+                    <span
+                        class="flex h-5 w-5 items-center justify-center rounded-full bg-primary/20"
+                    >
+                        <mat-icon
+                            class="text-primary"
+                            style="font-size: 11px; width: 11px; height: 11px"
+                            >auto_awesome</mat-icon
+                        >
+                    </span>
+                    <span class="text-[11px] font-bold tracking-wider text-primary"
+                        >YOUR GATEWAY TO MOROCCO</span
+                    >
+                </div>
+
+                <h1
+                    class="mt-8 text-4xl font-black leading-[1.06] tracking-tight text-text-primary sm:text-5xl xl:text-[3.5rem]"
+                >
+                    Discover the
+                    <br class="hidden sm:block" />
+                    <span class="text-gradient">Beauty of Morocco</span>
+                </h1>
+
+                <div class="mt-6 flex items-center gap-3">
+                    <div class="h-0.75 w-12 rounded-full bg-primary"></div>
+                    <div class="h-0.75 w-6 rounded-full bg-primary/40"></div>
+                    <div class="h-0.75 w-3 rounded-full bg-primary/20"></div>
+                </div>
+
+                <p class="mt-6 max-w-lg text-base leading-[1.8] text-text-secondary sm:text-[17px]">
+                    From the blue streets of Chefchaouen to the peaks of the Atlas Mountains,
+                    explore Morocco's vibrant cities, stunning landscapes, and rich culture with
+                    expert local guides.
+                </p>
+
+                <div class="mt-10 flex flex-wrap items-center gap-4">
+                    <a routerLink="/tours" class="btn-primary group rounded-2xl px-8 py-4 text-sm">
+                        <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                            >explore</mat-icon
+                        >
+                        Explore Tours
+                        <mat-icon
+                            class="transition-transform group-hover:translate-x-1"
+                            style="font-size: 16px; width: 16px; height: 16px"
+                            >east</mat-icon
+                        >
+                    </a>
+                    <a
+                        routerLink="/guides"
+                        class="btn-secondary flex items-center gap-2 rounded-2xl px-8 py-4 text-sm backdrop-blur-sm"
+                    >
+                        <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                            >people</mat-icon
+                        >
+                        Meet Our Guides
+                    </a>
+                </div>
+
+                <div class="mt-14 flex items-center gap-6 border-t border-border/40 pt-8 sm:gap-10">
+                    @for (h of screenService.highlights; track h.label; let last = $last) {
+                        @if (h.icon !== 'landscape') {
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/8 ring-primary/10"
+                                >
+                                    <mat-icon
+                                        class="text-primary"
+                                        style="font-size: 18px; width: 18px; height: 18px"
+                                        >{{ h.icon }}</mat-icon
+                                    >
+                                </div>
+                                <div>
+                                    <p
+                                        class="text-xl font-black leading-none tracking-tight text-text-primary"
+                                    >
+                                        {{ h.value }}
+                                    </p>
+                                    <p
+                                        class="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-text-tertiary"
+                                    >
+                                        {{ h.label }}
+                                    </p>
+                                </div>
+                            </div>
+                        }
+                        @if (!last) {
+                            <div class="hidden h-10 w-px bg-border/30 sm:block"></div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="hidden lg:col-span-5 lg:block">
+                <div class="relative ml-8">
+                    <div class="absolute -inset-4 rounded-4xl bg-primary/5 blur-sm"></div>
+
+                    <div class="relative overflow-hidden rounded-[1.75rem] ring-1 ring-white/10">
+                        <img
+                            src="images/Morocco-Travel-Map.jpg"
+                            alt="Morocco"
+                            class="w-full object-cover"
+                        />
+                        <div
+                            class="absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent"
+                        ></div>
+
+                        <div class="absolute bottom-5 left-5 right-5">
+                            <div
+                                class="flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-5 py-3 backdrop-blur-md"
+                            >
+                                <div class="flex items-center gap-2">
+                                    <mat-icon
+                                        class="text-white/80"
+                                        style="font-size: 16px; width: 16px; height: 16px"
+                                        >pin_drop</mat-icon
+                                    >
+                                    <span class="text-xs font-semibold text-white/90"
+                                        >30+ Destinations</span
+                                    >
+                                </div>
+                                <div class="h-4 w-px bg-white/20"></div>
+                                <div class="flex items-center gap-2">
+                                    <mat-icon
+                                        class="text-warning"
+                                        style="font-size: 14px; width: 14px; height: 14px"
+                                        >star</mat-icon
+                                    >
+                                    <span class="text-xs font-bold text-white/90">4.9 Rating</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="card absolute -right-8 top-6 animate-fade-in rounded-2xl p-4 shadow-elevated"
+                    >
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="flex h-11 w-11 items-center justify-center rounded-xl bg-success/10"
+                            >
+                                <mat-icon
+                                    class="text-success"
+                                    style="font-size: 20px; width: 20px; height: 20px"
+                                    >verified</mat-icon
+                                >
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-text-primary">Trusted Platform</p>
+                                <p class="text-[10px] text-text-tertiary">10K+ happy travelers</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="card absolute -bottom-6 -left-8 animate-fade-in rounded-2xl p-4 shadow-elevated"
+                    >
+                        <div class="flex items-center gap-3">
+                            <div class="flex -space-x-2">
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-[10px] font-bold text-primary ring-2 ring-surface"
+                                >
+                                    A
+                                </div>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-secondary/20 text-[10px] font-bold text-secondary ring-2 ring-surface"
+                                >
+                                    M
+                                </div>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-info/20 text-[10px] font-bold text-info ring-2 ring-surface"
+                                >
+                                    K
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold text-text-primary">120+ Guides</p>
+                                <p class="text-[9px] text-text-tertiary">Ready to explore</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="absolute bottom-0 left-0 right-0">
+        <svg
+            viewBox="0 0 1440 50"
+            fill="none"
+            class="w-full"
+            preserveAspectRatio="none"
+            style="height: 36px"
+        >
+            <path
+                d="M0 50L60 45C120 40 240 30 360 27C480 24 600 28 720 32C840 36 960 40 1080 39C1200 38 1320 32 1380 29L1440 26V50H0Z"
+                [attr.fill]="'var(--bg-color)'"
+            />
+        </svg>
+    </div>
+</section>

@@ -337,23 +337,25 @@ public class TourServiceImpl implements TourService {
             }
 
             if (durationStr != null && !durationStr.isBlank()) {
-                String cleanDuration = durationStr.trim();
                 try {
-                    if (cleanDuration.startsWith("+")) {
-                        int val = Integer.parseInt(cleanDuration.substring(1).trim());
-                        predicates.add(cb.greaterThanOrEqualTo(root.get("durationDays"), val));
-                        log.debug("Filter applied: durationDays >= {}", val);
-                    } else if (cleanDuration.startsWith("-")) {
-                        int val = Integer.parseInt(cleanDuration.substring(1).trim());
-                        predicates.add(cb.lessThanOrEqualTo(root.get("durationDays"), val));
-                        log.debug("Filter applied: durationDays <= {}", val);
+                    if (durationStr.contains("-")) {
+                        String[] parts = durationStr.split("-");
+                        int min = Integer.parseInt(parts[0].trim());
+                        int max = Integer.parseInt(parts[1].trim());
+
+                        if (max == 99) {
+                            predicates.add(cb.greaterThanOrEqualTo(root.get("durationDays"), min));
+                            log.debug("Filtre durée : >= {}", min);
+                        } else {
+                            predicates.add(cb.between(root.get("durationDays"), min, max));
+                            log.debug("Filtre durée : entre {} et {}", min, max);
+                        }
                     } else {
-                        int val = Integer.parseInt(cleanDuration);
+                        int val = Integer.parseInt(durationStr.trim());
                         predicates.add(cb.equal(root.get("durationDays"), val));
-                        log.debug("Filter applied: durationDays == {}", val);
                     }
-                } catch (NumberFormatException e) {
-                    log.warn("Invalid duration format received: '{}'", durationStr);
+                } catch (Exception e) {
+                    log.warn("Format de durée invalide reçu : '{}'", durationStr);
                 }
             }
 

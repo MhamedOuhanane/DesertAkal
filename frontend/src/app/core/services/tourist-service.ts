@@ -3,11 +3,11 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { ApiResponse, PageAble, Pagination } from '../models/response.models';
 import { Observable } from 'rxjs';
-import { Tour } from '../../features/tour/tour';
 import { buildHttpParams } from '../utils/http-utils';
 import { Reservation, ReservationFilters } from '../models/reservation.model';
 import { Payment, PaymentFilters } from '../models/payment.model';
 import { Review, ReviewFilters } from '../models/review.model';
+import { Tour } from '../models/tour.model';
 
 @Injectable({
     providedIn: 'root',

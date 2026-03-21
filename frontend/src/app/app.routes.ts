@@ -9,16 +9,7 @@ export const routes: Routes = [
         path: '',
         canActivate: [homeGuard],
         loadComponent: () => import('./layouts/main-layout/main-layout').then((m) => m.MainLayout),
-        children: [
-            {
-                path: '',
-                loadComponent: () => import('./features/home/home').then((m) => m.Home),
-            },
-            {
-                path: 'tours',
-                loadComponent: () => import('./features/tour/tour').then((m) => m.Tour),
-            },
-        ],
+        loadChildren: () => import('./features/public/public.routes').then((r) => r.PUBLIC_ROUTES),
     },
 
     {
