@@ -20,6 +20,12 @@ export interface ReviewFilters extends PageAble {
     minRating?: number;
 }
 
+export interface ReviewFormData {
+    reviewableUuid: string;
+    reviewableType: ReviewableType;
+    reviewableName: string;
+}
+
 export interface ReviewCreate {
     rating: string;
     comment: string;

@@ -125,7 +125,7 @@
                     >
                     <h2 class="text-sm font-bold text-text-primary">Tour</h2>
                 </div>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-bold text-text-primary">
                             {{ reservation()!.tourTitle }}
@@ -140,6 +140,18 @@
                             View tour
                         </a>
                     </div>
+
+                    @if (canReview()) {
+                        <button
+                            (click)="reviewTour()"
+                            class="flex items-center gap-1.5 rounded-lg bg-warning/10 px-3 py-2 text-xs font-medium text-warning transition-colors hover:bg-warning/20"
+                        >
+                            <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                                >rate_review</mat-icon
+                            >
+                            Review Tour
+                        </button>
+                    }
                 </div>
             </div>
 
@@ -193,43 +205,59 @@
                     </div>
 
                     @if (reservation()!.guideName) {
-                        <div class="flex items-center gap-3 rounded-xl bg-main-bg/50 p-4">
-                            @if (reservation()!.guidePhoto) {
-                                <img
-                                    [src]="reservation()!.guidePhoto"
-                                    class="h-10 w-10 rounded-full object-cover ring-2 ring-border"
-                                />
-                            } @else {
-                                <div
-                                    class="flex h-10 w-10 items-center justify-center rounded-full bg-info/10 text-xs font-bold text-info"
-                                >
-                                    {{ getInitials(reservation()!.guideName) }}
-                                </div>
-                            }
-                            <div>
-                                <p
-                                    class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
-                                >
-                                    Guide
-                                </p>
-                                <p class="text-sm font-bold text-text-primary">
-                                    {{ reservation()!.guideName }}
-                                </p>
-                                @if (guideProfileLink()) {
-                                    <a
-                                        [routerLink]="[
-                                            guideProfileLink(),
-                                            reservation()!.guideUuid,
-                                        ]"
-                                        class="flex items-center gap-0.5 text-[10px] text-primary hover:underline"
+                        <div class="flex items-center justify-between rounded-xl bg-main-bg/50 p-4">
+                            <div class="flex items-center gap-3">
+                                @if (reservation()!.guidePhoto) {
+                                    <img
+                                        [src]="reservation()!.guidePhoto"
+                                        class="h-10 w-10 rounded-full object-cover ring-2 ring-border"
+                                    />
+                                } @else {
+                                    <div
+                                        class="flex h-10 w-10 items-center justify-center rounded-full bg-info/10 text-xs font-bold text-info"
                                     >
-                                        View profile
-                                        <mat-icon style="font-size: 10px; width: 10px; height: 10px"
-                                            >open_in_new</mat-icon
-                                        >
-                                    </a>
+                                        {{ getInitials(reservation()!.guideName) }}
+                                    </div>
                                 }
+                                <div>
+                                    <p
+                                        class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary"
+                                    >
+                                        Guide
+                                    </p>
+                                    <p class="text-sm font-bold text-text-primary">
+                                        {{ reservation()!.guideName }}
+                                    </p>
+                                    @if (guideProfileLink()) {
+                                        <a
+                                            [routerLink]="[
+                                                guideProfileLink(),
+                                                reservation()!.guideUuid,
+                                            ]"
+                                            class="flex items-center gap-0.5 text-[10px] text-primary hover:underline"
+                                        >
+                                            View profile
+                                            <mat-icon
+                                                style="font-size: 10px; width: 10px; height: 10px"
+                                                >open_in_new</mat-icon
+                                            >
+                                        </a>
+                                    }
+                                </div>
                             </div>
+
+                            <!-- ✅ Review Guide button -->
+                            @if (canReview()) {
+                                <button
+                                    (click)="reviewGuide()"
+                                    class="flex items-center gap-1.5 rounded-lg bg-warning/10 px-3 py-2 text-xs font-medium text-warning transition-colors hover:bg-warning/20"
+                                >
+                                    <mat-icon style="font-size: 14px; width: 14px; height: 14px"
+                                        >rate_review</mat-icon
+                                    >
+                                    Review Guide
+                                </button>
+                            }
                         </div>
                     }
                 </div>

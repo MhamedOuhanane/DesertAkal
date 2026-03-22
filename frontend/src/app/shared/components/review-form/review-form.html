@@ -1,0 +1,127 @@
+<div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+    (click)="close()"
+>
+    <div
+        class="w-full max-w-md overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl"
+        (click)="$event.stopPropagation()"
+    >
+        <div class="flex items-center justify-between border-b border-border px-6 py-4">
+            <h2 class="text-lg font-bold text-text-primary">Write a Review</h2>
+            <button
+                (click)="close()"
+                class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-main-bg"
+            >
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px">close</mat-icon>
+            </button>
+        </div>
+
+        <div class="p-6">
+            <div class="mb-6 rounded-xl bg-main-bg p-4 text-center">
+                <span
+                    class="mb-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                    [class]="
+                        data.reviewableType === 'TOUR'
+                            ? 'bg-blue-500/10 text-blue-600'
+                            : 'bg-purple-500/10 text-purple-600'
+                    "
+                >
+                    {{ data.reviewableType }}
+                </span>
+                <p class="text-sm font-semibold text-text-primary">{{ data.reviewableName }}</p>
+            </div>
+
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                <div class="mb-6">
+                    <label class="label mb-2 block text-center"
+                        >How would you rate your experience?</label
+                    >
+                    <div class="flex items-center justify-center gap-1">
+                        @for (star of [1, 2, 3, 4, 5]; track star) {
+                            <button
+                                type="button"
+                                (click)="setRating(star)"
+                                (mouseenter)="hoverRating.set(star)"
+                                (mouseleave)="hoverRating.set(0)"
+                                class="transition-transform hover:scale-110"
+                            >
+                                <mat-icon
+                                    style="font-size: 36px; width: 36px; height: 36px"
+                                    [class.star-filled]="
+                                        star <= (hoverRating() || form.get('rating')?.value || 0)
+                                    "
+                                    [class.star-empty]="
+                                        star > (hoverRating() || form.get('rating')?.value || 0)
+                                    "
+                                >
+                                    star
+                                </mat-icon>
+                            </button>
+                        }
+                    </div>
+                    <p class="mt-1 text-center text-xs text-text-tertiary">
+                        {{ getRatingLabel() }}
+                    </p>
+                    @if (form.get('rating')?.touched && form.get('rating')?.invalid) {
+                        <p class="mt-1 text-center text-xs text-danger">Please select a rating</p>
+                    }
+                </div>
+
+                <div class="mb-6">
+                    <label class="label">Your Review</label>
+                    <textarea
+                        formControlName="comment"
+                        rows="4"
+                        class="input w-full resize-none"
+                        placeholder="Share your experience... What did you enjoy? What could be improved?"
+                    ></textarea>
+                    <div class="mt-1 flex items-center justify-between">
+                        @if (form.get('comment')?.touched && form.get('comment')?.invalid) {
+                            <p class="text-xs text-danger">
+                                @if (form.get('comment')?.hasError('required')) {
+                                    Review is required
+                                } @else if (form.get('comment')?.hasError('minlength')) {
+                                    At least 10 characters
+                                }
+                            </p>
+                        } @else {
+                            <span></span>
+                        }
+                        <span class="text-[10px] text-text-disabled">
+                            {{ form.get('comment')?.value?.length || 0 }} / 1000
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button
+                        type="button"
+                        (click)="close()"
+                        class="btn-secondary flex-1 justify-center text-sm"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        [disabled]="isSubmitting()"
+                        class="btn-primary flex-1 justify-center text-sm disabled:opacity-50"
+                    >
+                        @if (isSubmitting()) {
+                            <mat-icon
+                                class="animate-spin"
+                                style="font-size: 16px; width: 16px; height: 16px"
+                                >autorenew</mat-icon
+                            >
+                            Posting...
+                        } @else {
+                            <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                                >send</mat-icon
+                            >
+                            Post Review
+                        }
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
