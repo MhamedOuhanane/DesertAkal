@@ -50,6 +50,16 @@
                 </button>
             }
 
+            @if (canPay) {
+                <button
+                    (click)="payBooking(reservation()?.uuid!); $event.stopPropagation()"
+                    class="inline-flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-2.5 text-[11px] font-medium text-primary transition-colors hover:bg-primary/20"
+                >
+                    <mat-icon style="font-size: 16px; width: 16px; height: 16px">payment</mat-icon>
+                    Pay Now
+                </button>
+            }
+
             @if (canCancel) {
                 <ng-container *appHasRole="[RoleEnum.ADMIN, RoleEnum.TOURIST]">
                     <button
@@ -347,7 +357,7 @@
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-text-secondary">Amount</span>
                         <span class="text-sm font-bold text-green-600">
-                            {{ reservation()!.amount | currency: 'MAD ' : 'symbol' : '1.0-0' }}
+                            {{ reservation()!.amount | currency: 'EUR' : 'symbol' : '1.0-0' }}
                         </span>
                     </div>
                     <div class="divider"></div>

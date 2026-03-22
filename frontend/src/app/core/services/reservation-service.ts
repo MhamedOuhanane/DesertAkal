@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse, Pagination } from '../models/response.models';
@@ -8,6 +8,8 @@ import {
     ReservationFind,
     ReservationFilters,
     ReservationVerification,
+    ReservationCreate,
+    ReservationUpdate,
 } from '../models/reservation.model';
 import { Payment } from '../models/payment.model';
 import { buildHttpParams } from '../utils/http-utils';
@@ -16,6 +18,14 @@ import { buildHttpParams } from '../utils/http-utils';
 export class ReservationService {
     private http = inject(HttpClient);
     private baseUrl = `${environment.apiUrl}/reservations`;
+
+    create(dto: ReservationCreate): Observable<ApiResponse<ReservationFind>> {
+        return this.http.post<ApiResponse<ReservationFind>>(this.baseUrl, dto);
+    }
+
+    update(uuid: string, dto: ReservationUpdate): Observable<ApiResponse<ReservationFind>> {
+        return this.http.patch<ApiResponse<ReservationFind>>(`${this.baseUrl}/${uuid}`, dto);
+    }
 
     findAll(params: ReservationFilters): Observable<ApiResponse<Pagination<Reservation>>> {
         return this.http.get<ApiResponse<Pagination<Reservation>>>(this.baseUrl, {

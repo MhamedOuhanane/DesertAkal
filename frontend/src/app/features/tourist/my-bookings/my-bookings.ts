@@ -85,7 +85,7 @@ export class MyBookings {
     }
 
     payBooking(uuid: string): void {
-        this.router.navigate(['/tourist/dashboard/bookings', uuid]);
+        this.router.navigate(['/tourist/dashboard/bookings', uuid, 'pay']);
     }
 
     openCancelDialog(uuid: string): void {

@@ -1,0 +1,145 @@
+<div class="mb-6 flex items-center gap-3">
+    <a
+        routerLink="/tourist/dashboard/bookings"
+        class="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary hover:text-primary"
+    >
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px">arrow_back</mat-icon>
+    </a>
+    <h1 class="text-2xl font-bold text-text-primary">Booking Confirmation</h1>
+</div>
+
+@if (isLoading()) {
+    <div class="card mx-auto max-w-2xl animate-pulse p-8">
+        <div class="space-y-4">
+            <div class="mx-auto h-16 w-16 rounded-full bg-border/30"></div>
+            <div class="mx-auto h-6 w-48 rounded bg-border/30"></div>
+            <div class="h-40 rounded-xl bg-border/20"></div>
+        </div>
+    </div>
+} @else if (reservation()) {
+    <div class="mx-auto max-w-2xl space-y-6">
+        <div class="card overflow-hidden">
+            <div
+                class="p-8 text-center"
+                [class]="
+                    reservation()!.status === 'CONFIRMED'
+                        ? 'bg-linear-to-b from-green-500/10 to-transparent'
+                        : 'bg-linear-to-b from-orange-500/10 to-transparent'
+                "
+            >
+                <div
+                    class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full"
+                    [class]="getStatusConfig(reservation()!.status).bg"
+                >
+                    <mat-icon
+                        style="font-size: 40px; width: 40px; height: 40px"
+                        [class]="getStatusConfig(reservation()!.status).text"
+                    >
+                        {{ getStatusConfig(reservation()!.status).icon }}
+                    </mat-icon>
+                </div>
+                <h2 class="text-xl font-black text-text-primary">
+                    {{ getStatusConfig(reservation()!.status).label }}
+                </h2>
+                <p class="mt-1 text-sm text-text-secondary">
+                    Reference:
+                    <span class="font-mono font-bold text-primary">{{
+                        reservation()!.reference
+                    }}</span>
+                </p>
+            </div>
+        </div>
+
+        @if (reservation()!.qrCode && reservation()!.status === 'CONFIRMED') {
+            <div class="card p-6 text-center">
+                <h3 class="mb-3 text-sm font-bold text-text-primary">Your Booking QR Code</h3>
+                <div
+                    class="mx-auto w-fit rounded-xl border-2 border-dashed border-primary/30 bg-white p-4"
+                >
+                    <img [src]="reservation()!.qrCode" alt="QR Code" class="h-48 w-48" />
+                </div>
+                <p class="mt-2 text-xs text-text-tertiary">
+                    Show this QR code to your guide on the day of the tour.
+                </p>
+            </div>
+        }
+
+        <div class="card p-6">
+            <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-text-primary">
+                <mat-icon class="text-primary" style="font-size: 18px; width: 18px; height: 18px"
+                    >info</mat-icon
+                >
+                Booking Details
+            </h3>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between rounded-lg bg-main-bg px-4 py-3">
+                    <span class="text-sm text-text-secondary">Tour</span>
+                    <span class="text-sm font-semibold text-text-primary">{{
+                        reservation()!.tourTitle
+                    }}</span>
+                </div>
+                <div class="flex items-center justify-between rounded-lg bg-main-bg px-4 py-3">
+                    <span class="text-sm text-text-secondary">Guide</span>
+                    <span class="text-sm font-medium text-text-primary">{{
+                        reservation()!.guideName
+                    }}</span>
+                </div>
+                <div class="flex items-center justify-between rounded-lg bg-main-bg px-4 py-3">
+                    <span class="text-sm text-text-secondary">Dates</span>
+                    <span class="text-sm font-medium text-text-primary">
+                        {{ reservation()!.startDate | date: 'MMM d' }} →
+                        {{ reservation()!.endDate | date: 'MMM d, y' }}
+                    </span>
+                </div>
+                <div class="flex items-center justify-between rounded-lg bg-main-bg px-4 py-3">
+                    <span class="text-sm text-text-secondary">People</span>
+                    <span class="text-sm font-medium text-text-primary">{{
+                        reservation()!.numberPeople
+                    }}</span>
+                </div>
+                <div class="divider"></div>
+                <div class="flex items-center justify-between px-4 py-2">
+                    <span class="text-base font-bold text-text-primary">Total Paid</span>
+                    <span class="text-lg font-black text-primary">
+                        {{ reservation()!.amount | currency: 'MAD ' : 'symbol' : '1.0-0' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+            @if (reservation()!.pdfUrl && reservation()!.status === 'CONFIRMED') {
+                <button
+                    (click)="downloadPdf()"
+                    [disabled]="isDownloading()"
+                    class="btn-primary flex-1 justify-center text-sm disabled:opacity-50"
+                >
+                    @if (isDownloading()) {
+                        <mat-icon
+                            class="animate-spin"
+                            style="font-size: 16px; width: 16px; height: 16px"
+                            >autorenew</mat-icon
+                        >
+                        Downloading...
+                    } @else {
+                        <mat-icon style="font-size: 16px; width: 16px; height: 16px"
+                            >download</mat-icon
+                        >
+                        Download Voucher (PDF)
+                    }
+                </button>
+            }
+            <a
+                routerLink="/tourist/dashboard/bookings"
+                class="btn-secondary flex-1 justify-center text-sm"
+            >
+                <mat-icon style="font-size: 16px; width: 16px; height: 16px">list</mat-icon>
+                My Bookings
+            </a>
+            <a routerLink="/tours" class="btn-secondary flex-1 justify-center text-sm">
+                <mat-icon style="font-size: 16px; width: 16px; height: 16px">explore</mat-icon>
+                Explore More Tours
+            </a>
+        </div>
+    </div>
+}

@@ -50,10 +50,8 @@ public class PayPalServiceImpl implements PayPalService {
                             .brandName(BrandInfo.COMPANY_NAME)
                             .landingPage("BILLING")
                             .userAction("PAY_NOW")
-                            .returnUrl(brand.getFrontendUrl()
-                                    + "/payment/success?order_id=" + payment.getUuid())
-                            .cancelUrl(brand.getFrontendUrl()
-                                    + "/payment/cancel?payment_id=" + payment.getUuid());
+                            .returnUrl(brand.getFrontendUrl() + "/payment/callback")
+                            .cancelUrl(brand.getFrontendUrl() + "/payment/callback?cancelled=true");
 
             orderRequest.applicationContext(context);
 

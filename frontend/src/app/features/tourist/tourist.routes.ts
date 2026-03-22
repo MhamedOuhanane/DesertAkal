@@ -14,12 +14,41 @@ export const TOURIST_ROUTES: Routes = [
                 loadComponent: () => import('./my-bookings/my-bookings').then((m) => m.MyBookings),
             },
             {
-                path: ':uuid',
+                path: 'new',
                 loadComponent: () =>
-                    import('../../shared/pages/reservation-detail/reservation-detail').then(
-                        (m) => m.ReservationDetail,
+                    import('./reservation-flow/reservation-form/reservation-form').then(
+                        (m) => m.ReservationForm,
                     ),
-                data: { breadcrumb: 'Details' },
+                data: { breadcrumb: 'New Booking' },
+            },
+            {
+                path: ':uuid',
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () =>
+                            import('../../shared/pages/reservation-detail/reservation-detail').then(
+                                (m) => m.ReservationDetail,
+                            ),
+                        data: { breadcrumb: 'Details' },
+                    },
+                    {
+                        path: 'pay',
+                        loadComponent: () =>
+                            import('./reservation-flow/reservation-pay/reservation-pay').then(
+                                (m) => m.ReservationPay,
+                            ),
+                        data: { breadcrumb: 'Pay Booking' },
+                    },
+                    {
+                        path: 'confirmation',
+                        loadComponent: () =>
+                            import('./reservation-flow/booking-confirmation/booking-confirmation').then(
+                                (m) => m.BookingConfirmation,
+                            ),
+                        data: { breadcrumb: 'Confirmation' },
+                    },
+                ],
             },
         ],
     },

@@ -50,6 +50,16 @@ export class GuideService {
         );
     }
 
+    getAvailableGuides(params: {
+        startDate: string;
+        endDate: string;
+        language?: string;
+    }): Observable<ApiResponse<Guide[]>> {
+        return this.http.get<ApiResponse<Guide[]>>(`${this.baseUrl}/available`, {
+            params: buildHttpParams(params),
+        });
+    }
+
     getReviews(uuid: string, params: ReviewFilters): Observable<ApiResponse<Pagination<Review>>> {
         return this.http.get<ApiResponse<Pagination<Review>>>(`${this.baseUrl}/${uuid}/reviews`, {
             params: buildHttpParams<ReviewFilters>(params),

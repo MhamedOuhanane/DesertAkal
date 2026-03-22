@@ -30,20 +30,7 @@ export class DashboardHeader {
 
     readonly showUserMenu = signal(false);
 
-    readonly userMenuLinks = signal<MenuItem[]>([
-        {
-            label: 'My Profile',
-            path: this.navService.dashboardHome() + '/profile',
-            icon: 'person',
-            roles: [RoleEnum.ADMIN, RoleEnum.GUIDE, RoleEnum.TOURIST],
-        },
-        {
-            label: 'Settings',
-            path: this.navService.dashboardHome() + '/settings',
-            icon: 'settings',
-            roles: [RoleEnum.ADMIN, RoleEnum.GUIDE, RoleEnum.TOURIST],
-        },
-    ]);
+    readonly userMenuLinks = this.navService.filteredUserMenuLinks;
 
     readonly isWeb = toSignal(
         this.breakpointObserver.observe('(min-width: 768px)').pipe(map((result) => result.matches)),

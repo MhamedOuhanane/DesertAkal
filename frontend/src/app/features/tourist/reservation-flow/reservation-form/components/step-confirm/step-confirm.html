@@ -1,0 +1,131 @@
+<div class="card p-6">
+    <h2 class="mb-6 flex items-center gap-2 text-lg font-bold text-text-primary">
+        <mat-icon class="text-primary" style="font-size: 20px; width: 20px; height: 20px"
+            >fact_check</mat-icon
+        >
+        Review Your Booking
+    </h2>
+
+    <div class="space-y-4">
+        <div class="flex items-center gap-4 rounded-xl border border-border p-4">
+            @if (tour().image) {
+                <img [src]="tour().image" class="h-16 w-24 shrink-0 rounded-lg object-cover" />
+            } @else {
+                <div
+                    class="flex h-16 w-24 shrink-0 items-center justify-center rounded-lg bg-primary/10"
+                >
+                    <mat-icon
+                        class="text-primary"
+                        style="font-size: 24px; width: 24px; height: 24px"
+                        >tour</mat-icon
+                    >
+                </div>
+            }
+            <div>
+                <p class="text-sm font-bold text-text-primary">{{ tour().title }}</p>
+                <p class="text-xs text-text-tertiary">
+                    {{ tour().durationDays }} days · {{ form().get('startDate')?.value }} →
+                    {{ endDate() }}
+                </p>
+            </div>
+        </div>
+
+        @if (selectedGuide(); as guide) {
+            <div class="flex items-center gap-3 rounded-xl border border-border p-4">
+                @if (guide.photo) {
+                    <img [src]="guide.photo" class="h-10 w-10 rounded-full object-cover" />
+                } @else {
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary"
+                    >
+                        {{ guide.firstName.charAt(0) }}{{ guide.lastName.charAt(0) }}
+                    </div>
+                }
+                <div>
+                    <p class="text-sm font-semibold text-text-primary">
+                        {{ guide.firstName }} {{ guide.lastName }}
+                    </p>
+                    <p class="text-[11px] text-text-tertiary">Your guide</p>
+                </div>
+            </div>
+        }
+
+        <div class="rounded-xl bg-main-bg p-4">
+            <div class="space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span class="text-text-secondary">People</span>
+                    <span class="font-medium text-text-primary">
+                        {{ form().get('numberPeople')?.value }}
+                    </span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-text-secondary">Duration</span>
+                    <span class="font-medium text-text-primary">
+                        {{ tour().durationDays }} days
+                    </span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-text-secondary">Dates</span>
+                    <span class="font-medium text-text-primary">
+                        {{ form().get('startDate')?.value }} → {{ endDate() }}
+                    </span>
+                </div>
+                <div class="divider"></div>
+                <div class="flex justify-between text-base">
+                    <span class="font-bold text-text-primary">Total</span>
+                    <span class="font-black text-primary">
+                        {{ form().get('amount')?.value | currency: 'EUR' : 'symbol' : '1.0-0' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <div class="flex items-start gap-2 rounded-lg bg-warning/10 p-3">
+                <mat-icon
+                    class="mt-0.5 text-warning"
+                    style="font-size: 16px; width: 16px; height: 16px"
+                    >info</mat-icon
+                >
+                <p class="text-xs text-text-secondary">
+                    Reservations must be made at least
+                    <strong>1 week</strong> in advance.
+                </p>
+            </div>
+            <div class="flex items-start gap-2 rounded-lg bg-info/10 p-3">
+                <mat-icon
+                    class="mt-0.5 text-info"
+                    style="font-size: 16px; width: 16px; height: 16px"
+                    >gavel</mat-icon
+                >
+                <p class="text-xs text-text-secondary">
+                    Cancellation by tourist incurs a
+                    <strong>10% fee</strong>. Admin cancellations are fully refunded.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-6 flex justify-between">
+        <button type="button" (click)="back.emit()" class="btn-secondary text-sm">
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px">arrow_back</mat-icon>
+            Back
+        </button>
+        <button
+            type="button"
+            (click)="confirm.emit()"
+            [disabled]="isSubmitting()"
+            class="btn-primary text-sm disabled:opacity-50"
+        >
+            @if (isSubmitting()) {
+                <mat-icon class="animate-spin" style="font-size: 16px; width: 16px; height: 16px"
+                    >autorenew</mat-icon
+                >
+                Creating...
+            } @else {
+                <mat-icon style="font-size: 16px; width: 16px; height: 16px">book_online</mat-icon>
+                Confirm & Proceed to Payment
+            }
+        </button>
+    </div>
+</div>

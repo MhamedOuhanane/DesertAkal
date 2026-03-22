@@ -8,6 +8,7 @@ import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,5 +17,6 @@ public interface GuideService {
     PaginationDTO findAll(String search, String language, @NonNull Pageable pageable);
     GuideFindDTO find(@NonNull UUID guideUuid);
     GuideFindDTO update(@NonNull UUID guideUuid, @NonNull GuideUpdateDTO dto);
+    List<GuideDTO> findAvailable(@NonNull LocalDateTime startDate, @NonNull LocalDateTime endDate, String language);
     List<GuideDTO> findTop5();
 }

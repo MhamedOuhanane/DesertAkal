@@ -31,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -186,6 +187,21 @@ public class GuideServiceImpl implements GuideService {
         log.info("Guide with UUID: {} successfully updated", guideUuid);
 
         return mapper.toFindDto(guide);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<GuideDTO> findAvailable(@NonNull LocalDateTime startDate, @NonNull LocalDateTime endDate, String language) {
+        log.info("Searching for available guides between {} and {} for language: {}",
+                startDate, endDate, language);
+
+        String langParam = (language == null) ? "" : language;
+
+        List<Guide> availableGuides = repository.findAvailableGuides(startDate, endDate, langParam);
+
+        log.debug("Found {} available guides", availableGuides.size());
+
+        return mapper.toDtos(availableGuides);
     }
 
     @Override

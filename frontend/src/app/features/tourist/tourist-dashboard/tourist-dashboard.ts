@@ -109,6 +109,10 @@ export class TouristDashboard implements OnInit {
         this.router.navigate(['/tourist/dashboard/bookings', uuid]);
     }
 
+    payBooking(uuid: string): void {
+        this.router.navigate(['/tourist/dashboard/bookings', uuid, 'pay']);
+    }
+
     getGreeting(): string {
         const hour = new Date().getHours();
         if (hour < 12) return 'Good morning';
