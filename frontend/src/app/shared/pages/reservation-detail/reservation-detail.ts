@@ -13,6 +13,10 @@ import { PaymentCard } from '../../components/payment-card/payment-card';
 import { DeleteDialog } from '../../components/delete-dialog/delete-dialog';
 import { HasRole } from '../../directives';
 import { ReservationService } from '../../../core/services/reservation-service';
+import { MatDialog } from '@angular/material/dialog';
+import { ReviewableType } from '../../../core/enums/reviewable-type.enum';
+import { ReviewFormDialog } from '../../components/review-form/review-form';
+import { ReviewFormData } from '../../../core/models/review.model';
 
 @Component({
     selector: 'app-reservation-detail',
@@ -25,6 +29,8 @@ export class ReservationDetail implements OnInit {
     private router = inject(Router);
     private reservationService = inject(ReservationService);
     private authStore = inject(AuthStore);
+    private dialog = inject(MatDialog);
+    protected readonly RoleEnum = RoleEnum;
 
     reservation = signal<ReservationFind | null>(null);
     isLoading = signal(true);
@@ -78,7 +84,21 @@ export class ReservationDetail implements OnInit {
     touristProfileLink = computed(() => (this.isAdmin() ? '/dashboard/users' : null));
     guideProfileLink = computed(() => (this.isAdmin() ? '/dashboard/guides' : null));
 
-    protected readonly RoleEnum = RoleEnum;
+    canReview = computed(() => {
+        return this.isTourist() && this.reservation()?.status === 'COMPLETED';
+    });
+
+    reviewTour(): void {
+        const r = this.reservation();
+        if (!r) return;
+        this.openReviewDialog(r.tourUuid, ReviewableType.TOUR, r.tourTitle);
+    }
+
+    reviewGuide(): void {
+        const r = this.reservation();
+        if (!r) return;
+        this.openReviewDialog(r.guideUuid, ReviewableType.GUIDE, r.guideName);
+    }
 
     async ngOnInit(): Promise<void> {
         const uuid = this.route.snapshot.paramMap.get('uuid');
@@ -169,6 +189,22 @@ export class ReservationDetail implements OnInit {
             this.isDeleting.set(false);
             this.showDeleteDialog.set(false);
         }
+    }
+
+    private openReviewDialog(
+        reviewableUuid: string,
+        reviewableType: ReviewableType,
+        reviewableName: string,
+    ): void {
+        this.dialog.open(ReviewFormDialog, {
+            data: { reviewableUuid, reviewableType, reviewableName } as ReviewFormData,
+            panelClass: 'transparent-dialog',
+            maxWidth: '100vw',
+            maxHeight: '100vh',
+            width: '100%',
+            height: '100%',
+            hasBackdrop: false,
+        });
     }
 
     get canPay(): boolean {
