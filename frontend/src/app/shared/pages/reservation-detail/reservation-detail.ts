@@ -25,7 +25,6 @@ export class ReservationDetail implements OnInit {
     private router = inject(Router);
     private reservationService = inject(ReservationService);
     private authStore = inject(AuthStore);
-    private navService = inject(NavigationService);
 
     reservation = signal<ReservationFind | null>(null);
     isLoading = signal(true);
@@ -170,6 +169,14 @@ export class ReservationDetail implements OnInit {
             this.isDeleting.set(false);
             this.showDeleteDialog.set(false);
         }
+    }
+
+    get canPay(): boolean {
+        return this.reservation()?.status === 'PENDING';
+    }
+
+    payBooking(uuid: string): void {
+        this.router.navigate(['/tourist/dashboard/bookings', uuid, 'pay']);
     }
 
     getInitials(name: string): string {

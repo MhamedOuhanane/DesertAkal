@@ -1,0 +1,104 @@
+<div class="mb-6 flex items-center gap-3">
+    <a
+        routerLink="/tourist/dashboard/bookings"
+        class="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary hover:text-primary"
+    >
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px">arrow_back</mat-icon>
+    </a>
+    <h1 class="text-2xl font-bold text-text-primary">Book a Tour</h1>
+</div>
+
+@if (isLoading()) {
+    <div class="card animate-pulse p-8">
+        <div class="space-y-4">
+            <div class="h-6 w-48 rounded bg-border/30"></div>
+            <div class="h-40 rounded-xl bg-border/20"></div>
+            <div class="h-10 w-full rounded bg-border/20"></div>
+        </div>
+    </div>
+} @else if (tour()) {
+    <div class="card mb-6 p-4">
+        <div class="flex items-center justify-between">
+            @for (step of steps; track step.n) {
+                <div class="flex items-center gap-2">
+                    <div
+                        class="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all"
+                        [class.bg-primary]="currentStep() >= step.n"
+                        [class.text-white]="currentStep() >= step.n"
+                        [class.bg-border/20]="currentStep() < step.n"
+                        [class.text-text-tertiary]="currentStep() < step.n"
+                    >
+                        @if (currentStep() > step.n) {
+                            <mat-icon style="font-size: 16px; width: 16px; height: 16px">
+                                check
+                            </mat-icon>
+                        } @else {
+                            {{ step.n }}
+                        }
+                    </div>
+                    <span
+                        class="hidden text-xs font-medium sm:block"
+                        [class.text-primary]="currentStep() >= step.n"
+                        [class.text-text-tertiary]="currentStep() < step.n"
+                    >
+                        {{ step.label }}
+                    </span>
+                </div>
+                @if (step.n < 3) {
+                    <div
+                        class="mx-2 h-0.5 flex-1 rounded"
+                        [class.bg-primary]="currentStep() > step.n"
+                        [class.bg-border]="currentStep() <= step.n"
+                    ></div>
+                }
+            }
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div class="lg:col-span-2">
+            @if (currentStep() === 1) {
+                <app-step-trip-details
+                    [form]="form"
+                    [tour]="tour()!"
+                    [minDate]="minDate"
+                    [pricePerPerson]="price()"
+                    (dateChanged)="loadAvailableGuides($event.startDate, $event.endDate)"
+                    (amountChanged)="recalculateAmount()"
+                    (next)="nextStep()"
+                />
+            }
+
+            @if (currentStep() === 2) {
+                <app-step-select-guide
+                    [form]="form"
+                    [guides]="guides()"
+                    [isLoading]="guidesLoading()"
+                    (back)="prevStep()"
+                    (next)="nextStep()"
+                />
+            }
+
+            @if (currentStep() === 3) {
+                <app-step-confirm
+                    [form]="form"
+                    [tour]="tour()!"
+                    [selectedGuide]="getSelectedGuide()"
+                    [endDate]="getEndDate()"
+                    [isSubmitting]="isSubmitting()"
+                    (back)="prevStep()"
+                    (confirm)="onSubmit()"
+                />
+            }
+        </div>
+
+        <app-booking-sidebar
+            [tour]="tour()!"
+            [form]="form"
+            [selectedGuide]="getSelectedGuide()"
+            [endDate]="getEndDate()"
+            [currentStep]="currentStep()"
+            [pricePerPerson]="price()"
+        />
+    </div>
+}

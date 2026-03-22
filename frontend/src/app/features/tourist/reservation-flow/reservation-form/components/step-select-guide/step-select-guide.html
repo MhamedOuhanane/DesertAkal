@@ -1,0 +1,121 @@
+<div class="card p-6">
+    <h2 class="mb-2 flex items-center gap-2 text-lg font-bold text-text-primary">
+        <mat-icon class="text-primary" style="font-size: 20px; width: 20px; height: 20px"
+            >person</mat-icon
+        >
+        Choose Your Guide
+    </h2>
+    <p class="mb-6 text-sm text-text-secondary">
+        These guides are available for your selected dates.
+    </p>
+
+    @if (isLoading()) {
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            @for (_ of [1, 2, 3, 4]; track $index) {
+                <div class="animate-pulse rounded-xl border border-border p-4">
+                    <div class="flex items-center gap-3">
+                        <div class="h-12 w-12 rounded-full bg-border/20"></div>
+                        <div class="flex-1 space-y-2">
+                            <div class="h-4 w-24 rounded bg-border/30"></div>
+                            <div class="h-3 w-16 rounded bg-border/20"></div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    } @else if (guides().length > 0) {
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            @for (guide of guides(); track guide.uuid) {
+                <button
+                    type="button"
+                    (click)="selectGuide(guide.uuid)"
+                    class="flex items-center gap-3 rounded-xl border p-4 text-left transition-all"
+                    [class.border-primary]="isSelected(guide.uuid)"
+                    [class.bg-primary/5]="isSelected(guide.uuid)"
+                    [class.ring-2]="isSelected(guide.uuid)"
+                    [class.ring-primary/30]="isSelected(guide.uuid)"
+                    [class.border-border]="!isSelected(guide.uuid)"
+                    [class.hover:border-primary/40]="!isSelected(guide.uuid)"
+                >
+                    @if (guide.photo) {
+                        <img
+                            [src]="guide.photo"
+                            class="h-12 w-12 rounded-full object-cover ring-2 ring-primary/10"
+                        />
+                    } @else {
+                        <div
+                            class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary ring-2 ring-primary/10"
+                        >
+                            {{ guide.firstName.charAt(0) }}{{ guide.lastName.charAt(0) }}
+                        </div>
+                    }
+
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm font-semibold text-text-primary">
+                            {{ guide.firstName }} {{ guide.lastName }}
+                        </p>
+                        <div class="mt-0.5 flex items-center gap-2">
+                            @if (guide.rating > 0) {
+                                <span
+                                    class="flex items-center gap-0.5 text-[11px] text-text-tertiary"
+                                >
+                                    <mat-icon
+                                        class="text-warning"
+                                        style="font-size: 12px; width: 12px; height: 12px"
+                                        >star</mat-icon
+                                    >
+                                    {{ guide.rating.toFixed(1) }}
+                                </span>
+                            }
+                        </div>
+                        @if (guide.languages.length) {
+                            <div class="mt-1 flex flex-wrap gap-1">
+                                @for (lang of guide.languages.slice(0, 3); track lang.uuid) {
+                                    <span
+                                        class="rounded bg-main-bg px-1.5 py-0.5 text-[9px] text-text-tertiary"
+                                    >
+                                        {{ lang.name }}
+                                    </span>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    @if (isSelected(guide.uuid)) {
+                        <mat-icon
+                            class="shrink-0 text-primary"
+                            style="font-size: 20px; width: 20px; height: 20px"
+                            >check_circle</mat-icon
+                        >
+                    }
+                </button>
+            }
+        </div>
+    } @else {
+        <div class="rounded-xl border border-dashed border-border py-10 text-center">
+            <mat-icon
+                class="mb-2 text-text-disabled"
+                style="font-size: 40px; width: 40px; height: 40px"
+                >person_off</mat-icon
+            >
+            <p class="text-sm font-medium text-text-primary">No guides available for these dates</p>
+            <p class="mt-1 text-xs text-text-tertiary">Try selecting different dates.</p>
+        </div>
+    }
+
+    <div class="mt-6 flex justify-between">
+        <button type="button" (click)="back.emit()" class="btn-secondary text-sm">
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px">arrow_back</mat-icon>
+            Back
+        </button>
+        <button
+            type="button"
+            (click)="onNext()"
+            [disabled]="!hasSelection()"
+            class="btn-primary text-sm disabled:opacity-50"
+        >
+            Review Booking
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px">arrow_forward</mat-icon>
+        </button>
+    </div>
+</div>

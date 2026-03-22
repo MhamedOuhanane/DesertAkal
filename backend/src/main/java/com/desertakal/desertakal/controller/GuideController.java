@@ -1,6 +1,8 @@
 package com.desertakal.desertakal.controller;
 
+import com.desertakal.desertakal.exception.custom.BadRequestException;
 import com.desertakal.desertakal.model.dto.guide.GuideCreateDTO;
+import com.desertakal.desertakal.model.dto.guide.GuideDTO;
 import com.desertakal.desertakal.model.dto.guide.GuideFindDTO;
 import com.desertakal.desertakal.model.dto.guide.GuideUpdateDTO;
 import com.desertakal.desertakal.model.dto.responce.PaginationDTO;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -183,6 +186,29 @@ public class GuideController {
                 "Your assigned reservations have been retrieved successfully",
                 HttpStatus.OK,
                 request, result));
+    }
+
+    @GetMapping("/available")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<@NonNull StandardResponseDTO<List<GuideDTO>>> getAvailableGuides(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            @RequestParam(required = false, defaultValue = "") String language,
+            HttpServletRequest request
+    ) {
+        log.info("REST request to get available guides from {} to {}", startDate, endDate);
+
+        if (endDate.isBefore(startDate)) {
+            throw new BadRequestException("End date must be after start date");
+        }
+
+        var result = service.findAvailable(startDate, endDate, language);
+
+        return ResponseEntity.ok(buildResponse(
+                "Available guides retrieved successfully",
+                HttpStatus.OK,
+                request,
+                result));
     }
 
     @GetMapping("/{uuid}/reviews")

@@ -1,0 +1,133 @@
+<div class="card p-6">
+    <h2 class="mb-2 flex items-center gap-2 text-lg font-bold text-text-primary">
+        <mat-icon class="text-primary" style="font-size: 20px; width: 20px; height: 20px">
+            event
+        </mat-icon>
+        Trip Details
+    </h2>
+    <p class="mb-6 text-sm text-text-secondary">
+        Choose your travel dates and group size for
+        <strong>{{ tour().title }}</strong
+        >.
+    </p>
+
+    <div class="space-y-5" [formGroup]="form()">
+        <div>
+            <label class="label">Start Date</label>
+            <div class="relative">
+                <mat-icon
+                    class="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary"
+                    style="font-size: 18px; width: 18px; height: 18px"
+                    >calendar_today</mat-icon
+                >
+                <input
+                    type="date"
+                    formControlName="startDate"
+                    [min]="minDate()"
+                    class="input w-full pl-10"
+                    (change)="onDateChange()"
+                />
+            </div>
+            @if (getError('startDate')) {
+                <p class="mt-1 text-xs text-danger">{{ getError('startDate') }}</p>
+            }
+            @if (form().get('startDate')?.value && tour().durationDays) {
+                <div class="mt-2 flex items-center gap-2 rounded-lg bg-primary/5 px-3 py-2">
+                    <mat-icon
+                        class="text-primary"
+                        style="font-size: 14px; width: 14px; height: 14px"
+                    >
+                        date_range
+                    </mat-icon>
+                    <p class="text-xs text-text-secondary">
+                        {{ form().get('startDate')?.value }}
+                        →
+                        {{ computeEndDate() }}
+                        <span class="ml-1 text-text-tertiary"
+                            >({{ tour().durationDays }} days)</span
+                        >
+                    </p>
+                </div>
+            }
+        </div>
+
+        <div>
+            <label class="label">Number of People</label>
+            <div class="flex items-center gap-3">
+                <button
+                    type="button"
+                    (click)="decrementPeople()"
+                    class="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-text-secondary transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                >
+                    <mat-icon style="font-size: 18px; width: 18px; height: 18px">remove</mat-icon>
+                </button>
+                <div class="relative">
+                    <mat-icon
+                        class="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary"
+                        style="font-size: 16px; width: 16px; height: 16px"
+                        >group</mat-icon
+                    >
+                    <input
+                        type="number"
+                        formControlName="numberPeople"
+                        class="input w-24 pl-9 text-center"
+                        min="1"
+                        max="20"
+                        (change)="onPeopleChange()"
+                    />
+                </div>
+                <button
+                    type="button"
+                    (click)="incrementPeople()"
+                    class="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-text-secondary transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                >
+                    <mat-icon style="font-size: 18px; width: 18px; height: 18px">add</mat-icon>
+                </button>
+            </div>
+            @if (getError('numberPeople')) {
+                <p class="mt-1 text-xs text-danger">{{ getError('numberPeople') }}</p>
+            }
+        </div>
+
+        <div class="rounded-xl border border-dashed border-primary/30 bg-primary/5 p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-text-tertiary">Price per person</p>
+                    <p class="text-sm font-bold text-text-primary">
+                        {{ pricePerPerson() | currency: 'EUR' : 'symbol' : '1.0-0' }}
+                    </p>
+                </div>
+                <mat-icon class="text-primary" style="font-size: 14px; width: 14px; height: 14px">
+                    close
+                </mat-icon>
+                <div>
+                    <p class="text-xs text-text-tertiary">People</p>
+                    <p class="text-sm font-bold text-text-primary">
+                        {{ form().get('numberPeople')?.value || 1 }}
+                    </p>
+                </div>
+                <mat-icon class="text-primary" style="font-size: 14px; width: 14px; height: 14px">
+                    drag_handle
+                </mat-icon>
+                <div class="text-right">
+                    <p class="text-xs text-text-tertiary">Total</p>
+                    <p class="text-lg font-black text-primary">
+                        {{ form().get('amount')?.value | currency: 'EUR' : 'symbol' : '1.0-0' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-6 flex justify-end">
+        <button
+            type="button"
+            (click)="onNext()"
+            [disabled]="!isValid()"
+            class="btn-primary text-sm disabled:opacity-50"
+        >
+            Choose Guide
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px">arrow_forward</mat-icon>
+        </button>
+    </div>
+</div>

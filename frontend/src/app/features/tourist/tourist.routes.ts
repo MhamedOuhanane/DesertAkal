@@ -14,6 +14,14 @@ export const TOURIST_ROUTES: Routes = [
                 loadComponent: () => import('./my-bookings/my-bookings').then((m) => m.MyBookings),
             },
             {
+                path: 'new',
+                loadComponent: () =>
+                    import('./reservation-flow/reservation-form/reservation-form').then(
+                        (m) => m.ReservationForm,
+                    ),
+                data: { breadcrumb: 'New Booking' },
+            },
+            {
                 path: ':uuid',
                 loadComponent: () =>
                     import('../../shared/pages/reservation-detail/reservation-detail').then(

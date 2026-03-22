@@ -21,7 +21,7 @@ import { MatIcon } from '@angular/material/icon';
             </div>
             <div class="min-w-0 flex-1">
                 <p class="text-xs font-bold text-text-primary">
-                    {{ payment().amount | currency: 'MAD ' : 'symbol' : '1.2-2' }}
+                    {{ payment().amount | currency: 'EUR ' : 'symbol' : '1.2-2' }}
                 </p>
                 <p class="text-[10px] text-text-tertiary">
                     {{ payment().date | date: 'MMM d, y HH:mm' }} · {{ payment().method }}
