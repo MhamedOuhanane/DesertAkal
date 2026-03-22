@@ -14,11 +14,11 @@ FROM eclipse-temurin:17-jre-alpine
 RUN addgroup -S spring && adduser -S spring -G spring
 
 WORKDIR /app
-COPY --from=build /app/target/*.jar deserakal.jar
+COPY --from=build /app/target/*.jar desertakal.jar
 RUN chown -R spring:spring /app
 
 USER spring:spring
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "deserakal.jar"]
+ENTRYPOINT ["java", "-jar", "desertakal.jar"]

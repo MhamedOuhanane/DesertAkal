@@ -42,15 +42,10 @@ services:
       dockerfile: Dockerfile
     container_name: desertakal-backend
     restart: unless-stopped
+    env_file:
+       - .env
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/desertakal_db
-      SPRING_DATASOURCE_USERNAME: desertakal
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
-        - MINIO_URL=http://minio:9000
-        - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
-        - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
-        - MINIO_BUCKET_NAME=documents
+      - SPRING_PROFILES_ACTIVE=docker
     ports:
       - "8080:8080"
       - "5005:5005"
@@ -63,26 +58,22 @@ services:
     networks:
       - desertakal-network
 
-  pgadmin:
-    image: dpage/pgadmin4:7
-    container_name: desertakal-pgadmin
+  frontend:
+    build: ./frontend
+    container_name: desertakal-frontend
     restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
     ports:
-      - "8081:80"
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
+      - "80:80"
     depends_on:
-      - postgres
+      - backend
     networks:
       - desertakal-network
+
 
 volumes:
   postgres_data:
   maven_cache:
-  pgadmin_data:
+  minio_data:
 
 networks:
   desertakal-network:
