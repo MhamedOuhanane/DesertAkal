@@ -72,7 +72,11 @@
                 <h3 class="mb-3 text-sm font-bold text-text-primary">Payment History</h3>
                 <div class="space-y-2">
                     @for (payment of payments(); track payment.uuid) {
-                        <app-payment-card [payment]="payment" (cancel)="cancelPendingPayment()" />
+                        <app-payment-card
+                            [payment]="payment"
+                            [showCancel]="true"
+                            (cancel)="cancelPendingPayment()"
+                        />
                     }
                 </div>
             </div>

@@ -44,7 +44,6 @@ export const routes: Routes = [
 
     {
         path: 'payment/callback',
-        canActivate: [authGuard],
         loadComponent: () =>
             import('./features/tourist/reservation-flow/payment-callback/payment-callback').then(
                 (m) => m.PaymentCallback,

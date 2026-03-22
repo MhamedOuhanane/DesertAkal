@@ -34,7 +34,7 @@ import { MatIcon } from '@angular/material/icon';
                 >
                     {{ payment().status }}
                 </span>
-                @if (payment().status === 'PENDING' && cancel) {
+                @if (payment().status === 'PENDING' && showCancel()) {
                     <button
                         (click)="cancel.emit()"
                         class="text-[10px] font-medium text-red-600 hover:underline"
@@ -48,6 +48,7 @@ import { MatIcon } from '@angular/material/icon';
 })
 export class PaymentCard {
     payment = input.required<Payment>();
+    showCancel = input<boolean>(false);
     cancel = output();
 
     getTypeConfig(): { bg: string; icon: string } {

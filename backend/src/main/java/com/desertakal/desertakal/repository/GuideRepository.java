@@ -28,7 +28,7 @@ public interface GuideRepository extends JpaRepository<@NonNull Guide, @NonNull 
                         SELECT r FROM Reservation r
                             WHERE r.guide = g
                                 AND r.status = 'CONFIRMED'
-                                    AND r.startDate < :endDate 
+                                    AND r.startDate < :endDate
                                         AND r.endDate > :startDate
                     )
     """)

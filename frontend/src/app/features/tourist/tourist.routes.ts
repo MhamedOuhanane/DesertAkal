@@ -40,6 +40,14 @@ export const TOURIST_ROUTES: Routes = [
                             ),
                         data: { breadcrumb: 'Pay Booking' },
                     },
+                    {
+                        path: 'confirmation',
+                        loadComponent: () =>
+                            import('./reservation-flow/booking-confirmation/booking-confirmation').then(
+                                (m) => m.BookingConfirmation,
+                            ),
+                        data: { breadcrumb: 'Confirmation' },
+                    },
                 ],
             },
         ],
