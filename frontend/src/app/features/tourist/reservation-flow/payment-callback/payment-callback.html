@@ -1,0 +1,73 @@
+<div class="flex min-h-[60vh] items-center justify-center">
+    <div class="card mx-auto max-w-md p-10 text-center">
+        @if (status() === 'loading') {
+            <div
+                class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10"
+            >
+                <mat-icon
+                    class="animate-spin text-primary"
+                    style="font-size: 32px; width: 32px; height: 32px"
+                    >autorenew</mat-icon
+                >
+            </div>
+            <h2 class="text-lg font-bold text-text-primary">Processing Payment...</h2>
+            <p class="mt-2 text-sm text-text-secondary">
+                Please wait while we confirm your payment. Do not close this page.
+            </p>
+        }
+
+        @if (status() === 'success') {
+            <div
+                class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10"
+            >
+                <mat-icon class="text-green-600" style="font-size: 32px; width: 32px; height: 32px"
+                    >check_circle</mat-icon
+                >
+            </div>
+            <h2 class="text-lg font-bold text-text-primary">Payment Successful!</h2>
+            <p class="mt-2 text-sm text-text-secondary">
+                Your booking has been confirmed. Redirecting...
+            </p>
+        }
+
+        @if (status() === 'error') {
+            <div
+                class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10"
+            >
+                <mat-icon class="text-red-600" style="font-size: 32px; width: 32px; height: 32px"
+                    >error</mat-icon
+                >
+            </div>
+            <h2 class="text-lg font-bold text-text-primary">Payment Failed</h2>
+            <p class="mt-2 text-sm text-text-secondary">{{ errorMessage() }}</p>
+            <a
+                routerLink="/tourist/dashboard/bookings"
+                class="btn-primary mt-6 inline-flex text-sm"
+            >
+                <mat-icon style="font-size: 16px; width: 16px; height: 16px">arrow_back</mat-icon>
+                Back to Bookings
+            </a>
+        }
+
+        @if (status() === 'cancelled') {
+            <div
+                class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-warning/10"
+            >
+                <mat-icon class="text-warning" style="font-size: 32px; width: 32px; height: 32px"
+                    >cancel</mat-icon
+                >
+            </div>
+            <h2 class="text-lg font-bold text-text-primary">Payment Cancelled</h2>
+            <p class="mt-2 text-sm text-text-secondary">
+                You cancelled the payment. Your reservation is still pending.
+            </p>
+            <a
+                routerLink="/tourist/dashboard/bookings"
+                class="btn-primary mt-6 inline-flex text-sm"
+            >
+                <mat-icon style="font-size: 16px; width: 16px; height: 16px">arrow_back</mat-icon>
+                Back to Bookings
+            </a>
+        }
+    </div>
+</div>
