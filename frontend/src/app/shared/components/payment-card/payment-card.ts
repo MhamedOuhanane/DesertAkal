@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { Payment } from '../../../core/models/payment.model';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
@@ -27,17 +27,28 @@ import { MatIcon } from '@angular/material/icon';
                     {{ payment().date | date: 'MMM d, y HH:mm' }} · {{ payment().method }}
                 </p>
             </div>
-            <span
-                class="rounded-full px-2 py-0.5 text-[9px] font-semibold"
-                [class]="getStatusColor()"
-            >
-                {{ payment().status }}
-            </span>
+            <div class="flex items-center gap-2">
+                <span
+                    class="rounded-full px-2 py-0.5 text-[9px] font-semibold"
+                    [class]="getStatusColor()"
+                >
+                    {{ payment().status }}
+                </span>
+                @if (payment().status === 'PENDING' && cancel) {
+                    <button
+                        (click)="cancel.emit()"
+                        class="text-[10px] font-medium text-red-600 hover:underline"
+                    >
+                        Cancel
+                    </button>
+                }
+            </div>
         </div>
     `,
 })
 export class PaymentCard {
     payment = input.required<Payment>();
+    cancel = output();
 
     getTypeConfig(): { bg: string; icon: string } {
         return this.payment().type === 'REFUND'

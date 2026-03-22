@@ -1,0 +1,156 @@
+<div class="mb-6 flex items-center gap-3">
+    <a
+        routerLink="/tourist/dashboard/bookings"
+        class="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary hover:text-primary"
+    >
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px">arrow_back</mat-icon>
+    </a>
+    <h1 class="text-2xl font-bold text-text-primary">Payment</h1>
+</div>
+
+@if (isLoading()) {
+    <div class="card animate-pulse p-8">
+        <div class="space-y-4">
+            <div class="h-6 w-48 rounded bg-border/30"></div>
+            <div class="h-40 rounded-xl bg-border/20"></div>
+        </div>
+    </div>
+} @else if (reservation()) {
+    <div class="mx-auto max-w-2xl space-y-6">
+        <div class="card p-6">
+            <h2 class="mb-4 flex items-center gap-2 text-lg font-bold text-text-primary">
+                <mat-icon class="text-primary" style="font-size: 20px; width: 20px; height: 20px"
+                    >receipt_long</mat-icon
+                >
+                Booking Summary
+            </h2>
+
+            <div class="space-y-3">
+                <div class="flex items-center justify-between rounded-lg bg-main-bg px-4 py-3">
+                    <span class="text-sm text-text-secondary">Tour</span>
+                    <span class="text-sm font-semibold text-text-primary">{{
+                        reservation()!.tourTitle
+                    }}</span>
+                </div>
+                <div class="flex items-center justify-between rounded-lg bg-main-bg px-4 py-3">
+                    <span class="text-sm text-text-secondary">Reference</span>
+                    <span class="font-mono text-sm font-bold text-primary">{{
+                        reservation()!.reference
+                    }}</span>
+                </div>
+                <div class="flex items-center justify-between rounded-lg bg-main-bg px-4 py-3">
+                    <span class="text-sm text-text-secondary">Dates</span>
+                    <span class="text-sm font-medium text-text-primary">
+                        {{ reservation()!.startDate | date: 'MMM d' }} →
+                        {{ reservation()!.endDate | date: 'MMM d, y' }}
+                    </span>
+                </div>
+                <div class="flex items-center justify-between rounded-lg bg-main-bg px-4 py-3">
+                    <span class="text-sm text-text-secondary">People</span>
+                    <span class="text-sm font-medium text-text-primary">{{
+                        reservation()!.numberPeople
+                    }}</span>
+                </div>
+                <div class="flex items-center justify-between rounded-lg bg-main-bg px-4 py-3">
+                    <span class="text-sm text-text-secondary">Guide</span>
+                    <span class="text-sm font-medium text-text-primary">{{
+                        reservation()!.guideName
+                    }}</span>
+                </div>
+                <div class="divider"></div>
+                <div class="flex items-center justify-between px-4 py-2">
+                    <span class="text-base font-bold text-text-primary">Total Amount</span>
+                    <span class="text-xl font-black text-primary">
+                        {{ reservation()!.amount | currency: 'EUR' : 'symbol' : '1.0-0' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        @if (payments().length > 0) {
+            <div class="card p-6">
+                <h3 class="mb-3 text-sm font-bold text-text-primary">Payment History</h3>
+                <div class="space-y-2">
+                    @for (payment of payments(); track payment.uuid) {
+                        <app-payment-card [payment]="payment" (cancel)="cancelPendingPayment()" />
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="card p-6">
+            <h2 class="mb-4 flex items-center gap-2 text-lg font-bold text-text-primary">
+                <mat-icon class="text-primary" style="font-size: 20px; width: 20px; height: 20px"
+                    >payment</mat-icon
+                >
+                Payment Method
+            </h2>
+
+            <button
+                type="button"
+                (click)="selectedMethod.set(PaymentMethod.PAYPAL)"
+                class="flex w-full items-center gap-4 rounded-xl border p-4 transition-all"
+                [class.border-primary]="selectedMethod() === 'PAYPAL'"
+                [class.bg-primary/5]="selectedMethod() === 'PAYPAL'"
+                [class.ring-2]="selectedMethod() === 'PAYPAL'"
+                [class.ring-primary/30]="selectedMethod() === 'PAYPAL'"
+                [class.border-border]="selectedMethod() !== 'PAYPAL'"
+            >
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#003087]/10">
+                    <mat-icon
+                        class="text-[#003087]"
+                        style="font-size: 24px; width: 24px; height: 24px"
+                        >account_balance_wallet</mat-icon
+                    >
+                </div>
+                <div class="text-left">
+                    <p class="text-sm font-bold text-text-primary">PayPal</p>
+                    <p class="text-xs text-text-tertiary">Pay securely with your PayPal account</p>
+                </div>
+                @if (selectedMethod() === 'PAYPAL') {
+                    <mat-icon
+                        class="ml-auto text-primary"
+                        style="font-size: 20px; width: 20px; height: 20px"
+                        >check_circle</mat-icon
+                    >
+                }
+            </button>
+
+            <div class="mt-4 flex items-start gap-2 rounded-lg bg-green-500/10 p-3">
+                <mat-icon
+                    class="mt-0.5 text-green-600"
+                    style="font-size: 14px; width: 14px; height: 14px"
+                    >lock</mat-icon
+                >
+                <p class="text-xs text-text-secondary">
+                    Your payment is processed securely. We never store your payment details.
+                </p>
+            </div>
+
+            <button
+                (click)="initiatePayment()"
+                [disabled]="isProcessing() || hasPendingPayment()"
+                class="btn-primary mt-6 w-full justify-center py-3.5 text-sm disabled:opacity-50"
+            >
+                @if (isProcessing()) {
+                    <mat-icon
+                        class="animate-spin"
+                        style="font-size: 18px; width: 18px; height: 18px"
+                        >autorenew</mat-icon
+                    >
+                    Redirecting to PayPal...
+                } @else {
+                    <mat-icon style="font-size: 18px; width: 18px; height: 18px">lock</mat-icon>
+                    Pay {{ reservation()!.amount | currency: 'EUR' : 'symbol' : '1.0-0' }} with
+                    PayPal
+                }
+            </button>
+
+            @if (hasPendingPayment()) {
+                <p class="mt-2 text-center text-xs text-warning">
+                    You have a pending payment. Cancel it first to create a new one.
+                </p>
+            }
+        </div>
+    </div>
+}

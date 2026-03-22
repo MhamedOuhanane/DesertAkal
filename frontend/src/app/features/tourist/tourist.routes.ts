@@ -23,11 +23,24 @@ export const TOURIST_ROUTES: Routes = [
             },
             {
                 path: ':uuid',
-                loadComponent: () =>
-                    import('../../shared/pages/reservation-detail/reservation-detail').then(
-                        (m) => m.ReservationDetail,
-                    ),
-                data: { breadcrumb: 'Details' },
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () =>
+                            import('../../shared/pages/reservation-detail/reservation-detail').then(
+                                (m) => m.ReservationDetail,
+                            ),
+                        data: { breadcrumb: 'Details' },
+                    },
+                    {
+                        path: 'pay',
+                        loadComponent: () =>
+                            import('./reservation-flow/reservation-pay/reservation-pay').then(
+                                (m) => m.ReservationPay,
+                            ),
+                        data: { breadcrumb: 'Pay Booking' },
+                    },
+                ],
             },
         ],
     },
