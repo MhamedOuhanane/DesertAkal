@@ -31,8 +31,11 @@ jobs:
           host: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USER }}
           key: ${{ secrets.DO_SSH_KEY }}
+          command_timeout: '30m'
           script: |
-            cd /home/desertakal/app
-            docker-compose pull backend
-            docker-compose up -d backend
+            cd /home/desertakal/desertakal 
+            git fetch --all
+            git reset --hard origin/main
+            docker compose pull backend
+            docker compose up -d backend
             docker image prune -f
