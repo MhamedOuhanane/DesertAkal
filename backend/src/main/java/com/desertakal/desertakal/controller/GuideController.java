@@ -82,7 +82,7 @@ public class GuideController {
     }
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull PaginationDTO>> shows(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String language,
