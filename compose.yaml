@@ -4,8 +4,8 @@ services:
     container_name: desertakal-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: desertakal_db
-      POSTGRES_USER: desertakal
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
@@ -14,7 +14,7 @@ services:
     networks:
       - desertakal-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U desertakal"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d desertakal_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -44,17 +44,17 @@ services:
     restart: unless-stopped
     env_file:
        - .env
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
     ports:
       - "8080:8080"
       - "5005:5005"
     volumes:
-      - ./backend:/app
+#      - ./backend:/app
       - maven_cache:/root/.m2
     depends_on:
       postgres:
         condition: service_healthy
+      minio:
+        condition: service_started
     networks:
       - desertakal-network
 
