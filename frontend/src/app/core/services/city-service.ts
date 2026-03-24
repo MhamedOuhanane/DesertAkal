@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { ApiResponse, Pagination } from '../models/response.models';
 import { City, CityCreate, CityFilters, CityFind, CityUpdate } from '../models/city.model';

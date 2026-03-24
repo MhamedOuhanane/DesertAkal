@@ -14,5 +14,6 @@ public interface RoleService {
     RoleFindDTO create(@NonNull RoleCreateDTO dto);
     RoleFindDTO update(@NonNull UUID roleUuid, @NonNull RoleUpdateDTO dto);
     RoleFindDTO find(@NonNull UUID roleName);
+    RoleFindDTO findByName(String name);
     void delete(@NonNull UUID roleUuid);
 }

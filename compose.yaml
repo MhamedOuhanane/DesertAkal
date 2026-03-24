@@ -1,5 +1,5 @@
 services:
-  postgres:
+  desertakal-postgres:
     image: postgres:16-alpine
     container_name: desertakal-postgres
     restart: unless-stopped
@@ -19,7 +19,7 @@ services:
       timeout: 5s
       retries: 5
 
-  minio:
+  desertakal-minio:
     image: minio/minio
     container_name: desertakal-minio
     restart: always
@@ -51,9 +51,9 @@ services:
 #      - ./backend:/app
       - maven_cache:/root/.m2
     depends_on:
-      postgres:
+      desertakal-postgres:
         condition: service_healthy
-      minio:
+      desertakal-minio:
         condition: service_started
     networks:
       - desertakal-network

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import {
     AbstractControl,
     FormBuilder,
@@ -14,8 +14,8 @@ import { ScreenService } from '../../../core/services/screen-service';
 import { AuthService } from '../../../core/auth/auth-service';
 import { toast } from 'ngx-sonner';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../../../environments/environment.development';
 import { OauthLogin } from '../../../shared/components/oauth-login/oauth-login';
+import { RoleService } from '../../../core/services/role-service';
 
 @Component({
     selector: 'app-register',
@@ -23,10 +23,12 @@ import { OauthLogin } from '../../../shared/components/oauth-login/oauth-login';
     imports: [ReactiveFormsModule, RouterLink, BrandLogo, TextInput, OauthLogin],
     templateUrl: './register.html',
 })
-export class Register {
+export class Register implements OnInit{
+    private roleService = inject(RoleService);
     private fb = inject(FormBuilder);
     private authService = inject(AuthService);
     private router = inject(Router);
+    private touristUuid = signal<string | null>(null);
 
     protected readonly screenService = inject(ScreenService);
 
@@ -59,6 +61,17 @@ export class Register {
             validators: [Register.passwordsMatch],
         },
     );
+
+    async ngOnInit() {
+        try {
+            const res = await firstValueFrom(this.roleService.findByName('TOURIST'));
+            if (res.data) {
+                this.touristUuid.set(res.data.uuid);
+            }
+        } catch (error) {
+            console.error('Could not fetch Tourist Role UUID', error);
+        }
+    }
 
     static passwordsMatch(group: AbstractControl): ValidationErrors | null {
         const password = group.get('password')?.value;
@@ -99,7 +112,7 @@ export class Register {
                 email: formValue.email,
                 password: formValue.password,
                 confirmPassword: formValue.confirmPassword,
-                roleUuid: environment.touristRole,
+                roleUuid: this.touristUuid()!,
             };
 
             const response = await firstValueFrom(this.authService.register(payload));

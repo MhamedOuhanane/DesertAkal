@@ -144,6 +144,15 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public RoleFindDTO findByName(@NonNull String name) {
+        log.info("Fetching details for Role Name: '{}'", name);
+        Role role = repository.findByName(name)
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", name));
+        return mapper.toFindDto(role);
+    }
+
+    @Override
     @Transactional
     public void delete(@NonNull UUID roleUuid) {
         log.info("Request to delete Role with UUID: {}", roleUuid);

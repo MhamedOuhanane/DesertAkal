@@ -10,7 +10,7 @@ import { ProfileData, UserAuth } from '../models/user.models';
 import { computed, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { CookieService } from 'ngx-cookie-service';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { toast } from 'ngx-sonner';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from './auth-service';

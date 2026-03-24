@@ -1,6 +1,6 @@
 import { HttpBackend, HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { LoginRequest, LoginResponse, Register } from '../auth/auth.models';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../models/response.models';

@@ -157,6 +157,20 @@ public class RoleController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/name/{name}")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<@NonNull StandardResponseDTO<RoleFindDTO>> findByName(@PathVariable String name, HttpServletRequest request) {
+        var result = service.findByName(name);
+        var response = StandardResponseDTO.<RoleFindDTO>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Role found successfully")
+                .status(200)
+                .data(result)
+                .path(request.getServletPath())
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
     @PatchMapping("/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<@NonNull StandardResponseDTO<@NonNull RoleFindDTO>> update(

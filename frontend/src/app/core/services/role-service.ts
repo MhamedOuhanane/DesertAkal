@@ -21,6 +21,10 @@ export class RoleService {
         return this.http.get<ApiResponse<RoleFind>>(`${this.baseUrl}/${uuid}`);
     }
 
+    findByName(name: string): Observable<ApiResponse<RoleFind>> {
+    return this.http.get<ApiResponse<RoleFind>>(`${this.baseUrl}/name/${name}`);
+}
+
     create(dto: RoleCreate): Observable<ApiResponse<RoleFind>> {
         return this.http.post<ApiResponse<RoleFind>>(this.baseUrl, dto);
     }

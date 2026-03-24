@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { ApiResponse, PageAble, Pagination } from '../models/response.models';
 import { Observable } from 'rxjs';
 import { buildHttpParams } from '../utils/http-utils';
