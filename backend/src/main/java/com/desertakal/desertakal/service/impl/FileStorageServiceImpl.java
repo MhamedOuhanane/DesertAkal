@@ -28,6 +28,9 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Value("${minio.url:http://localhost:9000}")
     private String baseUrl;
 
+    @Value("${app.minio.external-url:http://localhost:9000}")
+    private String externalUrl;
+
     @Override
     public String uploadDocument(@NonNull MultipartFile file, String folder) {
         try {
@@ -129,7 +132,7 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     private String getUrl(String path) {
-        return String.format("%s/%s/%s", baseUrl, bucketName, path);
+        return String.format("%s/%s/%s", externalUrl, bucketName, path);
     }
 
     private void ensureBucketExists() throws Exception {
