@@ -23,7 +23,7 @@ import { RoleService } from '../../../core/services/role-service';
     imports: [ReactiveFormsModule, RouterLink, BrandLogo, TextInput, OauthLogin],
     templateUrl: './register.html',
 })
-export class Register implements OnInit{
+export class Register implements OnInit {
     private roleService = inject(RoleService);
     private fb = inject(FormBuilder);
     private authService = inject(AuthService);
