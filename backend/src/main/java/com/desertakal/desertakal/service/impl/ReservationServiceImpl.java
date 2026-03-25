@@ -528,7 +528,7 @@ public class ReservationServiceImpl implements ReservationService {
         log.debug("Cancellation notifications dispatched to Tourist: {} and Guide: {}", tourist.getUuid(), guide.getUuid());
     }
 
-    private Specification<@NonNull Reservation> getSpecification(
+    public Specification<@NonNull Reservation> getSpecification(
             UUID touristUuid, UUID guideUuid,
             String tour, String guide, String tourist,
             ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate) {
